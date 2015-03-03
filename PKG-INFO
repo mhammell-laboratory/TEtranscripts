@@ -1,0 +1,177 @@
+Metadata-Version: 1.2.3
+Name: TEToolkit
+Version: 1.2.3
+Summary: Tools for estimating differential enrichment of Transposable Elements or other highly repetetive regions
+Home-page: http://www.example.org
+Author: Ying Jin, Oliver Tam, Eric Paniagua
+Author-email: yjin@cshl.edu
+License: MIT
+Description: TEToolkit
+        =========
+        
+        Created by Ying Jin, Eric Paniagua & Oliver Tam, February 2014
+        
+        Copyright (C) 2014 Ying Jin, Eric Paniagua & Oliver Tam
+        Contact: Ying Jin (yjin@cshl.edu)
+        
+        
+        Summary
+        -------
+        
+        TEToolkit is composed of two tools, TEpeaks and TEtranscripts, each described in
+        its own section below.
+        
+        NOTE! Both programs rely on specially curated GTF files, which are not
+        packaged with this software due to their size. Please check back for an
+        update to this package's homepage. Once it is up and running, the required
+        GTFs will be downloadable from there.
+        
+        TEpeak takes ChIP-seq (and similar data) alignment files (BAM or BED),
+        identiifes narrow peaks, and is also able to do differential analysis over
+        peaks of two sets of libraries. It is an extension of MACS by adding the
+        funcionality of taking into account multi-reads, another normalization
+        method, bin correlation, and differential analysis. The differential
+        analysis is performed using DESeq.
+        
+        TEtranscripts takes RNA-seq (and similar data) and annotates reads to both
+        genes & transposable elements. It then performs differential analysis using
+        DESeq.
+        
+        
+        Requirements
+        ------------
+        
+        Python:     2.6.x or 2.7.x (not tested in Python 3.x)
+        Samtools    (tested using version 0.1.19)
+        R:          2.15.x or greater
+        DESeq:      1.5.x or greater
+        
+        
+        Copying & distribution
+        ----------------------
+        
+        TEtranscripts and TEpeaks are part of TEToolKit.
+        
+        TEToolKit is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+        
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+        
+        You should have received a copy of the GNU General Public License
+        along with TEToolKit.  If not, see <http://www.gnu.org/licenses/>.
+        
+        
+        ================================
+        TEpeaks
+        ================================
+        
+        Usage
+        -----
+        usage: TEpeaks -t treatment sample [treatment sample ...]
+        -c control sample [control sample ...]
+        --tinput treatment input
+        --cinput control input
+        -s genome
+        [optional arguments]
+        
+        Required arguments:
+        -t | --treatment [treatment sample 1 treatment sample 2...]
+        Sample files in group 1 (e.g. treatment/mutant), separated by space
+        Sample files in group 2 (e.g. control/wildtype), separated by space
+        --tinput    treatment input
+        -s genome  (hg: human19, mm: mouse9, dm: dm3)
+        
+        Optional arguments:
+        -c | --control [control sample 1 control sample 2 ...]
+        --cinput  control input
+        --format [input file format]
+        Input file format: BAM or SAM. DEFAULT: BAM
+        --project [name]      Name of this project. DEFAULT: TEpeak_out
+        -p | --padj [pvalue]
+        FDR cutoff for significance. DEFAULT: 1e-5
+        -n | --norm [normalization]
+        Normalization method : sd (library size),
+        bc (bin correlation). DEFAULT: sd
+        -r | --step           step size. DEFAULT: 100
+        -a | --auto           auto detect shiftsize. DEFAULT: False
+        -d | --diff           require differential analysis
+        -g | --gap            maximum allowed gap. DEFAULT: 1000
+        -f | --fragsize       fragment size. DEFAULT: 200
+        --lmfold              lower bound of fold change for modeling shipsize.
+        DEFAULT: 10
+        --umfold              upper bound of fold change for modeling shiftsize.
+        DEFAULT: 30
+        --minread             minimal reads of a peak. DEFAULT: 5
+        --wig                 generate wiggle file for peaks (normalize to
+        10 million reads in total(library size))
+        -h | --help           help info
+        
+        
+        Example Command Lines
+        ---------------------
+        
+        TEpeaks --format BAM -t S1.bam --tinput S1input.bam -s mm -n sd
+        
+        TEpeaks --format BAM -t S1.bam S2.bam -c C1.bam C2.bam  --tinput S1input.bam  --cinput C1input.bam -s mm -n sd --diff
+        
+        
+        
+        ================================
+        TEtranscripts
+        ================================
+        
+        Usage
+        -----
+        usage: TEtranscript -t treatment sample [treatment sample ...]
+        -c control sample [control sample ...]
+        --GTF genic-GTF-file
+        --TE TE-GTF-file
+        [optional arguments]
+        
+        Required arguments:
+        -t | --treatment [treatment sample 1 treatment sample 2...]
+        Sample files in group 1 (e.g. treatment/mutant), separated by space
+        -c | --control [control sample 1 control sample 2 ...]
+        Sample files in group 2 (e.g. control/wildtype), separated by space
+        --GTF genic-GTF-file  GTF file for gene annotations
+        --TE TE-GTF-file      GTF file for transposable element annotations
+        
+        Optional arguments:
+        --format [input file format]
+        Input file format: BAM or SAM. DEFAULT: BAM
+        --stranded [option]   Is this a stranded library? (yes, no, or reverse).
+        DEFAULT: yes.
+        --mode [TE counting mode]
+        How to count TE:
+        uniq        (unique mappers only)
+        sameFam     (group TE by family)
+        sameInst    (assign to dominant TE)
+        multi       (distribute among all alignments).
+        DEFAULT: uniq
+        --project [name]      Name of this project. DEFAULT: TEtranscript_out
+        -p | --padj [pvalue]
+        FDR cutoff for significance. DEFAULT: 0.05
+        -f | --foldchange [foldchange]
+        Fold-change ratio (absolute) cutoff for differential expression.
+        DEFAULT: 1
+        --minread [min_read] read count cutoff. DEFAULT: 1
+        -n | --norm [normalization]
+        Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts),
+        quant (quantile normalization). DEFAULT: DESeq_default
+        --sortByPos             Input file is not sorted by chromosome position.
+        
+        
+        Example Command Lines
+        ---------------------
+        
+        TEtranscripts --format BAM --mode uniq -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam
+        
+        TEtranscripts -t sample1.bam -c sample2.bam --format BAM --GTF sample_refgene.gtf --TE sample_rmsk.gtf --norm TC --mode multi --project sample_test
+        
+Keywords: TE transposable element differential enrichment
+Platform: UNKNOWN
