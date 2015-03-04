@@ -5,16 +5,16 @@ def readme():
         return f.read()
 
 setup(name='TEToolkit',
-      version='1.3',
-      description='Tools for estimating differential enrichment of Transposable Elements or other highly repetetive regions',
+      version='1.3.1',
+      description='Tools for estimating differential enrichment of Transposable Elements and other highly repetetive regions',
       long_description=readme(),
       classifiers=[
       ],
       keywords='TE transposable element differential enrichment',
-      url='http://www.example.org',
-      author='Ying Jin, Oliver Tam',
+      url='http://hammelllab.labsites.cshl.edu/software#TEToolkit',
+      author='Ying Jin, Eric Paniagua, Oliver Tam and Molly Hammell',
       author_email='yjin@cshl.edu',
-      license='MIT',
+      license='GPLv3',
       packages=[
           'TEToolkit',
           'TEToolkit.IO',
