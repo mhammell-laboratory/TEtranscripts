@@ -6,7 +6,7 @@ def readme():
 
 setup(name='TEToolkit',
       version='1.3.1',
-      description='Tools for estimating differential enrichment of Transposable Elements and other highly repetetive regions',
+      description='Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions',
       long_description=readme(),
       classifiers=[
       ],
