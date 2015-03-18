@@ -140,11 +140,11 @@ TEtranscripts
 
 Usage
 -----
-usage: TEtranscript -t treatment sample [treatment sample ...] 
-                    -c control sample [control sample ...]
-                    --GTF genic-GTF-file
-                    --TE TE-GTF-file 
-                    [optional arguments]
+usage: TEtranscripts -t treatment sample [treatment sample ...] 
+                     -c control sample [control sample ...]
+                     --GTF genic-GTF-file
+                     --TE TE-GTF-file 
+                     [optional arguments]
 
 Required arguments:
   -t | --treatment [treatment sample 1 treatment sample 2...]
