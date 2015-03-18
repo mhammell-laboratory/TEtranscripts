@@ -39,6 +39,26 @@ Requirements
     DESeq:      1.5.x or greater
 
 
+Installation
+------------
+
+    1) Download compressed tarball.
+    2) Unpack tarball.
+    3) Navigate into unpacked directory.
+    4) Run the following:
+       $ python setup.py install
+
+    If you want to install locally (e.g. /local/home/usr),
+       run this command instead:
+    $ python setup.py install --prefix /local/home/usr
+
+    Note: In the above example, you must add /local/home/usr/bin
+    to the PATH variable, and 
+    /local/home/usr/lib/python2.X/site-packages 
+    to the PYTHONPATH variable, where python2.X refers to the 
+    python version (e.g. python2.7 if using python version 2.7.x).
+
+
 Copying & distribution
 ----------------------
 
