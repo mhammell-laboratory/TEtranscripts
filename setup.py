@@ -20,10 +20,10 @@ setup(name='TEToolkit',
           'TEToolkit.IO',
           'TEToolkit.ShortRead'
       ],
-      platforms=]
+      platforms=[
           'Linux',
           'MacOS'
-      ]
+      ],
       install_requires=[
           'argparse',
           'pysam>=0.8'
