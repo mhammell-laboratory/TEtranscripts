@@ -12,19 +12,15 @@ Created on Jan 27, 2014
 '''
 # python module
 import sys
-import logging
 import os.path
-import re
-import copy
 import math
 import operator
 import argparse
-import optparse, itertools, warnings, traceback, os.path
+import traceback
 
 import subprocess
 from time import time
 import pysam
-#from pysam.calignmentfile import AlignmentFile, AlignedSegment
 
 from TEToolkit.IO.ReadInputs import read_opts2
 from TEToolkit.TEindex import *
@@ -96,7 +92,7 @@ def count_reads(samples, format, geneIdx, teIdx,stranded, te_mode, sortByPos, pr
             (gene_counts,te_instance_counts) = count_transcript_abundance(filename,format,geneIdx,teIdx,stranded,te_mode, sortByPos, prj_name,numItr)
 
             #summarize on elements
-            te_ele_counts = teIdx.groupByEle(te_instance_counts)
+            te_ele_counts = teIdx.groupByName(te_instance_counts)
             # save gene counts and TE counts into count table
             cnt_tbl[filename] = dict(gene_counts.items() + te_ele_counts.items())
             num_reads = sum(gene_counts.values())+sum(te_ele_counts.values())
@@ -264,7 +260,7 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
             if aligned_read.is_unmapped or aligned_read.is_duplicate or aligned_read.is_qcfail :
                 continue
 
-            if aligned_read.is_paired :
+            if aligned_read.is_paired :  # this is not reliable if read mate is unmapped
                 if aligned_read.query_name == prev_read_name or prev_read_name == "":
                     prev_read_name = aligned_read.query_name
                     if aligned_read.is_read1 :
