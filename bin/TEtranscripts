@@ -7,24 +7,20 @@ Created on Jan 27, 2014
 @contact: yjin@cshl.edu
 @author: Oliver Tam
 @contact tam@cshl.edu
-@status: 
+@status:
 @version: 1.0.0
 '''
 # python module
 import sys
-import logging
 import os.path
-import re
-import copy
 import math
 import operator
 import argparse
-import optparse, itertools, warnings, traceback, os.path
+import traceback
 
 import subprocess
 from time import time
 import pysam
-#from pysam.calignmentfile import AlignmentFile, AlignedSegment
 
 from TEToolkit.IO.ReadInputs import read_opts2
 from TEToolkit.TEindex import *
@@ -34,11 +30,11 @@ from TEToolkit.GeneFeatures import *
 
 ### Define parameters for program ###
 def prepare_parser():
-    desc = "Identifying differential transcription of gene and transposable elements." 
+    desc = "Identifying differential transcription of gene and transposable elements."
 
     exmp = "Example: TEtranscripts --format BAM --mode uniq -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam  "
 
-   
+
     parser = argparse.ArgumentParser(prog='TEtranscripts',description=desc, epilog=exmp) #'Identifying differential transcription binding/histone modification sites.')
 
     parser.add_argument('-t','--treatment', metavar='treatment sample', dest='tfiles',nargs='+', required=True,
@@ -83,7 +79,7 @@ class UnknownChrom(Exception):
 
 # Reading files containing alignments (BAM of SAM)
 def count_reads(samples, format, geneIdx, teIdx,stranded, te_mode, sortByPos, prj_name,numItr):
-    
+
     cnt_tbl = {}
     libsize = []
     # check input files exist or not
@@ -94,17 +90,17 @@ def count_reads(samples, format, geneIdx, teIdx,stranded, te_mode, sortByPos, pr
     try:
         for filename in samples :
             (gene_counts,te_instance_counts) = count_transcript_abundance(filename,format,geneIdx,teIdx,stranded,te_mode, sortByPos, prj_name,numItr)
-            
+
             #summarize on elements
-            te_ele_counts = teIdx.groupByEle(te_instance_counts)
+            te_ele_counts = teIdx.groupByName(te_instance_counts)
             # save gene counts and TE counts into count table
             cnt_tbl[filename] = dict(gene_counts.items() + te_ele_counts.items())
             num_reads = sum(gene_counts.values())+sum(te_ele_counts.values())
     except:
         sys.stderr.write("Error: %s\n" % str(sys.exc_info()[1]))
-        sys.stderr.write( "[Exception type: %s, raised in %s:%d]\n" % 
-                          ( sys.exc_info()[1].__class__.__name__, 
-                            os.path.basename(traceback.extract_tb( sys.exc_info()[2] )[-1][0]), 
+        sys.stderr.write( "[Exception type: %s, raised in %s:%d]\n" %
+                          ( sys.exc_info()[1].__class__.__name__,
+                            os.path.basename(traceback.extract_tb( sys.exc_info()[2] )[-1][0]),
                             traceback.extract_tb( sys.exc_info()[2] )[-1][1] ) )
         sys.exit(1)
 
@@ -122,7 +118,7 @@ def fetch_exon(chrom, st, cigar,direction,format):
     if format == "BAM" :
         chrom_st += 1
     exon_bound =[]
-    
+
     for c,s in cigar:    #code and size
         if c==0:        #match
             if direction == 0 :
@@ -155,15 +151,15 @@ def ovp_annotation(references,multi_reads,geneIdx,teIdx,stranded,format) :
         itv_list = []
         direction = 1
         if r1 is not None and r1.is_reverse :
-            direction = -1 
+            direction = -1
         if r2 is not None and not r2.is_reverse :
             direction = -1
-        
+
         chrom1 = references[r1.tid]
         chrom2 = ""
         if r2 is not None :
             chrom2 = references[r2.tid]
-        
+
         if stranded == "no":
             direction = 0
         if stranded == "reverse":
@@ -171,17 +167,17 @@ def ovp_annotation(references,multi_reads,geneIdx,teIdx,stranded,format) :
 
         #fetch all mapping intervals
         itv_list = fetch_exon(chrom1,r1.pos,r1.cigartuples,direction,format)
-   
+
         if chrom2 != "" : #paired-end, both mates are mapped
             itv_list2 = fetch_exon(chrom2,r2.pos,r2.cigar,direction,format)
             itv_list.extend(itv_list2)
         try:
             TEs = teIdx.TE_annotation(itv_list)
             genes = geneIdx.Gene_annotation(itv_list)
-            
+
             if len(TEs) > 0   :
                 annot_TE.append(TEs)
- 
+
             if len(genes) > 0 :
                 annot_gene.append(list(set(genes)))
         except:
@@ -189,7 +185,7 @@ def ovp_annotation(references,multi_reads,geneIdx,teIdx,stranded,format) :
             raise
 
     return (annot_gene,annot_TE)
-				
+
 
 def readInAlignment(filename, format, sortByPos,prj_name):
     try:
@@ -199,12 +195,12 @@ def readInAlignment(filename, format, sortByPos,prj_name):
                 if len(samfile.header) ==0:
                     print >>sys.stderr, "BAM/SAM file has no header section. Exit!"
                     sys.exit(1)
-        
+
             else :
                 #psort = subprocess.Popen(["samtools", "sort", "-n", "-o", filename, "%s_%s_tmp" % (filename, prj_name)], stdout=subprocess.PIPE)
                 #samtools_in = subprocess.Popen(["samtools", "view", "-"], stdin=psort.stdout, stdout=subprocess.PIPE)
                 #psort.stdout.close()  # Allow p to receive a SIGPIPE if psort exits.
-                
+
                 cur_time = time.time()
                 bam_tmpfile = '.'+str(cur_time)
                 pysam.sort("-n",filename,bam_tmpfile)
@@ -214,13 +210,13 @@ def readInAlignment(filename, format, sortByPos,prj_name):
                     print >>sys.stderr, "BAM/SAM file has no header section. Exit!"
                     sys.exit(1)
                 subprocess.call(['rm -f ' + bam_tmpfile+'.bam' ],shell=True)
-                                
+
         else :
                 samfile = pysam.AlignmentFile(filename,'r')
                 if len(samfile.header) ==0:
                     print >>sys.stderr, "BAM/SAM file has no header section. Exit!"
                     sys.exit(1)
-        
+
     except:
         sys.stderr.write("Error occured when reading first line of sample file %s.\n" % filename)
         raise
@@ -228,20 +224,20 @@ def readInAlignment(filename, format, sortByPos,prj_name):
 
 
 def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mode, sortByPos, prj_name,numItr):
-  
-    
+
+
     #read in BAM/SAM file
-    samfile = readInAlignment(filename, format, sortByPos,prj_name)    
-    
+    samfile = readInAlignment(filename, format, sortByPos,prj_name)
+
     references = samfile.references
-    
+
     empty = 0
     nonunique = 0
     uniq_reads = 0
-    
+
     i = 0
     prev_read_name =''
-    
+
     alignments_per_read = []
     leftOver_gene = []
     leftOver_te = []
@@ -257,14 +253,14 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
     cc = 0
     try:
         while(1):
-            i += 1   
-            cc += 1   
+            i += 1
+            cc += 1
             aligned_read = samfile.next()
-           
+
             if aligned_read.is_unmapped or aligned_read.is_duplicate or aligned_read.is_qcfail :
                 continue
-    
-            if aligned_read.is_paired :
+
+            if aligned_read.is_paired :  # this is not reliable if read mate is unmapped
                 if aligned_read.query_name == prev_read_name or prev_read_name == "":
                     prev_read_name = aligned_read.query_name
                     if aligned_read.is_read1 :
@@ -272,7 +268,7 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                     if aligned_read.is_read2 :
                             multi_read2.append(aligned_read)
                     continue
-            
+
                 else :
                     if len(multi_read1) <= 1 and len(multi_read2) <= 1 :
                         uniq_reads += 1
@@ -289,7 +285,7 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                                 if abs(pos1-pos2) <= 500 :
                                     avgReadLength += abs(pos1-pos2)+read2.query_length
                                     tmp_cnt += 1
-                                    
+
                         alignments_per_read.append((read1,read2))
                     else :
                         nonunique += 1
@@ -304,7 +300,7 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                             if aligned_read.is_read2 :
                                 multi_read2.append(aligned_read)
                             continue
-                        
+
                         else:
                             #singlton
                             if len(multi_read2) == 0 :
@@ -318,9 +314,9 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                                 read1 = multi_read1[i]
                                 read2 = multi_read2[i]
                                 alignments_per_read.append((read1,read2))
-                                
-            
-            else : #single end read           
+
+
+            else : #single end read
                     if aligned_read.query_name == prev_read_name or prev_read_name == "":
                         alignments_per_read.append((aligned_read,None))
                         prev_read_name = aligned_read.qname
@@ -341,12 +337,12 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                                 alignments_per_read.append((aligned_read,None))
                                 continue
             try :
-                
+
                 (annot_gene,annot_TE) = ovp_annotation(references,alignments_per_read, geneIdx, teIdx,stranded,format)
-        
+
                 if len(alignments_per_read) > 1 : #multi read, prior to TE
                     no_annot_te = parse_annotations_TE(multi_reads,annot_TE, te_counts, te_multi_counts, leftOver_te)
-            
+
                     if no_annot_te :
                         no_annot_gene = parse_annotations_gene(annot_gene,gene_counts,leftOver_gene)
                         if no_annot_gene :
@@ -358,8 +354,8 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                         no_annot_te = parse_annotations_TE(multi_reads,annot_TE, te_counts, te_multi_counts, leftOver_te)
                         if no_annot_te :
                             empty += 1
-                
-        
+
+
             except:
                 sys.stderr.write("Error occurred when processing annotations of %s in file %s.\n" % (prev_read_name, filename))
                 raise
@@ -385,13 +381,13 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
     try:
             #resolve ambiguity
             if len(leftOver_gene) > 0 :
-                resolve_annotation_ambiguity(gene_counts,leftOver_gene)           
+                resolve_annotation_ambiguity(gene_counts,leftOver_gene)
             if len(leftOver_te) > 0 :
                 resolve_annotation_ambiguity(te_counts,leftOver_te)
 
             ss = sum(te_counts)
             sys.stderr.write("uniq te counts = %s \n" % (str(ss)))
-            
+
             te_tmp_counts = [0]*len(te_counts)
 
             if numItr > 0 :
@@ -400,25 +396,25 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                 sys.stderr.write(".......start iterative optimization ..........\n")
                 if avgReadLength > 0 :
                     avgReadLength = int(avgReadLength/tmp_cnt)
-                sys.stderr.write("...average read length %d \n" % (avgReadLength)) 
-                new_te_multi_counts = [0] *len(te_counts)  
+                sys.stderr.write("...average read length %d \n" % (avgReadLength))
+                new_te_multi_counts = [0] *len(te_counts)
                 if len(multi_reads) > 0 :
                     new_te_multi_counts = EMestimate(teIdx,multi_reads,te_tmp_counts,te_multi_counts,numItr,avgReadLength)
-                    
+
               except :
                 sys.stderr.write("Error in optimization\n")
                 raise
               te_counts = map(operator.add,te_counts,new_te_multi_counts)
             else :
               te_counts = map(operator.add,te_counts,te_multi_counts)
-            
-            
+
+
     except:
             sys.stderr.write("Error occurred when assigning read gene/TE annotations in file %s.\n" % (filename))
             raise
     st = sum(te_counts)
     sg = sum(gene_counts.values())
-    num_reads = st + sg 
+    num_reads = st + sg
 
     sys.stderr.write("TE counts total %s\n" % (st))
     sys.stderr.write("Gene counts total %s\n" % (sg))
@@ -430,10 +426,10 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
     return (gene_counts,te_counts)
 
 
-    
+
 def parse_annotations_gene(annot_gene, gene_counts,leftOver_gene):
         no_annot = True
-        
+
         if len(annot_gene) > 1 :
             leftOver_gene.append((annot_gene,1.0))
                 # if te_mode == "uniq" :
@@ -443,59 +439,59 @@ def parse_annotations_gene(annot_gene, gene_counts,leftOver_gene):
             if len(genes) == 1 :
                 gene_counts[genes[0]] += 1
             else :
-            	if genes[0] == genes[1] :
-            		gene_counts[genes[0]] += 1
-            	else :
-            		gene_counts[genes[0]] += 0.5
-            		gene_counts[genes[1]] += 0.5
+                if genes[0] == genes[1] :
+                    gene_counts[genes[0]] += 1
+                else :
+                    gene_counts[genes[0]] += 0.5
+                    gene_counts[genes[1]] += 0.5
         else :
             return True
-        
+
         return False
 
 # Assign ambiguous genic reads mapped to a location with multiple annotations
 def resolve_annotation_ambiguity(counts, leftOvers ) :
-  
+
     for (annlist,w) in leftOvers :
-    	readslist = {}
-    	total = 0.0
-    	size = len(annlist)
+        readslist = {}
+        total = 0.0
+        size = len(annlist)
         ww = 1.0 * w
         if size > 1:
             ww = ww/size
 
         for ann in annlist :
             for a in ann:
-            	if a not in readslist :
-            		readslist[a] = counts[a]
-            		total += counts[a]
-    
-	    if total > 0.0 :
-	        for a in readslist :
-	            v = ww * readslist[a] / total
-	            counts[a] += v
-	    else :
-	        for a in readslist :
-	            counts[a] = ww/len(readslist)
+                if a not in readslist :
+                    readslist[a] = counts[a]
+                    total += counts[a]
 
-               
+        if total > 0.0 :
+            for a in readslist :
+                v = ww * readslist[a] / total
+                counts[a] += v
+        else :
+            for a in readslist :
+                counts[a] = ww/len(readslist)
+
+
 def parse_annotations_TE(multi_reads,annot_TE,uniq_counts,multi_counts, leftOver_list):
     if len(annot_TE) == 0 :
         return True
-    
+
     if len(annot_TE) == 1 and len(annot_TE[0]) == 1 :
         uniq_counts[annot_TE[0][0]] += 1
-    
+
     if len(annot_TE) == 1 and len(annot_TE[0]) > 1 :
         leftOver_list.append((annot_TE,1.0))
-    
+
     if len(annot_TE) > 1:
             multi_algn = []
             for i in range(len(annot_TE)):
                 for te in annot_TE[i] :
                     multi_counts[te] += 1.0 / (len(annot_TE) * len(annot_TE[i]))
                     multi_algn.append(te)
-            
+
             multi_reads.append(multi_algn)
 
 
@@ -503,14 +499,14 @@ def parse_annotations_TE(multi_reads,annot_TE,uniq_counts,multi_counts, leftOver
 
 
 def output_res(res, ann, smps, prj):
-    
+
     fname = prj+".png"
-   
+
     plotHeatmap(res, ann, smps, fname)
-    return 
+    return
 
 def output_count_tbl(t_tbl, c_tbl, fname):
-       
+
     try:
         f = open(fname, 'w')
     except IOError:
@@ -526,21 +522,21 @@ def output_count_tbl(t_tbl, c_tbl, fname):
         for csmp in c_tbl.keys():
             keys = keys.union(c_tbl[csmp].keys())
             header +="\t"+csmp+".C"
-          
+
         for tsmp in t_tbl.keys():
             cnts = t_tbl[tsmp]
             for k in keys:
                 val = 0
                 if k in cnts :
                    val = cnts[k]
-                
+
                 if cnt_tbl.has_key(k) :
                     cnt_tbl[k].append(int(val))
                 else :
                     vallist = []
                     vallist.append(int(val))
                     cnt_tbl[k] = vallist
-                    
+
         for csmp in c_tbl.keys():
             cnts = c_tbl[csmp]
             for k in keys:
@@ -554,19 +550,19 @@ def output_count_tbl(t_tbl, c_tbl, fname):
                     vallist = []
                     vallist.append(int(val))
                     cnt_tbl[gene] = vallist
-        #output 
+        #output
         f.write(header + "\n")
         for gene in sorted(cnt_tbl.keys()) :
            vals = cnt_tbl[gene]
            vals_str = gene
            for i in range(len(vals)) :
-              vals_str +="\t"+str(vals[i])                       
+              vals_str +="\t"+str(vals[i])
            f.write(vals_str + "\n")
-            
+
         f.close()
-    
+
     return
-        
+
 def output_norm(sf, name, error):
     fname = name + ".norm"
     try:
@@ -579,7 +575,7 @@ def output_norm(sf, name, error):
         for b in sf:
             desc = "treat" + str(cnt)
             for i in range(len(b)):
-                desc += "\t"+str(round(b[i], 2)) 
+                desc += "\t"+str(round(b[i], 2))
             f.write(desc + "\n")
             cnt +=1
         f.close()
@@ -632,7 +628,7 @@ def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, norm, pval, fc, rpm_val,mi
         rpm_vec = ','.join(str(x/min_libSize) for x in rpm_val)
         rscript += 'tc <- c(%s)\n' % (rpm_vec)
 
-        
+
     # Performing differential analysis using DESeq
     rscript += 'library(DESeq, quietly=T)\n'
     rscript += 'cds <- newCountDataSet(data,groups)\n'
@@ -646,7 +642,7 @@ def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, norm, pval, fc, rpm_val,mi
         rscript += 'cds <- estimateDispersions(cds,method="per-condition")\n'
     else :
         rscript += 'cds <- estimateDispersions(cds,method="pooled")\n'
-    
+
     rscript += 'res <- nbinomTest(cds,"CGroup","TGroup")\n'
 
     # Generating output table
@@ -690,7 +686,7 @@ def main():
     info("Done building gene index ......\n")
     #TE index
     try :
-        
+
         teIdx = TEfeatures()
         cur_time = time.time()
         te_tmpfile = '.'+str(cur_time)+'.te.gtf'
@@ -705,44 +701,44 @@ def main():
     # Read sample files make count table
     info("\nReading sample files ...\n")
     (tsamples_tbl, tsamples_rpm) = count_reads(args.tfiles, args.parser, geneIdx, teIdx, args.stranded, args.te_mode, args.sortByPos, args.prj_name,args.numItr)
-    
+
     (csamples_tbl, csamples_rpm) = count_reads(args.cfiles, args.parser, geneIdx, teIdx, args.stranded, args.te_mode, args.sortByPos, args.prj_name,args.numItr)
-    
+
     info("Finished processing sample files")
-    
+
     info("Generating counts table")
-    
+
     f_cnt_tbl = args.prj_name + ".cntTable"
     output_count_tbl(tsamples_tbl, csamples_tbl, f_cnt_tbl)
     rpm_val = tsamples_rpm + csamples_rpm
-    
+
     #info("Calculating differential expression ...\n")
     # Obtaining R-code for differential analysis
-    
+
     rscript = write_R_code(f_cnt_tbl, args.tfiles, args.cfiles, args.prj_name, args.norm, args.pval, args.fc, rpm_val,args.min_read)
-    
+
     f_rscript = args.prj_name + '_DESeq.R'
     rcode = open('%s' % (f_rscript) , 'w')
     rcode.write(rscript)
     rcode.close()
-    
+
     # Running R-code for differential analysi
     try:
         sts = subprocess.call(['Rscript', f_rscript])
     except:
         error("Error in running differential analysis!\n")
         error("Error: %s\n" % str(sys.exc_info()[1]))
-        error( "[Exception type: %s, raised in %s:%d]\n" % ( sys.exc_info()[1].__class__.__name__, 
-        		os.path.basename(traceback.extract_tb( sys.exc_info()[2] )[-1][0]), 
-        		traceback.extract_tb( sys.exc_info()[2] )[-1][1] ) )
+        error( "[Exception type: %s, raised in %s:%d]\n" % ( sys.exc_info()[1].__class__.__name__,
+                os.path.basename(traceback.extract_tb( sys.exc_info()[2] )[-1][0]),
+                traceback.extract_tb( sys.exc_info()[2] )[-1][1] ) )
         sys.exit(1)
-    
+
     info("Done \n")
 
 
 if __name__ == '__main__':
-	try:
-		main()
-	except KeyboardInterrupt:
-		sys.stderr.write("User interrupt !\n")
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.stderr.write("User interrupt !\n")
         sys.exit(0)
