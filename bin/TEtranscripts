@@ -159,7 +159,9 @@ def ovp_annotation(references,multi_reads,geneIdx,teIdx,stranded,format) :
         if r2 is not None and not r2.is_reverse :
             direction = -1
         
-        chrom1 = references[r1.tid]
+        chrom1 = ""
+        if r1 is not None :
+            chrom1 = references[r1.tid]
         chrom2 = ""
         if r2 is not None :
             chrom2 = references[r2.tid]
@@ -170,7 +172,9 @@ def ovp_annotation(references,multi_reads,geneIdx,teIdx,stranded,format) :
             direction = direction *(-1)
 
         #fetch all mapping intervals
-        itv_list = fetch_exon(chrom1,r1.pos,r1.cigartuples,direction,format)
+        itv_list = []
+        if r1 is not None :
+            itv_list = fetch_exon(chrom1,r1.pos,r1.cigartuples,direction,format)
    
         if chrom2 != "" : #paired-end, both mates are mapped
             itv_list2 = fetch_exon(chrom2,r2.pos,r2.cigar,direction,format)
