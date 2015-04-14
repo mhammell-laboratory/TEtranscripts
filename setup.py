@@ -20,7 +20,7 @@ setup(name='TEToolkit',
           'TEToolkit.IO',
           'TEToolkit.ShortRead'
       ],
-      platforms=]
+      platforms=[
           'Linux',
           'MacOS'
       ]
