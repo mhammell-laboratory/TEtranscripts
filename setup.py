@@ -23,7 +23,7 @@ setup(name='TEToolkit',
       platforms=[
           'Linux',
           'MacOS'
-      ]
+      ],
       install_requires=[
           'argparse',
           'pysam>=0.8'
