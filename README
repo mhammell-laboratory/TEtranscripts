@@ -1,9 +1,13 @@
 TEToolkit
 =========
 
+[Github Page](https://github.com/mhammell-laboratory/tetoolkit)
+[Pypi Page](https://pypi.python.org/pypi/TEToolkit)
+[MHammell Lab](http://hammelllab.labsites.cshl.edu/software)
+
 Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
 
-Copyright (C) 2014 Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell
+Copyright (C) 2014-2015 Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell
 Contact: Ying Jin (yjin@cshl.edu)
 
 
@@ -13,10 +17,10 @@ Summary
     TEToolkit is composed of two tools, TEpeaks and TEtranscripts, each described in
     its own section below.
 
-NOTE! Both programs rely on specially curated GTF files, which are not
-packaged with this software due to their size. Please go to 
-http://hammelllab.labsites.cshl.edu/software#TEToolkit 
-for instructions to download the curated GTF files.
+    *NOTE* Both programs rely on specially curated GTF files, which are not
+    packaged with this software due to their size. Please go to 
+    http://hammelllab.labsites.cshl.edu/software#TEToolkit 
+    for instructions to download the curated GTF files.
 
     TEpeak takes ChIP-seq (and similar data) alignment files (BAM or BED),
     identiifes narrow peaks, and is also able to do differential analysis over
@@ -52,7 +56,7 @@ Installation
        run this command instead:
     $ python setup.py install --prefix /local/home/usr
 
-    Note: In the above example, you must add /local/home/usr/bin
+    *NOTE* In the above example, you must add /local/home/usr/bin
     to the PATH variable, and 
     /local/home/usr/lib/python2.X/site-packages 
     to the PYTHONPATH variable, where python2.X refers to the 
@@ -70,8 +74,8 @@ Copying & distribution
     (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    but *WITHOUT ANY WARRANTY*; without even the implied warranty of
+    *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE*.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -93,8 +97,8 @@ usage: TEpeaks -t treatment sample [treatment sample ...]
 
 Required arguments:
   -t | --treatment [treatment sample 1 treatment sample 2...]
-     Sample files in group 1 (e.g. treatment/mutant), separated by space
-     Sample files in group 2 (e.g. control/wildtype), separated by space
+     _Sample files in group 1 (e.g. treatment/mutant), separated by space_
+     _Sample files in group 2 (e.g. control/wildtype), separated by space_
   --tinput    treatment input 
   -s genome  (hg: human19, mm: mouse9, dm: dm3)
 
