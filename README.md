@@ -21,9 +21,9 @@ TEToolkit
     DESeq.
 
 
-[Github Page](https://github.com/mhammell-laboratory/tetoolkit)
-[Pypi Page](https://pypi.python.org/pypi/TEToolkit)
-[MHammell Lab](http://hammelllab.labsites.cshl.edu/software)
++ [Github Page](https://github.com/mhammell-laboratory/tetoolkit)
++ [Pypi Page](https://pypi.python.org/pypi/TEToolkit)
++ [MHammell Lab](http://hammelllab.labsites.cshl.edu/software)
 
 Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
 
