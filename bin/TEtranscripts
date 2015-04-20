@@ -71,6 +71,8 @@ def prepare_parser():
 
     parser.add_argument('-i', '--iteration', metavar='iteration', dest='numItr', nargs='?', type=int,  default=0,
                         help='number of iteration to run the optimization. DEFAULT: 0')
+    parser.add_argument('-L', '--fragmentLength', metavar='fragLength', dest='fragLength', nargs='?', type=int,  default=0,
+                        help='average fragment length for paired end reads. DEFAULT: estimate from the input alignment file')
     parser.add_argument('--verbose', metavar='verbose', dest='verbose', type=int, nargs='?', default=2,
                         help='Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2')
     parser.add_argument('--version', action='version', version='%(prog)s 1.3.1')
@@ -82,7 +84,7 @@ class UnknownChrom(Exception):
     pass
 
 # Reading files containing alignments (BAM of SAM)
-def count_reads(samples, format, geneIdx, teIdx,stranded, te_mode, sortByPos, prj_name,numItr):
+def count_reads(samples, format, geneIdx, teIdx,stranded, te_mode, sortByPos, prj_name,numItr,fragLength):
     
     cnt_tbl = {}
     libsize = []
@@ -93,7 +95,7 @@ def count_reads(samples, format, geneIdx, teIdx,stranded, te_mode, sortByPos, pr
             sys.exit(1)
     try:
         for filename in samples :
-            (gene_counts,te_instance_counts) = count_transcript_abundance(filename,format,geneIdx,teIdx,stranded,te_mode, sortByPos, prj_name,numItr)
+            (gene_counts,te_instance_counts) = count_transcript_abundance(filename,format,geneIdx,teIdx,stranded,te_mode, sortByPos, prj_name,numItr,fragLength)
             
             #summarize on elements
             te_ele_counts = teIdx.groupByEle(te_instance_counts)
@@ -231,7 +233,7 @@ def readInAlignment(filename, format, sortByPos,prj_name):
     return samfile
 
 
-def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mode, sortByPos, prj_name,numItr):
+def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mode, sortByPos, prj_name,numItr,fragLength):
   
     
     #read in BAM/SAM file
@@ -291,7 +293,10 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                                 pos1 = read1.reference_start
                                 pos2 = read2.reference_start
                                 if abs(pos1-pos2) <= 500 :
-                                    avgReadLength += abs(pos1-pos2)+read2.query_length
+                                    if fragLength != 0 :
+                                        avgReadLength += fragLength
+                                    else :
+					avgReadLength += abs(pos1-pos2)+read2.query_length
                                     tmp_cnt += 1
                                     
                         alignments_per_read.append((read1,read2))
@@ -404,7 +409,9 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                 sys.stderr.write(".......start iterative optimization ..........\n")
                 if avgReadLength > 0 :
                     avgReadLength = int(avgReadLength/tmp_cnt)
-                sys.stderr.write("...average read length %d \n" % (avgReadLength)) 
+                else :
+                    sys.stderr.write("There are not enough reads to estimate average read length/fragment length. \n" )
+                    raise 
                 new_te_multi_counts = [0] *len(te_counts)  
                 if len(multi_reads) > 0 :
                     new_te_multi_counts = EMestimate(teIdx,multi_reads,te_tmp_counts,te_multi_counts,numItr,avgReadLength)
@@ -708,9 +715,9 @@ def main():
         sys.exit(1)
     # Read sample files make count table
     info("\nReading sample files ...\n")
-    (tsamples_tbl, tsamples_rpm) = count_reads(args.tfiles, args.parser, geneIdx, teIdx, args.stranded, args.te_mode, args.sortByPos, args.prj_name,args.numItr)
+    (tsamples_tbl, tsamples_rpm) = count_reads(args.tfiles, args.parser, geneIdx, teIdx, args.stranded, args.te_mode, args.sortByPos, args.prj_name,args.numItr,args.fragLength)
     
-    (csamples_tbl, csamples_rpm) = count_reads(args.cfiles, args.parser, geneIdx, teIdx, args.stranded, args.te_mode, args.sortByPos, args.prj_name,args.numItr)
+    (csamples_tbl, csamples_rpm) = count_reads(args.cfiles, args.parser, geneIdx, teIdx, args.stranded, args.te_mode, args.sortByPos, args.prj_name,args.numItr,args.fragLength)
     
     info("Finished processing sample files")
     
