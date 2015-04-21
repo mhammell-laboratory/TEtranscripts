@@ -138,28 +138,49 @@ Usage
       --TE TE-GTF-file      GTF file for transposable element annotations
 
     Optional arguments:
+
+      *Input/Output options*
       --format [input file format]
          Input file format: BAM or SAM. DEFAULT: BAM
       --stranded [option]   Is this a stranded library? (yes, no, or reverse).
                             DEFAULT: yes.
+      --sortByPos           Input file is sorted by chromosome position.
+      --project [name]      Prefix used for output files (e.g. project name)
+                            DEFAULT: TEtranscript_out
+
+      *Analysis options*
       --mode [TE counting mode]
          How to count TE:
             uniq        (unique mappers only)
             multi       (distribute among all alignments).
          DEFAULT: uniq
-      --project [name]      Name of this project. DEFAULT: TEtranscript_out
+      --minread [min_read] read count cutoff. DEFAULT: 1
+      -L | --fragmentLength [fragLength]
+         Average length of fragment used for paired-end sequencing
+         DEFAULT: estimated from paired-end input alignment file
+      -n | --norm [normalization]
+         Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts), quant (quantile normalization). 
+         DEFAULT: DESeq_default
+      -i | --iteration 
+         maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 0
       -p | --padj [pvalue]
          FDR cutoff for significance. DEFAULT: 0.05
       -f | --foldchange [foldchange]
          Fold-change ratio (absolute) cutoff for differential expression. 
          DEFAULT: 1
-      --minread [min_read] read count cutoff. DEFAULT: 1
-      -n | --norm [normalization]
-         Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts), quant (quantile normalization). 
-         DEFAULT: DESeq_default
-      --sortByPos             Input file is sorted by chromosome position.
-      -i | --iteration 
-         maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 0
+
+      *Other options*
+      -h | --help
+         Show help message
+      --verbose [number]
+         Set verbose level.
+           0: only show critical messages
+           1: show additional warning messages
+           2: show process information
+           3: show debug messages
+         DEFAULT: 2
+      --version
+         Show program's version and exit
 
     *NOTE* BAM files must be either unsorted or sorted by queryname. If the BAM files are sorted by position, please use the '--sortByPos--' option
 
