@@ -8,7 +8,7 @@ Created on Jan 27, 2014
 @author: Oliver Tam
 @contact tam@cshl.edu
 @status: 
-@version: 1.0.0
+@version: X.X.X
 '''
 # python module
 import sys
@@ -36,9 +36,8 @@ from TEToolkit.GeneFeatures import *
 def prepare_parser():
     desc = "Identifying differential transcription of gene and transposable elements." 
 
-    exmp = "Example: TEtranscripts --format BAM --mode uniq -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam  "
+    exmp = "Example: TEtranscripts -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --GTF gene_annotation.gtf --TE TE_annotation.gtf --sortByPos --mode multi "
 
-   
     parser = argparse.ArgumentParser(prog='TEtranscripts',description=desc, epilog=exmp) #'Identifying differential transcription binding/histone modification sites.')
 
     parser.add_argument('-t','--treatment', metavar='treatment sample', dest='tfiles',nargs='+', required=True,
@@ -63,7 +62,7 @@ def prepare_parser():
     parser.add_argument('-f', '--foldchange', metavar='foldchange', dest='fc', nargs='?', type=float, const=2.0, default=1.0,
                         help='Fold-change ratio (absolute) cutoff for differential expression. DEFAULT: 1')
     parser.add_argument('--minread',metavar='min_read',dest='min_read',nargs='?',type=int,default=1,
-                        help='read count cutoff. genes/TEs with reads less than the cutoff will not be considered.')
+                        help='read count cutoff. genes/TEs with reads less than the cutoff will not be considered. DEFAULT: 1')
     parser.add_argument('-n', '--norm', metavar='normalization', dest='norm', nargs='?', default='DESeq_default', choices=['DESeq_default','TC','quant'],
                         help='Normalization method : DESeq_default (DEseq default normalization method), TC (total annotated counts), quant (quantile normalization). DEFAULT: DESeq_default')
     parser.add_argument('--sortByPos', dest = 'sortByPos', action="store_true",
@@ -71,11 +70,11 @@ def prepare_parser():
 
     parser.add_argument('-i', '--iteration', metavar='iteration', dest='numItr', nargs='?', type=int,  default=0,
                         help='number of iteration to run the optimization. DEFAULT: 0')
-    parser.add_argument('-L', '--fragmentLength', metavar='fragLength', dest='fragLength', nargs='?', type=int,  default=0,
-                        help='average fragment length for paired end reads. DEFAULT: estimate from the input alignment file')
+    parser.add_argument('-L', '--fragmentLength', metavar='fragLength', dest='fragLength', nargs='?', type=int,  default=0, choices=range(0,500),
+                        help='average fragment length for paired end reads (<=500nt). DEFAULT: estimate from the input alignment file')
     parser.add_argument('--verbose', metavar='verbose', dest='verbose', type=int, nargs='?', default=2,
                         help='Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2')
-    parser.add_argument('--version', action='version', version='%(prog)s 1.3.1')
+    parser.add_argument('--version', action='version', version='%(prog)s X.X.X')
 
     return parser
 
