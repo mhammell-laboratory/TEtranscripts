@@ -34,7 +34,7 @@ Requirements
 ------------
 
     Python:     2.6.x or 2.7.x (not tested in Python 3.x)
-    pysam    (tested using version 0.8.2.1)
+    pysam       0.8.2.1 or greater
     R:          2.15.x or greater
     DESeq:      1.5.x or greater
 
