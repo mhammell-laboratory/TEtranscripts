@@ -182,7 +182,7 @@ Usage
       --version
          Show program's version and exit
 
-    *NOTE* BAM files must be either unsorted or sorted by queryname. If the BAM files are sorted by position, please use the '--sortByPos--' option
+    *NOTE* BAM files must be either unsorted or sorted by queryname. If the BAM files are sorted by position, please use the '--sortByPos' option
 
 Example Command Lines
 ---------------------
