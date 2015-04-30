@@ -227,7 +227,6 @@ def readInAlignment(filename, format, sortByPos,prj_name):
 
 
 def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mode, sortByPos, prj_name,numItr,fragLength):
-  
     #read in BAM/SAM file
     samfile = readInAlignment(filename, format, sortByPos,prj_name)
 
@@ -458,7 +457,6 @@ def parse_annotations_gene(annot_gene, gene_counts,leftOver_gene):
 
 # Assign ambiguous genic reads mapped to a location with multiple annotations
 def resolve_annotation_ambiguity(counts, leftOvers ) :
-
     for (annlist,w) in leftOvers :
         readslist = {}
         total = 0.0
@@ -506,14 +504,12 @@ def parse_annotations_TE(multi_reads,annot_TE,uniq_counts,multi_counts, leftOver
 
 
 def output_res(res, ann, smps, prj):
-
     fname = prj+".png"
 
     plotHeatmap(res, ann, smps, fname)
     return
 
 def output_count_tbl(t_tbl, c_tbl, fname):
-
     try:
         f = open(fname, 'w')
     except IOError:
@@ -589,7 +585,6 @@ def output_norm(sf, name, error):
 
 
 def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, norm, pval, fc, rpm_val,min_read):
-
     # Assembling R-code for analysis
     rscript = ''
     rscript += '\n'
