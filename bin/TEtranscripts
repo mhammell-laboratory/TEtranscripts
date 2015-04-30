@@ -7,13 +7,8 @@ Created on Jan 27, 2014
 @contact: yjin@cshl.edu
 @author: Oliver Tam
 @contact tam@cshl.edu
-<<<<<<< HEAD
 @status: 
 @version: X.X.X
-=======
-@status:
-@version: 1.0.0
->>>>>>> pschaughency/master
 '''
 # python module
 import sys
@@ -39,10 +34,6 @@ def prepare_parser():
 
     exmp = "Example: TEtranscripts -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --GTF gene_annotation.gtf --TE TE_annotation.gtf --sortByPos --mode multi "
 
-<<<<<<< HEAD
-=======
-
->>>>>>> pschaughency/master
     parser = argparse.ArgumentParser(prog='TEtranscripts',description=desc, epilog=exmp) #'Identifying differential transcription binding/histone modification sites.')
 
     parser.add_argument('-t','--treatment', metavar='treatment sample', dest='tfiles',nargs='+', required=True,
@@ -88,13 +79,7 @@ class UnknownChrom(Exception):
     pass
 
 # Reading files containing alignments (BAM of SAM)
-<<<<<<< HEAD
 def count_reads(samples, format, geneIdx, teIdx,stranded, te_mode, sortByPos, prj_name,numItr,fragLength):
-    
-=======
-def count_reads(samples, format, geneIdx, teIdx,stranded, te_mode, sortByPos, prj_name,numItr):
-
->>>>>>> pschaughency/master
     cnt_tbl = {}
     libsize = []
     # check input files exist or not
@@ -104,13 +89,8 @@ def count_reads(samples, format, geneIdx, teIdx,stranded, te_mode, sortByPos, pr
             sys.exit(1)
     try:
         for filename in samples :
-<<<<<<< HEAD
             (gene_counts,te_instance_counts) = count_transcript_abundance(filename,format,geneIdx,teIdx,stranded,te_mode, sortByPos, prj_name,numItr,fragLength)
             
-=======
-            (gene_counts,te_instance_counts) = count_transcript_abundance(filename,format,geneIdx,teIdx,stranded,te_mode, sortByPos, prj_name,numItr)
-
->>>>>>> pschaughency/master
             #summarize on elements
             te_ele_counts = teIdx.groupByName(te_instance_counts)
             # save gene counts and TE counts into count table
@@ -174,15 +154,9 @@ def ovp_annotation(references,multi_reads,geneIdx,teIdx,stranded,format) :
             direction = -1
         if r2 is not None and not r2.is_reverse :
             direction = -1
-<<<<<<< HEAD
-        
         chrom1 = ""
         if r1 is not None :
             chrom1 = references[r1.tid]
-=======
-
-        chrom1 = references[r1.tid]
->>>>>>> pschaughency/master
         chrom2 = ""
         if r2 is not None :
             chrom2 = references[r2.tid]
@@ -193,15 +167,10 @@ def ovp_annotation(references,multi_reads,geneIdx,teIdx,stranded,format) :
             direction = direction *(-1)
 
         #fetch all mapping intervals
-<<<<<<< HEAD
         itv_list = []
         if r1 is not None :
             itv_list = fetch_exon(chrom1,r1.pos,r1.cigartuples,direction,format)
    
-=======
-        itv_list = fetch_exon(chrom1,r1.pos,r1.cigartuples,direction,format)
-
->>>>>>> pschaughency/master
         if chrom2 != "" : #paired-end, both mates are mapped
             itv_list2 = fetch_exon(chrom2,r2.pos,r2.cigar,direction,format)
             itv_list.extend(itv_list2)
@@ -257,15 +226,8 @@ def readInAlignment(filename, format, sortByPos,prj_name):
     return samfile
 
 
-<<<<<<< HEAD
 def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mode, sortByPos, prj_name,numItr,fragLength):
   
-    
-=======
-def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mode, sortByPos, prj_name,numItr):
-
-
->>>>>>> pschaughency/master
     #read in BAM/SAM file
     samfile = readInAlignment(filename, format, sortByPos,prj_name)
 
@@ -439,15 +401,10 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                 sys.stderr.write(".......start iterative optimization ..........\n")
                 if avgReadLength > 0 :
                     avgReadLength = int(avgReadLength/tmp_cnt)
-<<<<<<< HEAD
                 else :
                     sys.stderr.write("There are not enough reads to estimate average read length/fragment length. \n" )
                     raise 
                 new_te_multi_counts = [0] *len(te_counts)  
-=======
-                sys.stderr.write("...average read length %d \n" % (avgReadLength))
-                new_te_multi_counts = [0] *len(te_counts)
->>>>>>> pschaughency/master
                 if len(multi_reads) > 0 :
                     new_te_multi_counts = EMestimate(teIdx,multi_reads,te_tmp_counts,te_multi_counts,numItr,avgReadLength)
 
@@ -750,17 +707,10 @@ def main():
         sys.exit(1)
     # Read sample files make count table
     info("\nReading sample files ...\n")
-<<<<<<< HEAD
+
     (tsamples_tbl, tsamples_rpm) = count_reads(args.tfiles, args.parser, geneIdx, teIdx, args.stranded, args.te_mode, args.sortByPos, args.prj_name,args.numItr,args.fragLength)
-    
     (csamples_tbl, csamples_rpm) = count_reads(args.cfiles, args.parser, geneIdx, teIdx, args.stranded, args.te_mode, args.sortByPos, args.prj_name,args.numItr,args.fragLength)
     
-=======
-    (tsamples_tbl, tsamples_rpm) = count_reads(args.tfiles, args.parser, geneIdx, teIdx, args.stranded, args.te_mode, args.sortByPos, args.prj_name,args.numItr)
-
-    (csamples_tbl, csamples_rpm) = count_reads(args.cfiles, args.parser, geneIdx, teIdx, args.stranded, args.te_mode, args.sortByPos, args.prj_name,args.numItr)
-
->>>>>>> pschaughency/master
     info("Finished processing sample files")
 
     info("Generating counts table")
