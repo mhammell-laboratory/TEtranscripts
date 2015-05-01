@@ -308,6 +308,12 @@ def read_opts2(parser):
         if args.fragLength < 0 :
             logging.error("the fragment length cannot be negative. \n")
             sys.exit(1)
+        if args.minL < 0 :
+            logging.error("the minimum fragment length cannot be negative. \n")
+            sys.exit(1)
+        if args.maxL < 0 :
+            logging.error("the maximum fragment length cannot be negative. \n")
+            sys.exit(1)
 
 	# Level of logging for tool
 	logging.basicConfig(level=(4 - args.verbose) * 10,

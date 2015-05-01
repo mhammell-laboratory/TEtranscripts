@@ -157,8 +157,8 @@ Usage
          DEFAULT: uniq
       --minread [min_read] read count cutoff. DEFAULT: 1
       -L | --fragmentLength [fragLength]
-         Average length of fragment used for paired-end sequencing
-         DEFAULT: estimated from paired-end input alignment file
+         Average length of fragment used for single-end sequencing
+         DEFAULT: For paired-end, estimated from the input alignment file. For single-end, ignored by default.
       -n | --norm [normalization]
          Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts), quant (quantile normalization). 
          DEFAULT: DESeq_default
