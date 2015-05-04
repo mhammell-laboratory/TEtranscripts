@@ -1,9 +1,5 @@
 from setuptools import setup
 
-def readme():
-    with open('README.md') as f:
-        return f.read()
-
 try:
       from pypandoc import convert
       read_md = lambda f: convert(f, 'rst')
