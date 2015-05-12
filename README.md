@@ -196,6 +196,41 @@ Example Command Lines
 
     TEtranscripts --sortByPos --format BAM --mode multi -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --project sample_sorted_test
 
+
+==========================================
+Recommendations for TEToolkit input files
+==========================================
+
+TEToolkit can perform transposable element quantification from 
+alignment results (e.g. BAM files) generated from a variety of
+programs. Given the variety of experimental systems, we could not
+provide an optimal alignment strategy for every approach. Therefore,
+we recommend that users identify the optimal parameters for their
+particular genome and alignment program in order to get the best
+results.
+
+When optimizing the alignment parameters, we recommend taking
+these points into consideration:
+
+1. Allowing sufficient number of multi-mappers during alignment
+
+Most alignment programs provide only 1 alignment per read
+by default. We recommend reporting multiple alignments per
+read. We have found that reporting a maximum of 100 alignments
+per read provides an optimal compromise between the size of the
+alignment file and recovery of multi-mappers in many genome 
+builds. However, we highly suggest that users optimize this 
+parameter for their particular experiment, as this could 
+significantly improve the quality of transposable element 
+quantification.
+
+2. Optimizing allowed number of mismatch per alignment
+
+Specific recommendations when using STAR
+---------------------------------------
+
+
+
 ======================
 Copying & distribution
 ======================
