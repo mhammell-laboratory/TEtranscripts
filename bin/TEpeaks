@@ -4,8 +4,8 @@ Created on Oct 12, 2011
 
 @author: Ying Jin
 @contact: yjin@cshl.edu
-@status: 
-@version: 
+@status:
+@version:
 '''
 import argparse
 import re
@@ -16,8 +16,8 @@ import time
 from math import floor
 
 from TEToolkit.Constants import *
-from TEToolkit.PeakDetect import * 
-from TEToolkit.IO.ReadInputs import read_opts, read_chrlen_tbl, read_short_reads, read_te_annotation, read_short_reads_sameFam
+from TEToolkit.PeakDetect import *
+from TEToolkit.IO.ReadInputs import read_opts, read_chrlen_tbl, read_short_reads, read_short_reads_sameFam
 from TEToolkit.Normalization import normalize
 from TEToolkit.PeakModel import PeakModel, NotEnoughPairsException
 from TEToolkit.TEindex import *
@@ -32,7 +32,7 @@ class PeakRegion:
         self.chroms     = []            # list of chromosome names (string), unsorted
         self.peaklist   = {}            # key is chromosome (string)
                                         # value is list of pairs (start, end)
-        
+
     def reset (self, chr):
         self.cur_end    = self.peaklist[chr][0][1]
         self.cur_start  = self.peaklist[chr][0][0]
@@ -46,7 +46,7 @@ class PeakRegion:
             len1 = end - start                  # TODO ???
             len2 = peaks[i][1] - peaks[i][0]    # TODO ???
             ovplen = 0                          # TODO Is this overlap length?
-            
+
             if end < peaks[i][0]:                                   # case 1: new entry
                 if i == 0 or peaks[i - 1][1] < start:
                     peaks.insert(i, (start, end))
@@ -66,14 +66,14 @@ class PeakRegion:
                     self.insert(chr, start, end)
 
                     return
-            
+
             if end < peaks[i][1] and start > peaks[i][0]:           # case 2: contained in
                 self.cur_end    = peaks[i][1]
                 self.cur_start  = peaks[i][0]
                 self.cur_index  = i
 
                 return
-            
+
             if end < peaks[i][1] and start < peaks[i][0]:           # case 3: see overlap
                 ovplen = end - peaks[i][0]
 
@@ -96,16 +96,16 @@ class PeakRegion:
                     self.cur_index = i
 
                     return
-                                
+
             if end > peaks[i][1] and start < peaks[i][0]:           # case 4
                 if i == len(peaks) - 1 or end < peaks[i + 1][0]:        # contain
                     peaks[i] = (start, end)
 
                     self.cur_end    = end
                     self.cur_start  = start
-                    self.cur_index  = i 
+                    self.cur_index  = i
 
-                    return 
+                    return
 
                 if end > peaks[i + 1][0]:                               # overlap
                     self.cur_end = peaks[i + 1][1]
@@ -116,12 +116,12 @@ class PeakRegion:
 
                     self.insert(chr, start, end)
 
-                    return 
+                    return
 
             if start < peaks[i][1] and end > peaks[i][1]:           # case 5
                 ovplen = peaks[i][1] - start
 
-                if ovplen >= len1 / 2 or ovplen >= len2 / 2:  
+                if ovplen >= len1 / 2 or ovplen >= len2 / 2:
                     # take union
                     start = peaks[i][0]
 
@@ -135,14 +135,14 @@ class PeakRegion:
                         return
                     else:
                         peaks.pop(i)
-                        
+
                         self.cur_index  = i
                         self.cur_end    = peaks[i][1]
                         self.cur_start  = peaks[i][0]
 
                         self.insert(chr,start,end)
 
-                        return 
+                        return
                 else:
                     # new entry
                     start = peaks[i][1] + 1
@@ -163,11 +163,11 @@ class PeakRegion:
                         self.cur_index = i + 1
 
                         return
-                                            
+
             if start > peaks[i][1] :                                # case 6: new entry
                 if i == len(peaks) - 1:
                     peaks.append((start, end))
-                    
+
                     self.cur_start  = start
                     self.cur_end    = end
                     self.cur_index  = i + 1
@@ -182,7 +182,7 @@ class PeakRegion:
                         peaks.insert(i + 1, (start, end))
 
                         self.cur_start  = start
-                        self.cur_end    = end 
+                        self.cur_end    = end
 
                         return
                     else:
@@ -202,7 +202,7 @@ class PeakRegion:
             self.cur_index  = 0
 
             return
-    
+
 def detectDFBS (tsamples, csamples, norm, opt):
     tpeak_tbl   = {}
     cpeak_tbl   = {}
@@ -227,7 +227,7 @@ def detectDFBS (tsamples, csamples, norm, opt):
 
             if len(peaks) > 0:
                 cmb_peaks.reset(chr)
-                
+
         for csample in csamples:
             peaks = csample.peaks[chr]
 
@@ -236,7 +236,7 @@ def detectDFBS (tsamples, csamples, norm, opt):
 
             if len(peaks) > 0 :
                 cmb_peaks.reset(chr)
-            
+
         peakregions = cmb_peaks.peaklist[chr]
 
         smpprefix   = "T"
@@ -245,11 +245,11 @@ def detectDFBS (tsamples, csamples, norm, opt):
             cnts        = t.get_counts_by_chr(chr, 0)
             smpname     = smpprefix + str(i)
             peakcounts  = {}
-            j           = 0   
+            j           = 0
 
             for peak in peakregions:
                 w       = 0
-                entry   = chr + ":" + str(peak[0]) + ":" + str(peak[1]) 
+                entry   = chr + ":" + str(peak[0]) + ":" + str(peak[1])
 
                 for z in cnts:
                     pos = floor(z)
@@ -268,21 +268,21 @@ def detectDFBS (tsamples, csamples, norm, opt):
                     w += cnt            # accumulate weight within peak
 
                 peakcounts[entry] = w * norm[0][i]      # TODO What is 'norm'?
-                
-            tpeak_tbl[smpname] = peakcounts 
+
+            tpeak_tbl[smpname] = peakcounts
             t.clean(chr)                                # TODO member function 'clean' of what type?
-                
+
         smpprefix = "C"
 
         for i, c in csamples:
             cnts        = c.get_counts_by_chr(chr, 0)
             smpname     = smpprefix + str(i)
             peakcounts  = {}
-            j           = 0   
+            j           = 0
 
             for peak in peakregions:
                 w = 0
-                entry = chr + ":" + str(peak[0]) + ":" + str(peak[1]) 
+                entry = chr + ":" + str(peak[0]) + ":" + str(peak[1])
 
                 for z in cnts:
                     pos = floor(z)
@@ -296,30 +296,30 @@ def detectDFBS (tsamples, csamples, norm, opt):
                         continue
 
                     if pos > peak[1]:   # stop at end of peak
-                        break        
+                        break
 
                     w += cnt            # accumulate weight within peak
 
                 peakcounts[entry] = w * norm[1][i]
-                
-            cpeak_tbl[smpname] = peakcounts 
+
+            cpeak_tbl[smpname] = peakcounts
             t.clean(chr)                                # TODO member function 'clean' of what type?
-            
+
     return (tpeak_tbl, cpeak_tbl)
 
 
 def main():
     args = read_opts(prepare_parser())
-    
+
     info = args.info
 #    warn = args.warn
 #    debug = args.debug
     error = args.error
 
     info("\n" + args.argtxt + "\n")
-    
+
    # teIdx = TEfeatures()
-    
+
     #if args.TEmode == 'sameFamily':
     #    if args.TEannotation != None:
     #        info("reading TE annotation file ... \n")
@@ -327,12 +327,12 @@ def main():
     #    else:
     #        error("please provide TE annotation file !\n")
     #        sys.exit(0)
-    
+
     info("reading sample files ...\n")
 
     tsamples    = []
     tinputs     = []
-    
+
 #    if args.TEmode == 'multi':
     tsamples    = read_short_reads(args.tfiles, args.parser,args.TEmode)
     tinputs     = read_short_reads(args.tinputs, args.parser,args.TEmode)
@@ -340,16 +340,16 @@ def main():
     #    tsamples    = read_short_reads_sameFam(args.tfiles, args.parser,teIdx)
     #    tinputs     = read_short_reads_sameFam(args.tinputs, args.parser,teIdx)
     # TODO Handle invalid TEmode argument
-            
+
     if tinputs[0].libsize() == 0:                       # TODO Why inspect first element of 'tinputs'?
         error("Library size of sample %s is 0 !\n " % (args.tinputs[0]))
-        system.exit(1)       
-    
+        system.exit(1)
+
     for i in range(len(tsamples)) :
         if tsamples[i].libsize() == 0 :
             error("Library size of sample %s is 0 !\n " % (args.tfiles[i]))
             system.exit(1)
-       
+
     csamples    = []
     cinputs     = []
 
@@ -359,7 +359,7 @@ def main():
         cinputs     = read_short_reads(args.cinputs, args.parser,args.TEmode)
         #elif args.TEmode == 'sameFamily' :
         #    csamples    = read_short_reads_sameFam(args.cfiles, args.parser,teIdx)
-        #    cinputs     = read_short_reads_sameFam(args.cinputs, args.parser,teIdx) 
+        #    cinputs     = read_short_reads_sameFam(args.cinputs, args.parser,teIdx)
         # TODO Handle invalid TEmode argument
 
         if cinputs[0].libsize() == 0:                   # TODO Why inspect first element of 'cinputs'?
@@ -371,13 +371,13 @@ def main():
             if c.libsize() == 0 :
                 error("Library size of sample %s is 0 !\n " % (args.cfiles[i]))
                 system.exit(1)
-    
+
     args.tsize = tsamples[0].tsize()                    # TODO Why inspect only first element of 'tsamples'?
                                                         # TODO What is 'tsize'?
 
     info("tag size %s \n" % (args.tsize))
     info("normalization ...\n")
-    
+
     scal_factors = normalize(
         args.norm,
         tsamples,
@@ -387,9 +387,9 @@ def main():
         args.species[0],
         args.prj_name
     )
-    
+
     output_norm(scal_factors, args.prj_name, error)
-    
+
     info("call binding sites (peaks) .......\n")
 
     if not args.auto:
@@ -419,7 +419,7 @@ def main():
 
             if args.fragsize <= 2 * args.tsize:
                 args.fragsize   = args.tsize * 2
-                args.scanwindow = 2 * args.fragsize 
+                args.scanwindow = 2 * args.fragsize
 
                 warn("#2 Since the d calculated from paired-peaks are smaller than 2 * tag length, it may be influenced by unknown sequencing problem. TEpeaks will use %d as shiftsize, %d as fragment length." % (options.shiftsize, options.d))
         except NotEnoughPairsException:
@@ -427,7 +427,7 @@ def main():
             args.scanwindow = args.fragsize * 2
 
             warn("#2 Using default fragment length of %d bps" % args.fragsize)
- 
+
     for i, t in enumerate(tsamples):
         sf      = [1,1]
         sf[0]   = scal_factors[0][i]
@@ -436,7 +436,7 @@ def main():
         peakdetect1 = PeakDetect(
             treat           = t,
             control         = tinputs[0],                   # TODO Why the zero index?
-            opt             = args, 
+            opt             = args,
             scal_factors    = sf
         )
 
@@ -454,7 +454,7 @@ def main():
             )
 
     tinputs = []
-  
+
     for i, c in enumerate(csamples):
         sf      = [1,1]
         sf[0]   = scal_factors[1][i]
@@ -463,7 +463,7 @@ def main():
         peakdetect2 = PeakDetect(
             treat           = c,
             control         = cinputs[0],                       # TODO Why the zero index?
-            opt             = args, 
+            opt             = args,
             scal_factors    = sf
         )
 
@@ -472,7 +472,7 @@ def main():
         with open(args.prj_name + "C" + str(i) + "_peaks.xls", "w") as opfhd:
             opfhd.write(peakdetect2.toxls())
 
-        peaks2.append(peakdetect2) 
+        peaks2.append(peakdetect2)
 
         if args.wig :
             peakdetect2.towig(
@@ -497,7 +497,7 @@ def main():
             info("Done \n")
 
             return
-            
+
         info("Detecting differentially enriched binding sites ...\n")
 
         tmpfile = args.prj_name + "_peaks_counts.rc"
@@ -510,8 +510,8 @@ def main():
             opt         = args
         )
 
-        output_peaks_tbl(tpeaks, cpeaks, tmpfile, args) 
-        
+        output_peaks_tbl(tpeaks, cpeaks, tmpfile, args)
+
         cnd         = 'per-condition'
         sharingMode = 'maximum'
         fitType     = 'local'
@@ -526,28 +526,28 @@ def main():
                 sharingMode = 'fit-only'
                 fitType     = 'local'
 
-            rscript = "diffPeaks.r" 
+            rscript = "diffPeaks.r"
 
             diff2r_script(rscript)
-           
+
             subprocess.call(["Rscript", rscript, cnd, fitType,sharingMode, tmpfile, resfile])
         except:
             info("Differential analysis error!\n")
             sys.exit(1)
-            
+
     info("Cleaning up...\n")
 
-    subprocess.call(["rm *.r"], shell = True)        
+    subprocess.call(["rm *.r"], shell = True)
 
     info("Done\n")
 
 
 #def output_res(res,ann,smps,prj):
-#    
+#
 #    fname = prj+".png"
-#   
+#
 #   # plotHeatmap(res,ann,smps,fname)
-#    return 
+#    return
 
 
 def output_peaks_tbl (t_tbl, c_tbl, fname, opt):
@@ -567,7 +567,7 @@ def output_peaks_tbl (t_tbl, c_tbl, fname, opt):
                         cnt_tbl[gene].append(cnts[gene])
                     else:
                         cnt_tbl[gene] = [cnts[gene]]
-                        
+
             for csmp in c_tbl:
                 cnts    = c_tbl[csmp]
                 header  = "%s\t%s.C" % (header, csmp)
@@ -578,7 +578,7 @@ def output_peaks_tbl (t_tbl, c_tbl, fname, opt):
                     else:
                         cnt_tbl[gene] = [cnts[gene]]
 
-            # Output 
+            # Output
             f.write(header + "\n")
 
             for gene in cnt_tbl.keys():
@@ -597,9 +597,9 @@ def output_peaks_tbl (t_tbl, c_tbl, fname, opt):
     except IOError:
         error("Cannot create report file %s !\n" % (fname))
         sys.exit(1)
-    
+
     return
-    
+
 
 def output_norm (sf, name, error):
     fname = name + ".norm"
@@ -609,7 +609,7 @@ def output_norm (sf, name, error):
             desc = "treat"
 
             for z in sf[0]:
-                desc += "\t" + str(round(z, 2)) 
+                desc += "\t" + str(round(z, 2))
 
             f.write(desc+"\n")
 
@@ -712,14 +712,14 @@ legend("topleft",c("forward tags","reverse tags","shifted tags"),lty=c(1,1,1),co
 legend("right",c("d=%d"),bty="n")
 dev.off()
 """ % (','.join(map(str, norm_p)), ','.join(map(str, norm_m)), ','.join(map(str, norm_s)), name, d))
-                
+
 
 def prepare_parser ():
     """ inputs(parameters) required/allowed in this pipeline """
-    desc = "Identifying differential transcription binding/histone modification sites." 
-                                                                                        
-                                                                                                   
-    exmp = "Example: TEpeaks -t ChIP1.bed ChIP2.bed -c Ctl1.bed Ctl2.bed --tinput input1.bed --cinput input2.bed -s hg " 
+    desc = "Identifying differential transcription binding/histone modification sites."
+
+
+    exmp = "Example: TEpeaks -t ChIP1.bed ChIP2.bed -c Ctl1.bed Ctl2.bed --tinput input1.bed --cinput input2.bed -s hg "
     parser = argparse.ArgumentParser(description = desc,epilog = exmp) #'Identifying differential transcription binding/histone modification sites.')
     # parser.add_argument('-t','--treatment', metavar='treatment sample', dest='tfiles',nargs='+', required=True,
     #               help='treatment samples (BED files)')
@@ -735,7 +735,7 @@ def prepare_parser ():
                    help = 'input files of control')
     parser.add_argument('-s', '--species', metavar = 'species', dest='species', nargs = 1, required = True,
                    help = 'species : hg (Human hg19),  mm (Mouse mm9), dm (fruit fly dm3),tm (tomato )')
-    parser.add_argument('-w', '--windowsize', metavar = 'window size', dest = 'wsize', nargs = '?', type = int, 
+    parser.add_argument('-w', '--windowsize', metavar = 'window size', dest = 'wsize', nargs = '?', type = int,
                    default = WIN_SIZE, help = 'size of a sliding window. DEFAULT: 1000')
     parser.add_argument('-r', '--step', metavar = 'step', dest = 'step', nargs = '?', type = int,
                    default = STEP, help = 'size of a step. DEFAULT: 100')
@@ -768,7 +768,7 @@ def prepare_parser ():
                         help = "output peaks into wiggle format.")
     parser.add_argument('--mode', metavar = 'TEmode', dest = 'TEmode', nargs = '?', default = 'multi',
                         help = "multi (distribute among all alignments) or uniq (consider uniq-reads only). DEFAULT:multi")
-    
+
     return parser
 
 
