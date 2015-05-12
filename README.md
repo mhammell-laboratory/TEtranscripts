@@ -237,10 +237,12 @@ differences in identifying multi-mappers. Upon further discussion with the autho
 `--outAnchorMultimapNmax` and `--outFilterMultimapNmax`, though we highly suggest users test multiple values of `--outAnchorMultimapNmax`
 to identify the optimal value for their experiment.
 
+Testing
 
 ========================
 Copying & distribution
 ========================
+
 
 TEtranscripts and TEpeaks are part of TEToolKit.
 
