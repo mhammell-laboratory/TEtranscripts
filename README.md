@@ -201,35 +201,41 @@ Example Command Lines
 Recommendations for TEToolkit input files
 ==========================================
 
-TEToolkit can perform transposable element quantification from 
-alignment results (e.g. BAM files) generated from a variety of
-programs. Given the variety of experimental systems, we could not
-provide an optimal alignment strategy for every approach. Therefore,
-we recommend that users identify the optimal parameters for their
-particular genome and alignment program in order to get the best
+TEToolkit can perform transposable element quantification from alignment results (e.g. BAM files) generated from a variety of programs. 
+Given the variety of experimental systems, we could not provide an optimal alignment strategy for every approach. Therefore,
+we recommend that users identify the optimal parameters for their particular genome and alignment program in order to get the best
 results.
 
-When optimizing the alignment parameters, we recommend taking
-these points into consideration:
+When optimizing the alignment parameters, we recommend taking these points into consideration:
 
-1. Allowing sufficient number of multi-mappers during alignment
+Allowing sufficient number of multi-mappers during alignment
+------------------------------------------------------------
 
-Most alignment programs provide only 1 alignment per read
-by default. We recommend reporting multiple alignments per
-read. We have found that reporting a maximum of 100 alignments
-per read provides an optimal compromise between the size of the
-alignment file and recovery of multi-mappers in many genome 
-builds. However, we highly suggest that users optimize this 
-parameter for their particular experiment, as this could 
-significantly improve the quality of transposable element 
-quantification.
+Most alignment programs provide only 1 alignment per read by default. We recommend reporting multiple alignments per read. We have found 
+that reporting a maximum of 100 alignments per read provides an optimal compromise between the size of the alignment file and recovery 
+of multi-mappers in many genome builds. However, we highly suggest that users optimize this parameter for their particular experiment, 
+as this could significantly improve the quality of transposable element quantification.
 
-2. Optimizing allowed number of mismatch per alignment
+Optimizing alignment parameters for non-reference strains
+---------------------------------------------------------
+
+It is common that the specific laboratory strains used in an experiment contains genomic variations not present in the reference strain.
+While this can be mitigated through allowing mismatches during alignments, certain lab strains (e.g. Drosophila melanogaster) have
+diverged significantly from the reference genomes. We highly recommend that users should refine their alignment procedures to better
+account for the expected variations between their lab strains and the reference genome, which will accordingly improve their analysis
+with TEToolkit. Users can also align to a custom genome build specific to their organism, though they would need GTF annotations for 
+genes and transposable elements that are compatible with their custom genome in order to utilize TEToolkit. Please contact us if you
+require advice in generating these annotation files.
 
 Specific recommendations when using STAR
 ---------------------------------------
 
-
+[[STAR]](https://github.com/alexdobin/STAR) utilizes two parameters for optimal identification of multi-mappers `--outFilterMultimapNmax`
+and `--outAnchorMultimapNmax`. The author of STAR recommends that `--outAnchorMultimapNmax` should be set at twice the value used in
+`--outFilterMultimapNmax`, but no less than 50. In our study, we used the same number for both parameters (100), and found negligible
+differences in identifying multi-mappers. Upon further discussion with the author of STAR, we recommend that setting the same value for
+`--outAnchorMultimapNmax` and `--outFilterMultimapNmax`, though we highly suggest users test multiple values of `--outAnchorMultimapNmax`
+to identify the optimal value for their experiment.
 
 ======================
 Copying & distribution
