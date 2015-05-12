@@ -1,5 +1,5 @@
-TEToolkit
-=========
+# TEToolkit
+
 Version: X.X.X
 
     TEToolkit is composed of two tools, TEpeaks and TEtranscripts, each described in
@@ -31,8 +31,7 @@ Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
 Copyright (C) 2014-2015 Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell
 Contact: Ying Jin (yjin@cshl.edu)
 
-Requirements
-------------
+## Requirements
 
     Python:     2.6.x or 2.7.x (not tested in Python 3.x)
     pysam       0.8.2.1 or greater
@@ -40,8 +39,7 @@ Requirements
     DESeq:      1.5.x or greater
 
 
-Installation
-------------
+## Installation
 
     1) Download compressed tarball.
     2) Unpack tarball.
@@ -60,12 +58,9 @@ Installation
     python version (e.g. python2.7 if using python version 2.7.x).
 
 
-================================
-TEpeaks
-================================
+# TEpeaks
 
-Usage
------
+## Usage
 
     usage: TEpeaks -t treatment sample [treatment sample ...] 
                         -c control sample [control sample ...]
@@ -83,7 +78,7 @@ Usage
 
     Optional arguments:
       -c | --control [control sample 1 control sample 2 ...]
-      --cinput  control input
+    --cinput  control input
       --format [input file format]
          Input file format: BAM or BED. DEFAULT: BAM
       --project [name]      Name of this project. DEFAULT: TEpeak_out
@@ -108,8 +103,7 @@ Usage
       -h | --help           help info
 
 
-Example Command Lines
----------------------
+## Example Command Lines
 
     TEpeaks --format BAM -t S1.bam --tinput S1input.bam -s mm -n sd --mode multi
 
@@ -117,12 +111,9 @@ Example Command Lines
 
 
 
-================================
-TEtranscripts
-================================
+# TEtranscripts
 
-Usage
------
+## Usage
 
     usage: TEtranscripts -t treatment sample [treatment sample ...] 
                          -c control sample [control sample ...]
@@ -185,8 +176,7 @@ Usage
 
     *NOTE* BAM files must be either unsorted or sorted by queryname. If the BAM files are sorted by position, please use the '--sortByPos' option
 
-Example Command Lines
----------------------
+## Example Command Lines
 
     *** If BAM files are unsorted, or sorted by queryname: ***
 
@@ -197,9 +187,7 @@ Example Command Lines
     TEtranscripts --sortByPos --format BAM --mode multi -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --project sample_sorted_test
 
 
-==========================================
-Recommendations for TEToolkit input files
-==========================================
+# Recommendations for TEToolkit input files
 
 TEToolkit can perform transposable element quantification from alignment results (e.g. BAM files) generated from a variety of programs. 
 Given the variety of experimental systems, we could not provide an optimal alignment strategy for every approach. Therefore,
@@ -208,16 +196,14 @@ results.
 
 When optimizing the alignment parameters, we recommend taking these points into consideration:
 
-Allowing sufficient number of multi-mappers during alignment
-------------------------------------------------------------
+### Allowing sufficient number of multi-mappers during alignment
 
 Most alignment programs provide only 1 alignment per read by default. We recommend reporting multiple alignments per read. We have found 
 that reporting a maximum of 100 alignments per read provides an optimal compromise between the size of the alignment file and recovery 
 of multi-mappers in many genome builds. However, we highly suggest that users optimize this parameter for their particular experiment, 
 as this could significantly improve the quality of transposable element quantification.
 
-Optimizing alignment parameters for non-reference strains
----------------------------------------------------------
+### Optimizing alignment parameters for non-reference strains
 
 It is common that the specific laboratory strains used in an experiment contains genomic variations not present in the reference strain.
 While this can be mitigated through allowing mismatches during alignments, certain lab strains (e.g. Drosophila melanogaster) have
@@ -227,8 +213,7 @@ with TEToolkit. Users can also align to a custom genome build specific to their 
 genes and transposable elements that are compatible with their custom genome in order to utilize TEToolkit. Please contact us if you
 require advice in generating these annotation files.
 
-Specific recommendations when using STAR
----------------------------------------
+### Specific recommendations when using STAR
 
 [STAR](https://github.com/alexdobin/STAR) utilizes two parameters for optimal identification of multi-mappers `--outFilterMultimapNmax`
 and `--outAnchorMultimapNmax`. The author of STAR recommends that `--outAnchorMultimapNmax` should be set at twice the value used in
