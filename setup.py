@@ -8,7 +8,7 @@ except ImportError:
       read_md = lambda f: open(f, 'r').read()
 
 setup(name='TEToolkit',
-      version='X.X.X',
+      version='1.4.2',
       description='Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions',
       long_description=readme('README.md'),
       classifiers=[
