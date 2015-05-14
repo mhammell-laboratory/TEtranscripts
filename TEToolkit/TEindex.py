@@ -385,26 +385,26 @@ class TEfeatures:
 
         return te_ele_counts
 
-#    group by transcript name
-#    def groupByName(self,te_inst_counts) :
-#
-#        TEs = self.getNames()
-#        te_name_counts = dict(zip(TEs,[0]*len(TEs)))
-#
-#        for i in range(len(te_inst_counts)) :
-#            name = self.getFullName(i)
-#
-#            if name is None:
-#                sys.stderr.write("TE out of index boundary!\n")
-#                sys.exit(1)
-#
-#            if name in te_name_counts :
-#                te_name_counts[name] += te_inst_counts[i]
-#            else :
-#                sys.stderr.write("TE inconsistency! "+name+"\n")
-#                sys.exit(1)
-#
-#        return te_name_counts
+    #group by transcript name
+    def groupByName(self,te_inst_counts) :
+
+        TEs = self.getNames()
+        te_name_counts = dict(zip(TEs,[0]*len(TEs)))
+
+        for i in range(len(te_inst_counts)) :
+            name = self.getFullName(i)
+
+            if name is None:
+                sys.stderr.write("TE out of index boundary!\n")
+                sys.exit(1)
+
+            if name in te_name_counts :
+                te_name_counts[name] += te_inst_counts[i]
+            else :
+                sys.stderr.write("TE inconsistency! "+name+"\n")
+                sys.exit(1)
+
+        return te_name_counts
 
     def build (self,filename,te_mode):
             self.__srcfile = filename
