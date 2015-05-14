@@ -1,16 +1,13 @@
 from setuptools import setup
 
-try:
-      from pypandoc import convert
-      read_md = lambda f: convert(f, 'rst')
-except ImportError:
-      print("warning: pypandoc module not found, could not convert Markdown to RST")
-      read_md = lambda f: open(f, 'r').read()
+def readme():
+      with open('README.rst') as f:
+	       return f.read()
 
 setup(name='TEToolkit',
       version='X.X.X',
       description='Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions',
-      long_description=readme('README.md'),
+      long_description=readme(),
       classifiers=[
       ],
       keywords='TE transposable element differential enrichment',
