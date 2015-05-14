@@ -1,7 +1,7 @@
 TEToolkit
 =========
 
-Version: X.X.X
+Version: 1.4.3
 
 ::
 
