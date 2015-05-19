@@ -33,7 +33,7 @@ Contact: Ying Jin (yjin@cshl.edu)
 ## Requirements
 
     Python:     2.6.x or 2.7.x (not tested in Python 3.x)
-    pysam       0.8.2.1 or greater
+    pysam:      0.8.2.1 or greater
     R:          2.15.x or greater
     DESeq:      1.5.x or greater
 
