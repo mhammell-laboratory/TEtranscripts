@@ -24,8 +24,10 @@ DESeq.
 
 
 `Github Page <https://github.com/mhammell-laboratory/tetoolkit>`_
+
 `Pypi Page <https://pypi.python.org/pypi/TEToolkit>`_
-`MHammell Lab<http://hammelllab.labsites.cshl.edu/software>`_
+
+`MHammell Lab <http://hammelllab.labsites.cshl.edu/software>`_
 
 Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
 
@@ -36,8 +38,11 @@ Requirements
 ------------
 
 Python:     2.6.x or 2.7.x (not tested in Python 3.x)
+
 pysam:       0.8.2.1 or greater
+
 R:          2.15.x or greater
+
 DESeq:      1.5.x or greater
 
 
@@ -263,6 +268,6 @@ but *WITHOUT ANY WARRANTY*; without even the implied warranty of
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with TEToolKit.  If not, see http://www.gnu.org/licenses/.
+along with TEToolKit.  If not, see `this website <http://www.gnu.org/licenses/>`_.
 
 
