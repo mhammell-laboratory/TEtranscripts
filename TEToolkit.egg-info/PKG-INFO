@@ -1,73 +1,93 @@
 Metadata-Version: 1.0
 Name: TEToolkit
-Version: 1.4.7
+Version: 1.4.8
 Summary: Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions
 Home-page: http://hammelllab.labsites.cshl.edu/software#TEToolkit
 Author: Ying Jin, Eric Paniagua, Oliver Tam and Molly Hammell
 Author-email: yjin@cshl.edu
 License: GPLv3
-Description: # TEToolkit
+Description: TEToolkit
+        =========
         
-        Version: 1.4.7
+        Version: 1.4.8
         
-            TEToolkit is composed of two tools, TEpeaks and TEtranscripts, each described in
-            its own section below.
+        TEToolkit is composed of two tools, TEpeaks and TEtranscripts, each
+        described in its own section below.
         
-            *NOTE* Both programs rely on specially curated GTF files, which are not
-            packaged with this software due to their size. Please go to 
-            http://hammelllab.labsites.cshl.edu/software#TEToolkit 
-            for instructions to download the curated GTF files.
+        *NOTE* Both programs rely on specially curated GTF files, which are not
+        packaged with this software due to their size. Please go to 
+        `our website <http://hammelllab.labsites.cshl.edu/software#TEToolkit>`_
+        for instructions to download the curated GTF files.
         
-            TEpeak takes ChIP-seq (and similar data) alignment files (BAM or BED),
-            identiifes narrow peaks, and is also able to do differential analysis over
-            peaks of two sets of libraries. It is an extension of MACS by adding the
-            funcionality of taking into account multi-reads, another normalization
-            method, bin correlation, and differential analysis. The differential
-            analysis is performed using DESeq. 
+        TEpeak takes ChIP-seq (and similar data) alignment files (BAM or BED),
+        identiifes narrow peaks, and is also able to do differential analysis over
+        peaks of two sets of libraries. It is an extension of MACS by adding the
+        funcionality of taking into account multi-reads, another normalization
+        method, bin correlation, and differential analysis. The differential
+        analysis is performed using DESeq. 
         
-            TEtranscripts takes RNA-seq (and similar data) and annotates reads to both
-            genes & transposable elements. It then performs differential analysis using
-            DESeq.
+        TEtranscripts takes RNA-seq (and similar data) and annotates reads to both
+        genes & transposable elements. It then performs differential analysis using
+        DESeq.
         
-        + Github Page https://github.com/mhammell-laboratory/tetoolkit
-        + Pypi Page https://pypi.python.org/pypi/TEToolkit
-        + MHammell Lab http://hammelllab.labsites.cshl.edu/software
+        
+        `Github Page <https://github.com/mhammell-laboratory/tetoolkit>`_
+        
+        `Pypi Page <https://pypi.python.org/pypi/TEToolkit>`_
+        
+        `MHammell Lab <http://hammelllab.labsites.cshl.edu/software>`_
         
         Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
         
         Copyright (C) 2014-2015 Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell
         Contact: Ying Jin (yjin@cshl.edu)
         
-        ## Requirements
+        Requirements
+        ------------
         
-            Python:     2.6.x or 2.7.x (not tested in Python 3.x)
-            pysam:      0.8.2.1 or greater
-            R:          2.15.x or greater
-            DESeq:      1.5.x or greater
+        Python:     2.6.x or 2.7.x (not tested in Python 3.x)
+        
+        pysam:       0.8.2.1 or greater
+        
+        R:          2.15.x or greater
+        
+        DESeq:      1.5.x or greater
         
         
-        ## Installation
+        Installation
+        ------------
         
-            1) Download compressed tarball.
-            2) Unpack tarball.
-            3) Navigate into unpacked directory.
-            4) Run the following:
-               $ python setup.py install
+        1. Download compressed tarball.
+        2. Unpack tarball.
+        3. Navigate into unpacked directory.
+        4. Run the following::
         
-            If you want to install locally (e.g. /local/home/usr),
-               run this command instead:
+            $ python setup.py install
+        
+        If you want to install locally (e.g. /local/home/usr),
+        run this command instead::
+        
             $ python setup.py install --prefix /local/home/usr
         
-            *NOTE* In the above example, you must add /local/home/usr/bin
-            to the PATH variable, and 
-            /local/home/usr/lib/python2.X/site-packages 
-            to the PYTHONPATH variable, where python2.X refers to the 
-            python version (e.g. python2.7 if using python version 2.7.x).
+        *NOTE* In the above example, you must add
+        
+            /local/home/usr/bin
+        
+        to the PATH variable, and
+        
+             /local/home/usr/lib/python2.X/site-packages 
+        
+        to the PYTHONPATH variable, where python2.X refers to the 
+        python version (e.g. python2.7 if using python version 2.7.x).
         
         
-        # TEpeaks
+        TEpeaks
+        =========
         
-        ## Usage
+        Usage
+        ---------
+        
+        ::
         
             usage: TEpeaks -t treatment sample [treatment sample ...] 
                                 -c control sample [control sample ...]
@@ -110,7 +130,10 @@ Description: # TEToolkit
               -h | --help           help info
         
         
-        ## Example Command Lines
+        Example Command Lines
+        ----------------------
+        
+        ::
         
             TEpeaks --format BAM -t S1.bam --tinput S1input.bam -s mm -n sd --mode multi
         
@@ -118,9 +141,13 @@ Description: # TEToolkit
         
         
         
-        # TEtranscripts
+        TEtranscripts
+        =============
         
-        ## Usage
+        Usage
+        -----
+        
+        ::
         
             usage: TEtranscripts -t treatment sample [treatment sample ...] 
                                  -c control sample [control sample ...]
@@ -181,20 +208,23 @@ Description: # TEToolkit
               --version
                  Show program's version and exit
         
-            *NOTE* BAM files must be either unsorted or sorted by queryname. If the BAM files are sorted by position, please use the '--sortByPos' option
+        *NOTE* BAM files must be either unsorted or sorted by queryname. If the BAM files are sorted by position, please use the '--sortByPos' option
         
-        ## Example Command Lines
         
-            *** If BAM files are unsorted, or sorted by queryname: ***
+        Example Command Lines
+        ---------------------
+        
+        If BAM files are unsorted, or sorted by queryname:: 
         
             TEtranscripts --format BAM --mode multi -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --project sample_nosort_test
         
-            *** If BAM files are sorted by coordinates/position: ***
+        If BAM files are sorted by coordinates/position::
         
             TEtranscripts --sortByPos --format BAM --mode multi -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --project sample_sorted_test
         
         
-        # Recommendations for TEToolkit input files
+        Recommendations for TEToolkit input files
+        =========================================
         
         TEToolkit can perform transposable element quantification from alignment results (e.g. BAM files) generated from a variety of programs. 
         Given the variety of experimental systems, we could not provide an optimal alignment strategy for every approach. Therefore,
@@ -203,14 +233,14 @@ Description: # TEToolkit
         
         When optimizing the alignment parameters, we recommend taking these points into consideration:
         
-        ### Allowing sufficient number of multi-mappers during alignment
+        *Allowing sufficient number of multi-mappers during alignment*
         
         Most alignment programs provide only 1 alignment per read by default. We recommend reporting multiple alignments per read. We have found 
         that reporting a maximum of 100 alignments per read provides an optimal compromise between the size of the alignment file and recovery 
         of multi-mappers in many genome builds. However, we highly suggest that users optimize this parameter for their particular experiment, 
         as this could significantly improve the quality of transposable element quantification.
         
-        ### Optimizing alignment parameters for non-reference strains
+        *Optimizing alignment parameters for non-reference strains*
         
         It is common that the specific laboratory strains used in an experiment contains genomic variations not present in the reference strain.
         While this can be mitigated through allowing mismatches during alignments, certain lab strains (e.g. Drosophila melanogaster) have
@@ -220,9 +250,9 @@ Description: # TEToolkit
         genes and transposable elements that are compatible with their custom genome in order to utilize TEToolkit. Please contact us if you
         require advice in generating these annotation files.
         
-        ### Specific recommendations when using STAR
+        *Specific recommendations when using STAR*
         
-        STAR https://github.com/alexdobin/STAR utilizes two parameters for optimal identification of multi-mappers `--outFilterMultimapNmax` and `--outAnchorMultimapNmax`. 
+        `STAR <https://github.com/alexdobin/STAR>`_ utilizes two parameters for optimal identification of multi-mappers `--outFilterMultimapNmax` and `--outAnchorMultimapNmax`. 
         The author of STAR recommends that `--outAnchorMultimapNmax` should be set at twice the value used in `--outFilterMultimapNmax`, 
         but no less than 50. In our study, we used the same number for both parameters (100), and found negligible differences in identifying 
         multi-mappers. Upon further discussion with the author of STAR, we recommend that setting the same value for `--outAnchorMultimapNmax`
@@ -230,7 +260,8 @@ Description: # TEToolkit
         optimal value for their experiment.
         
         
-        # Copying & distribution
+        Copying & distribution
+        ======================
         
         TEtranscripts and TEpeaks are part of TEToolKit.
         
@@ -245,7 +276,7 @@ Description: # TEToolkit
         GNU General Public License for more details.
         
         You should have received a copy of the GNU General Public License
-        along with TEToolKit.  If not, see http://www.gnu.org/licenses/.
+        along with TEToolKit.  If not, see `this website <http://www.gnu.org/licenses/>`_.
         
         
         
