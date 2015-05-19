@@ -21,9 +21,9 @@ Version: X.X.X
     genes & transposable elements. It then performs differential analysis using
     DESeq.
 
-+ Github Page <https://github.com/mhammell-laboratory/tetoolkit>
-+ Pypi Page <https://pypi.python.org/pypi/TEToolkit>
-+ MHammell Lab <http://hammelllab.labsites.cshl.edu/software>
++ Github Page https://github.com/mhammell-laboratory/tetoolkit
++ Pypi Page https://pypi.python.org/pypi/TEToolkit
++ MHammell Lab http://hammelllab.labsites.cshl.edu/software
 
 Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
 
@@ -214,7 +214,7 @@ require advice in generating these annotation files.
 
 ### Specific recommendations when using STAR
 
-STAR <https://github.com/alexdobin/STAR> utilizes two parameters for optimal identification of multi-mappers `--outFilterMultimapNmax` and `--outAnchorMultimapNmax`. 
+STAR https://github.com/alexdobin/STAR utilizes two parameters for optimal identification of multi-mappers `--outFilterMultimapNmax` and `--outAnchorMultimapNmax`. 
 The author of STAR recommends that `--outAnchorMultimapNmax` should be set at twice the value used in `--outFilterMultimapNmax`, 
 but no less than 50. In our study, we used the same number for both parameters (100), and found negligible differences in identifying 
 multi-mappers. Upon further discussion with the author of STAR, we recommend that setting the same value for `--outAnchorMultimapNmax`
@@ -237,6 +237,6 @@ but *WITHOUT ANY WARRANTY*; without even the implied warranty of
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with TEToolKit.  If not, see <http://www.gnu.org/licenses/>.
+along with TEToolKit.  If not, see http://www.gnu.org/licenses/.
 
 
