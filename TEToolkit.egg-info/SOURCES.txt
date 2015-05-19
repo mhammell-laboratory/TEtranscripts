@@ -1,5 +1,6 @@
 COPYING
 MANIFEST.in
+README
 setup.cfg
 setup.py
 TEToolkit/Common.py
