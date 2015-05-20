@@ -1,7 +1,7 @@
 TEToolkit
 =========
 
-Version: 1.4.9
+Version: X.X.X
 
 TEToolkit is composed of two tools, TEpeaks and TEtranscripts, each
 described in its own section below.
