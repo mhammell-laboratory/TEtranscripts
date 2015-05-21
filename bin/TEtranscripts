@@ -94,10 +94,11 @@ def count_reads(samples, format, geneIdx, teIdx,stranded, te_mode, sortByPos, pr
             (gene_counts,te_instance_counts) = count_transcript_abundance(filename,format,geneIdx,teIdx,stranded,te_mode, sortByPos, prj_name,numItr,fragLength,maxL)
             
             #summarize on elements
-            te_ele_counts = teIdx.groupByEle(te_instance_counts)
+            te_ele_counts = teIdx.groupByName(te_instance_counts)
             # save gene counts and TE counts into count table
             cnt_tbl[filename] = dict(gene_counts.items() + te_ele_counts.items())
             num_reads = sum(gene_counts.values())+sum(te_ele_counts.values())
+            libsize.append(num_reads)
     except:
         sys.stderr.write("Error: %s\n" % str(sys.exc_info()[1]))
         sys.stderr.write( "[Exception type: %s, raised in %s:%d]\n" %
@@ -107,7 +108,6 @@ def count_reads(samples, format, geneIdx, teIdx,stranded, te_mode, sortByPos, pr
         sys.exit(1)
 
     return (cnt_tbl,libsize)
-#return (cnt_tbl, rpm_val)
 
 
 #read assignment
