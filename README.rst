@@ -32,6 +32,7 @@ DESeq.
 Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
 
 Copyright (C) 2014-2015 Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell
+
 Contact: Ying Jin (yjin@cshl.edu)
 
 Requirements
@@ -39,7 +40,7 @@ Requirements
 
 Python:     2.6.x or 2.7.x (not tested in Python 3.x)
 
-pysam:       0.8.2.1 or greater
+pysam:      0.8.2.1 or greater
 
 R:          2.15.x or greater
 
@@ -97,7 +98,7 @@ Usage
 
     Optional arguments:
       -c | --control [control sample 1 control sample 2 ...]
-    --cinput  control input
+      --cinput  control input
       --format [input file format]
          Input file format: BAM or BED. DEFAULT: BAM
       --project [name]      Name of this project. DEFAULT: TEpeak_out
