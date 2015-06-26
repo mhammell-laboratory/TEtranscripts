@@ -9,6 +9,13 @@ setup(name='TEToolkit',
       description='Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions',
       long_description=readme(),
       classifiers=[
+          'Development Status :: 5 - Production/Stable'
+          'Environment :: Console'
+          'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'
+          'Topic :: Scientific/Engineering :: Bio-Informatics'
+          'Programming Language :: Python :: 2.7'
+          'Operating System :: MacOS'
+          'Operating System :: Unix'	   
       ],
       keywords='TE transposable element differential enrichment',
       url='http://hammelllab.labsites.cshl.edu/software#TEToolkit',
