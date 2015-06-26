@@ -3,9 +3,9 @@ Name:         TEToolkit
 Version:      X.X.X
 Summary:      Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions
 Home-page:    http://hammelllab.labsites.cshl.edu/software#TEToolkit
-Author:       Ying Jin, Eric Paniagua, Oliver Tam and Molly Hammell
+Author:       Ying Jin, Eric Paniagua, Oliver Tam, Molly Hammell
 Author-email: yjin@cshl.edu
 License:      GPLv3
 Description:  TEToolkit enables differential analysis of Transposable Elements in RNA-Seq and ChIP-Seq data
 Keywords:     TE transposable element differential enrichment
-Platform:     Linux, MacOSX
+Platform:     Linux, MacOSX, Unix
