@@ -94,7 +94,7 @@ Usage
          _Sample files in group 1 (e.g. treatment/mutant), separated by space_
          _Sample files in group 2 (e.g. control/wildtype), separated by space_
       --tinput    treatment input 
-      -s genome  (hg: human19, mm: mouse9, dm: dm3)
+      -s genome  (hg: human, mm: mouse, dm: d. melanogaster)
 
     Optional arguments:
       -c | --control [control sample 1 control sample 2 ...]
