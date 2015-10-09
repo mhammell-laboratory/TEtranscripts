@@ -10,7 +10,9 @@ setup(name='TEToolkit',
       long_description=readme(),
       classifiers=[
           'Development Status :: 5 - Production/Stable',
+		  'Intended Audience :: Science/Research',
           'Environment :: Console',
+          'Natural Language :: English',
           'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
           'Topic :: Scientific/Engineering :: Bio-Informatics',
           'Programming Language :: Python :: 2.7',
@@ -30,13 +32,12 @@ setup(name='TEToolkit',
       platforms=[
           'Linux',
           'MacOS',
-		  'Unix'
+          'Unix'
       ],
       install_requires=[
           'argparse',
           'pysam>=0.8'
       ],
-
       include_package_data=True,
       zip_safe=False,
       scripts=[
