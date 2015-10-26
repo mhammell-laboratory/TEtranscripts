@@ -1,0 +1,2 @@
+argparse
+pysam>=0.8

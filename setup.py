@@ -5,10 +5,19 @@ def readme():
 	       return f.read()
 
 setup(name='TEToolkit',
-      version='1.5',
+      version='X.X.X',
       description='Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions',
       long_description=readme(),
       classifiers=[
+          'Development Status :: 5 - Production/Stable',
+		  'Intended Audience :: Science/Research',
+          'Environment :: Console',
+          'Natural Language :: English',
+          'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+          'Topic :: Scientific/Engineering :: Bio-Informatics',
+          'Programming Language :: Python :: 2.7',
+          'Operating System :: MacOS',
+          'Operating System :: Unix'	   
       ],
       keywords='TE transposable element differential enrichment',
       url='http://hammelllab.labsites.cshl.edu/software#TEToolkit',
@@ -28,7 +37,6 @@ setup(name='TEToolkit',
           'argparse',
           'pysam>=0.8'
       ],
-
       include_package_data=True,
       zip_safe=False,
       scripts=[
