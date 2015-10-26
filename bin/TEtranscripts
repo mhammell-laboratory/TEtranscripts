@@ -48,9 +48,9 @@ def prepare_parser():
                         help='Input file format: BAM or SAM. DEFAULT: BAM')
     parser.add_argument('--stranded', metavar='option', dest='stranded', nargs='?', type=str, default="yes", choices=['yes','no','reverse'],
                         help='Is this a stranded library? (yes, no, or reverse). DEFAULT: yes.')
-    parser.add_argument('--mode', metavar='TE counting mode', dest='te_mode', nargs='?', type=str, const="multi", default='uniq', choices=['uniq','multi'],
+    parser.add_argument('--mode', metavar='TE counting mode', dest='te_mode', nargs='?', type=str, const="multi", default='multi', choices=['uniq','multi'],
                         help='How to count TE: uniq (unique mappers only), or multi (distribute among all alignments).\
-                        DEFAULT: uniq')
+                        DEFAULT: multi')
     parser.add_argument('--project', metavar='name', dest='prj_name', nargs='?', default='TEtranscripts_out',
                         help='Name of this project. DEFAULT: TEtranscripts_out')
     parser.add_argument('-p', '--padj', metavar='pvalue', dest='pval', nargs='?', type=float, const=0.1, default=0.05,
@@ -63,9 +63,8 @@ def prepare_parser():
                         help='Normalization method : DESeq_default (DEseq default normalization method), TC (total annotated counts), quant (quantile normalization). DEFAULT: DESeq_default')
     parser.add_argument('--sortByPos', dest = 'sortByPos', action="store_true",
                         help='Alignment files are sorted by chromosome position.')
-
-    parser.add_argument('-i', '--iteration', metavar='iteration', dest='numItr', nargs='?', type=int,  default=0,
-                        help='number of iteration to run the optimization. DEFAULT: 0')
+    parser.add_argument('-i', '--iteration', metavar='iteration', dest='numItr', nargs='?', type=int,  default=10,
+                        help='number of iteration to run the optimization. DEFAULT: 10')
     parser.add_argument('--maxL',metavar='maxL',dest='maxL',nargs='?',type=int,default=500,help='maximum fragment length. DEFAULT:500')
     parser.add_argument('--minL',metavar='minL',dest='minL',nargs='?',type=int,default=0,help='minimum fragment length. DEFAULT:0')
     parser.add_argument('-L', '--fragmentLength', metavar='fragLength', dest='fragLength', nargs='?', type=int,  default=0,
@@ -262,11 +261,17 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
 
             if aligned_read.is_unmapped or aligned_read.is_duplicate or aligned_read.is_qcfail :
                 continue
-
+           
+            added_flag_pos = aligned_read.query_name.find('/')
+            cur_read_name = ""
+            if added_flag_pos == -1 :
+                cur_read_name = aligned_read.query_name
+            else:
+                cur_read_name = aligned_read.query_name[:added_flag_pos]
             if aligned_read.is_paired :  # this is not reliable if read mate is unmapped
                 paired = True
-                if aligned_read.query_name == prev_read_name or prev_read_name == "":
-                    prev_read_name = aligned_read.query_name
+                if cur_read_name == prev_read_name or prev_read_name == "":
+                    prev_read_name = cur_read_name
                     if aligned_read.is_read1 :
                             multi_read1.append(aligned_read)
                     if aligned_read.is_read2 :
@@ -283,6 +288,10 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                         if len(multi_read2) == 1:
                             read2 = multi_read2[0]
                         if read1 is not None and read1.is_proper_pair :
+                            if read2 is None :
+                                sys.stderr.write("******NOT COMPLETE*******\n")
+                                sys.stderr.write("If the BAM file is sorted by coordinates, please specify --sortByPos and re-run!\n")
+                                sys.exit(0)
                             if tmp_cnt < 10000 :
                                 pos1 = read1.reference_start
                                 pos2 = read2.reference_start
@@ -298,7 +307,7 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                             alignments_per_read = []
                             multi_read1 = []
                             multi_read2 = []
-                            prev_read_name = aligned_read.query_name
+                            prev_read_name = cur_read_name
                             if aligned_read.is_read1 :
                                 multi_read1.append(aligned_read)
                             if aligned_read.is_read2 :
@@ -321,9 +330,9 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
 
 
             else : #single end read
-                    if aligned_read.query_name == prev_read_name or prev_read_name == "":
+                    if cur_read_name == prev_read_name or prev_read_name == "":
                         alignments_per_read.append((aligned_read,None))
-                        prev_read_name = aligned_read.qname
+                        prev_read_name = cur_read_name
                         continue
                     else : # a new read
                         if tmp_cnt < 10000 :
@@ -337,7 +346,7 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                             if te_mode == 'uniq' : #ignore multi-reads
                                 empty += 1
                                 alignments_per_read = []
-                                prev_read_name = aligned_read.query_name
+                                prev_read_name = cur_read_name
                                 alignments_per_read.append((aligned_read,None))
                                 continue
             try :
@@ -370,7 +379,7 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
             alignments_per_read = []
             multi_read1 = []
             multi_read2 = []
-            prev_read_name = aligned_read.qname
+            prev_read_name = cur_read_name
             if not aligned_read.is_paired :
                 alignments_per_read.append((aligned_read,None))
             else :
