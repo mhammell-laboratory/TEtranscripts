@@ -1,6 +1,6 @@
-Metadata-Version: 1.0
+Metadata-Version: 1.1
 Name: TEToolkit
-Version: 1.4.11
+Version: 1.5.0
 Summary: Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions
 Home-page: http://hammelllab.labsites.cshl.edu/software#TEToolkit
 Author: Ying Jin, Eric Paniagua, Oliver Tam and Molly Hammell
@@ -9,7 +9,7 @@ License: GPLv3
 Description: TEToolkit
         =========
         
-        Version: 1.4.11
+        Version: 1.5.0
         
         TEToolkit is composed of two tools, TEpeaks and TEtranscripts, each
         described in its own section below.
@@ -19,7 +19,7 @@ Description: TEToolkit
         `our website <http://hammelllab.labsites.cshl.edu/software#TEToolkit>`_
         for instructions to download the curated GTF files.
         
-        TEpeak takes ChIP-seq (and similar data) alignment files (BAM or BED),
+        TEpeaks takes ChIP-seq (and similar data) alignment files (BAM or BED),
         identiifes narrow peaks, and is also able to do differential analysis over
         peaks of two sets of libraries. It is an extension of MACS by adding the
         funcionality of taking into account multi-reads, another normalization
@@ -40,6 +40,7 @@ Description: TEToolkit
         Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
         
         Copyright (C) 2014-2015 Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell
+        
         Contact: Ying Jin (yjin@cshl.edu)
         
         Requirements
@@ -47,7 +48,7 @@ Description: TEToolkit
         
         Python:     2.6.x or 2.7.x (not tested in Python 3.x)
         
-        pysam:       0.8.2.1 or greater
+        pysam:      0.8.2.1 or greater
         
         R:          2.15.x or greater
         
@@ -101,11 +102,11 @@ Description: TEToolkit
                  _Sample files in group 1 (e.g. treatment/mutant), separated by space_
                  _Sample files in group 2 (e.g. control/wildtype), separated by space_
               --tinput    treatment input 
-              -s genome  (hg: human19, mm: mouse9, dm: dm3)
+              -s genome  (hg: human, mm: mouse, dm: d. melanogaster)
         
             Optional arguments:
               -c | --control [control sample 1 control sample 2 ...]
-            --cinput  control input
+              --cinput  control input
               --format [input file format]
                  Input file format: BAM or BED. DEFAULT: BAM
               --project [name]      Name of this project. DEFAULT: TEpeak_out
@@ -179,7 +180,7 @@ Description: TEToolkit
                  How to count TE:
                     uniq        (unique mappers only)
                     multi       (distribute among all alignments).
-                 DEFAULT: uniq
+                 DEFAULT: multi
               --minread [min_read] read count cutoff. DEFAULT: 1
               -L | --fragmentLength [fragLength]
                  Average length of fragment used for single-end sequencing
@@ -188,7 +189,7 @@ Description: TEToolkit
                  Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts), quant (quantile normalization). 
                  DEFAULT: DESeq_default
               -i | --iteration 
-                 maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 0
+                 maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 10
               -p | --padj [pvalue]
                  FDR cutoff for significance. DEFAULT: 0.05
               -f | --foldchange [foldchange]
@@ -283,3 +284,12 @@ Description: TEToolkit
 Keywords: TE transposable element differential enrichment
 Platform: Linux
 Platform: MacOS
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: Environment :: Console
+Classifier: Natural Language :: English
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Unix
