@@ -11,7 +11,7 @@ packaged with this software due to their size. Please go to
 `our website <http://hammelllab.labsites.cshl.edu/software#TEToolkit>`_
 for instructions to download the curated GTF files.
 
-TEpeak takes ChIP-seq (and similar data) alignment files (BAM or BED),
+TEpeaks takes ChIP-seq (and similar data) alignment files (BAM or BED),
 identiifes narrow peaks, and is also able to do differential analysis over
 peaks of two sets of libraries. It is an extension of MACS by adding the
 funcionality of taking into account multi-reads, another normalization
@@ -172,7 +172,7 @@ Usage
          How to count TE:
             uniq        (unique mappers only)
             multi       (distribute among all alignments).
-         DEFAULT: uniq
+         DEFAULT: multi
       --minread [min_read] read count cutoff. DEFAULT: 1
       -L | --fragmentLength [fragLength]
          Average length of fragment used for single-end sequencing
@@ -181,7 +181,7 @@ Usage
          Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts), quant (quantile normalization). 
          DEFAULT: DESeq_default
       -i | --iteration 
-         maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 0
+         maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 10
       -p | --padj [pvalue]
          FDR cutoff for significance. DEFAULT: 0.05
       -f | --foldchange [foldchange]
