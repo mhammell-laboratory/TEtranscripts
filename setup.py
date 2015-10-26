@@ -5,12 +5,12 @@ def readme():
 	       return f.read()
 
 setup(name='TEToolkit',
-      version='X.X.X',
+      version='1.5.0',
       description='Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions',
       long_description=readme(),
       classifiers=[
           'Development Status :: 5 - Production/Stable',
-		  'Intended Audience :: Science/Research',
+          'Intended Audience :: Science/Research',
           'Environment :: Console',
           'Natural Language :: English',
           'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
