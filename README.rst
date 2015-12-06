@@ -74,6 +74,32 @@ to the PYTHONPATH variable, where python2.X refers to the
 python version (e.g. python2.7 if using python version 2.7.x).
 
 
+Special note for RStudio users
+------------------------------
+
+If you are using RStudio (especially Mac OS X users), please ensure that the Rscript program is on your PATH variable.
+You can check this by running the following::
+
+    $ which Rscript
+
+If you get the following messages::
+
+   /usr/bin/which: no Rscript in (/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin)
+
+You will need to add Rscript to your PATH variable.
+For standard installations of R on Mac OS X, you can make a symbolic link to your Rscript program by doing the following::
+
+    $ ln -s /Library/Frameworks/R.framework/Resources/bin/Rscript [a folder in your PATH variable] (e.g. /local/home/usr/bin)
+
+Check that your symbolic link works by running the following::
+
+    $ which Rscript
+
+This time, you should be able to get the following::
+
+    /local/home/usr/bin (or wherever the symbolic link was placed)
+
+
 TEpeaks
 =========
 
