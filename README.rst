@@ -62,11 +62,11 @@ run this command instead::
 
     $ python setup.py install --prefix /local/home/usr
 
-*NOTE* In the above example, you must add
+*NOTE* In the above example, you must add::
 
     /local/home/usr/bin
 
-to the PATH variable, and
+to the PATH variable, and::
 
      /local/home/usr/lib/python2.X/site-packages 
 
@@ -82,7 +82,7 @@ You can check this by running the following::
 
     $ which Rscript
 
-If you get the following messages::
+If you get the following message::
 
    /usr/bin/which: no Rscript in (/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin)
 
