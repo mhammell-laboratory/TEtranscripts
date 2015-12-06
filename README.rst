@@ -77,7 +77,7 @@ python version (e.g. python2.7 if using python version 2.7.x).
 Special note for RStudio users
 ------------------------------
 
-If you are using RStudio (especially Mac OS X users), please ensure that the Rscript program is on your PATH variable.
+If you are using RStudio (especially Mac OS X users), please ensure that the Rscript program is in your PATH variable.
 You can check this by running the following::
 
     $ which Rscript
