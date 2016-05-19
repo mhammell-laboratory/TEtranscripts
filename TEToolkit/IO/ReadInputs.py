@@ -249,15 +249,17 @@ def read_opts2(parser):
              logging.error("No such file: %s !\n" % (args.gtffile))
              sys.exit(1)
 	# Obtain & store list of files for group 1 (e.g. treatment/mutant)
-	for i in range(len(args.tfiles)) :
-		if not os.path.isfile(args.tfiles[i]) :
-			logging.error("No such file: %s !\n" % (args.tfiles[i]))
-			sys.exit(1)
+	if "tfiles" in args:
+		for i in range(len(args.tfiles)) :
+			if not os.path.isfile(args.tfiles[i]) :
+				logging.error("No such file: %s !\n" % (args.tfiles[i]))
+				sys.exit(1)
 	# Obtain & store list of files for group2 (e.g. control/wildtype)
-	for i in range(len(args.cfiles)) :
-		if not os.path.isfile(args.cfiles[i]) :
-			logging.error("No such file: %s !\n" % (args.cfiles[i]))
-			sys.exit(1)
+	if "cfiles" in args:
+		for i in range(len(args.cfiles)) :
+			if not os.path.isfile(args.cfiles[i]) :
+				logging.error("No such file: %s !\n" % (args.cfiles[i]))
+				sys.exit(1)
 	# Identify file format for subsequent processing (parsing)
 	if args.format == "BAM" :
 		args.parser = "BAM"
@@ -277,31 +279,34 @@ def read_opts2(parser):
 		parser.print_help()
 		sys.exit(1)
         # Method of normalization (rpm or quantile)
-	if args.norm not in ['quant','TC','DESeq_default'] :
-		logging.error("normalization method %s not supported\n" % (args.norm))
-		parser.print_help()
-		sys.exit(1)
-		# Cutoff for adjusted p-value
-	if args.pval < 0 or args.pval > 1 :
-		logging.error("p-value should be a value in [0,1]\n")
-		sys.exit(1)
+	if "norm" in args:
+		if args.norm not in ['quant','TC','DESeq_default'] :
+			logging.error("normalization method %s not supported\n" % (args.norm))
+			parser.print_help()
+			sys.exit(1)
+	# Cutoff for adjusted p-value
+	if "pval" in args:
+		if args.pval < 0 or args.pval > 1 :
+			logging.error("p-value should be a value in [0,1]\n")
+			sys.exit(1)
 	# Cutoff for fold change
-	if args.fc == 0:
-		logging.error("absolute fold change ratio cannot be zero\n")
-		sys.exit(1)
-	elif args.fc < 0:
-		args.fc = -1.0 * args.fc
-	elif args.fc < 1 :
-		args.fc = 1.0/args.fc
-	else:
-		args.fc = 1.0 * args.fc
+	if "fc" in args:
+		if args.fc == 0:
+			logging.error("absolute fold change ratio cannot be zero\n")
+			sys.exit(1)
+		elif args.fc < 0:
+			args.fc = -1.0 * args.fc
+		elif args.fc < 1 :
+			args.fc = 1.0/args.fc
+		else:
+			args.fc = 1.0 * args.fc
 	
 	if args.sortByPos:
 		args.sortByPos=True
 	else:
 		args.sortByPos=False
 
-        if args.min_read < 0 :
+        if "min_read" in args and args.min_read < 0 :
            args.min_read = 1
         if args.numItr < 0 :
             args.numItr = 0
@@ -325,6 +330,15 @@ def read_opts2(parser):
 	args.warn = logging.warning
 	args.debug = logging.debug
 	args.info = logging.info
+
+	if "prj_name" not in args:
+		args.prj_name = args.prefix
+		args.tfiles = args.bam
+                args.cfiles = ''
+		args.norm = 'NA'
+		args.pval = 1.0
+		args.fc = 0.0
+		args.min_read = 0
 	
 	args.argtxt = "\n".join(("# ARGUMENTS LIST:", \
 				"# name = %s" % (args.prj_name), \

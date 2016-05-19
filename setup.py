@@ -41,6 +41,7 @@ setup(name='TEToolkit',
       zip_safe=False,
       scripts=[
           'bin/TEtranscripts',
-          'bin/TEpeaks'
+          'bin/TEpeaks',
+          'bin/TEcount'
       ]
 )
