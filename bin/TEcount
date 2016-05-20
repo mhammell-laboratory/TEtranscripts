@@ -52,8 +52,8 @@ def prepare_parser():
                         help='Name of this project. DEFAULT: TEtranscripts_out')
     parser.add_argument('--sortByPos', dest='sortByPos', action="store_true",
                         help='Alignment file is sorted by chromosome position.')
-    parser.add_argument('-i', '--iteration', metavar='iteration', dest='numItr', type=int, default=10,
-                        help='number of iteration to run the optimization. DEFAULT: 10')
+    parser.add_argument('-i', '--iteration', metavar='iteration', dest='numItr', type=int, default=100,
+                        help='number of iteration to run the optimization. DEFAULT: 100')
     parser.add_argument('--maxL', metavar='maxL', dest='maxL', type=int, default=500, help='maximum fragment length. DEFAULT:500')
     parser.add_argument('--minL', metavar='minL', dest='minL', type=int, default=0, help='minimum fragment length. DEFAULT:0')
     parser.add_argument('-L', '--fragmentLength', metavar='fragLength', dest='fragLength', type=int, default=0,
@@ -92,7 +92,7 @@ def count_reads(filename, format, geneIdx, teIdx, stranded, te_mode, sortByPos, 
                           traceback.extract_tb(sys.exc_info()[2])[-1][1]))
         sys.exit(1)
 
-    return (cnt_tbl, libsize)
+    return cnt_tbl
 
 
 def fetch_exon(chrom, st, cigar, direction, format):
@@ -496,8 +496,8 @@ def output_count_tbl(tbl, prefix):
     classes = {}
     families = {}
 
-    for k, v in cnts:
-        if k.count(':') != 3:
+    for k, v in cnts.items():
+        if k.count(':') != 2:
             # Gene
             if k not in genes:
                 genes[k] = int(v)
@@ -506,17 +506,17 @@ def output_count_tbl(tbl, prefix):
         else:
             TEname, TEfamily, TEclass = k.split(":")
             if TEname not in names:
-                names[TEname] = int(TEname)
+                names[TEname] = int(v)
             else:
-                names[TEname] += int(TEname)
+                names[TEname] += int(v)
             if TEfamily not in families:
-                families[TEfamily] = int(TEfamily)
+                families[TEfamily] = int(v)
             else:
-                families[TEfamily] += int(TEfamily)
-            if TEclass not in classs:
-                classes[TEclass] = int(TEclass)
+                families[TEfamily] += int(v)
+            if TEclass not in classes:
+                classes[TEclass] = int(v)
             else:
-                classes[TEclass] += int(TEclass)
+                classes[TEclass] += int(v)
 
     # Write the output, which is sorted by key in case this is ever run in python3
     for k in sorted(genes.keys()):
@@ -525,7 +525,7 @@ def output_count_tbl(tbl, prefix):
     for k in sorted(names.keys()):
         f_name.write("{}\t{}\n".format(k, names[k]))
     f_name.close()
-    for k in sorted(familes.keys()):
+    for k in sorted(families.keys()):
         f_family.write("{}\t{}\n".format(k, families[k]))
     f_family.close()
     for k in sorted(classes.keys()):
@@ -566,19 +566,19 @@ def main():
     # Read sample files make count table
     info("\nReading sample file ...\n")
 
-    tsamples_tbl = count_reads(args.bam,
-                               args.parser,
-                               geneIdx,
-                               teIdx,
-                               args.stranded,
-                               args.te_mode,
-                               args.sortByPos,
-                               args.numItr,
-                               args.fragLength,
-                               args.maxL)
+    tbl = count_reads(args.bam,
+                      args.parser,
+                      geneIdx,
+                      teIdx,
+                      args.stranded,
+                      args.te_mode,
+                      args.sortByPos,
+                      args.numItr,
+                      args.fragLength,
+                      args.maxL)
     info("Finished processing sample file")
 
-    output_count_tbl(tsamples_tbl, args.prefix)
+    output_count_tbl(tbl, args.prefix)
 
 
 if __name__ == '__main__':
