@@ -1,7 +1,7 @@
 TEToolkit
 =========
 
-Version: X.X.X
+Version: 1.5.1
 
 *NOTE* TEtranscripts rely on specially curated GTF files, which are not
 packaged with this software due to their size. Please go to 
