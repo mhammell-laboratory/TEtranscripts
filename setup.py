@@ -21,7 +21,7 @@ setup(name='TEToolkit',
       ],
       keywords='TE transposable element differential enrichment',
       url='http://hammelllab.labsites.cshl.edu/software#TEToolkit',
-      author='Ying Jin, Eric Paniagua, Oliver Tam and Molly Hammell',
+      author='Ying Jin, Eric Paniagua, Oliver Tam, Molly Hammell',
       author_email='yjin@cshl.edu',
       license='GPLv3',
       packages=[
