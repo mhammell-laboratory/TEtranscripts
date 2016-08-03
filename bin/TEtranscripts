@@ -8,7 +8,7 @@ Created on Jan 27, 2014
 @author: Oliver Tam
 @contact tam@cshl.edu
 @status: 
-@version: X.X.X
+@version: 1.5.1
 '''
 # python module
 import sys
@@ -71,7 +71,7 @@ def prepare_parser():
                         help='average fragment length for single end reads. For paired-end, estimated from the input alignment file. DEFAULT: for paired-end, estimate from the input alignment file; for single-end, ignored by default.')
     parser.add_argument('--verbose', metavar='verbose', dest='verbose', type=int, nargs='?', default=2,
                         help='Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2')
-    parser.add_argument('--version', action='version', version='%(prog)s X.X.X')
+    parser.add_argument('--version', action='version', version='%(prog)s 1.5.1')
 
     return parser
 
@@ -262,13 +262,17 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
             if aligned_read.is_unmapped or aligned_read.is_duplicate or aligned_read.is_qcfail :
                 continue
            
-            added_flag_pos = aligned_read.query_name.find('/')
-            cur_read_name = ""
-            if added_flag_pos == -1 :
-                cur_read_name = aligned_read.query_name
-            else:
-                cur_read_name = aligned_read.query_name[:added_flag_pos]
+            cur_read_name = aligned_read.query_name
+
             if aligned_read.is_paired :  # this is not reliable if read mate is unmapped
+                added_flag_pos = aligned_read.query_name.find('/')
+                if added_flag_pos == -1 :
+                    added_flag_pos = len(aligned_read.query_name)
+                if aligned_read.query_name.endswith(".1") or aligned_read.query_name.endswith(".2") :
+                    added_flag_pos = len(aligned_read.query_name) - 2
+                
+                cur_read_name = aligned_read.query_name[:added_flag_pos]
+                
                 paired = True
                 if cur_read_name == prev_read_name or prev_read_name == "":
                     prev_read_name = cur_read_name

@@ -3,20 +3,10 @@ TEToolkit
 
 Version: X.X.X
 
-TEToolkit is composed of two tools, TEpeaks and TEtranscripts, each
-described in its own section below.
-
-*NOTE* Both programs rely on specially curated GTF files, which are not
+*NOTE* TEtranscripts rely on specially curated GTF files, which are not
 packaged with this software due to their size. Please go to 
 `our website <http://hammelllab.labsites.cshl.edu/software#TEToolkit>`_
 for instructions to download the curated GTF files.
-
-TEpeaks takes ChIP-seq (and similar data) alignment files (BAM or BED),
-identiifes narrow peaks, and is also able to do differential analysis over
-peaks of two sets of libraries. It is an extension of MACS by adding the
-funcionality of taking into account multi-reads, another normalization
-method, bin correlation, and differential analysis. The differential
-analysis is performed using DESeq. 
 
 TEtranscripts takes RNA-seq (and similar data) and annotates reads to both
 genes & transposable elements. It then performs differential analysis using
@@ -62,102 +52,16 @@ run this command instead::
 
     $ python setup.py install --prefix /local/home/usr
 
-*NOTE* In the above example, you must add::
+*NOTE* In the above example, you must add
 
     /local/home/usr/bin
 
-to the PATH variable, and::
+to the PATH variable, and
 
      /local/home/usr/lib/python2.X/site-packages 
 
 to the PYTHONPATH variable, where python2.X refers to the 
 python version (e.g. python2.7 if using python version 2.7.x).
-
-
-Special note for RStudio users
-------------------------------
-
-If you are using RStudio (especially Mac OS X users), please ensure that the Rscript program is in your PATH variable.
-You can check this by running the following::
-
-    $ which Rscript
-
-If you get the following message::
-
-   /usr/bin/which: no Rscript in (/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin)
-
-You will need to add Rscript to your PATH variable.
-For standard installations of R on Mac OS X, you can make a symbolic link to your Rscript program by doing the following::
-
-    $ ln -s /Library/Frameworks/R.framework/Resources/bin/Rscript [a folder in your PATH variable] (e.g. /local/home/usr/bin)
-
-Check that your symbolic link works by running the following::
-
-    $ which Rscript
-
-This time, you should be able to get the following::
-
-    /local/home/usr/bin (or wherever the symbolic link was placed)
-
-
-TEpeaks
-=========
-
-Usage
----------
-
-::
-
-    usage: TEpeaks -t treatment sample [treatment sample ...] 
-                        -c control sample [control sample ...]
-                        --tinput treatment input
-                        --cinput control input
-                        -s genome  
-                        [optional arguments]
-
-    Required arguments:
-      -t | --treatment [treatment sample 1 treatment sample 2...]
-         _Sample files in group 1 (e.g. treatment/mutant), separated by space_
-         _Sample files in group 2 (e.g. control/wildtype), separated by space_
-      --tinput    treatment input 
-      -s genome  (hg: human, mm: mouse, dm: d. melanogaster)
-
-    Optional arguments:
-      -c | --control [control sample 1 control sample 2 ...]
-      --cinput  control input
-      --format [input file format]
-         Input file format: BAM or BED. DEFAULT: BAM
-      --project [name]      Name of this project. DEFAULT: TEpeak_out
-      -p | --padj [pvalue]
-         FDR cutoff for significance. DEFAULT: 1e-5
-      -n | --norm [normalization]
-         Normalization method : sd (library size),
-                                bc (bin correlation). DEFAULT: sd
-      -r | --step           step size. DEFAULT: 100
-      -a | --auto           auto detect shiftsize. DEFAULT: False
-      -d | --diff           require differential analysis
-      -g | --gap            maximum allowed gap. DEFAULT: 1000
-      -f | --fragsize       fragment size. DEFAULT: 200
-      --lmfold              lower bound of fold change for modeling shipsize.
-                            DEFAULT: 10
-      --umfold              upper bound of fold change for modeling shiftsize.
-                            DEFAULT: 30
-      --minread             minimal reads of a peak. DEFAULT: 5
-      --mode                TE counting mode. 'uniq' consider uniq-reads only. 'multi' distribute to all alignments. DEFAULT: multi
-      --wig                 generate wiggle file for peaks (normalize to
-                                10 million reads in total(library size))
-      -h | --help           help info
-
-
-Example Command Lines
-----------------------
-
-::
-
-    TEpeaks --format BAM -t S1.bam --tinput S1input.bam -s mm -n sd --mode multi
-
-    TEpeaks --format BAM -t S1.bam S2.bam -c C1.bam C2.bam  --tinput S1input.bam  --cinput C1input.bam -s mm -n sd --diff --mode multi
-
 
 
 TEtranscripts
@@ -271,18 +175,18 @@ require advice in generating these annotation files.
 
 *Specific recommendations when using STAR*
 
-`STAR <https://github.com/alexdobin/STAR>`_ utilizes two parameters for optimal identification of multi-mappers `--outFilterMultimapNmax` and `--winAnchorMultimapNmax`. 
-The author of STAR recommends that `--winAnchorMultimapNmax` should be set at twice the value used in `--outFilterMultimapNmax`, 
+`STAR <https://github.com/alexdobin/STAR>`_ utilizes two parameters for optimal identification of multi-mappers `--outFilterMultimapNmax` and `--outAnchorMultimapNmax`. 
+The author of STAR recommends that `--outAnchorMultimapNmax` should be set at twice the value used in `--outFilterMultimapNmax`, 
 but no less than 50. In our study, we used the same number for both parameters (100), and found negligible differences in identifying 
-multi-mappers. Upon further discussion with the author of STAR, we recommend that setting the same value for `--winAnchorMultimapNmax`
-and `--outFilterMultimapNmax`, though we highly suggest users test multiple values of `--winAnchorMultimapNmax` to identify the 
+multi-mappers. Upon further discussion with the author of STAR, we recommend that setting the same value for `--outAnchorMultimapNmax`
+and `--outFilterMultimapNmax`, though we highly suggest users test multiple values of `--outAnchorMultimapNmax` to identify the 
 optimal value for their experiment.
 
 
 Copying & distribution
 ======================
 
-TEtranscripts and TEpeaks are part of TEToolKit.
+TEtranscripts is part of TEToolKit.
 
 TEToolKit is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

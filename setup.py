@@ -40,7 +40,6 @@ setup(name='TEToolkit',
       include_package_data=True,
       zip_safe=False,
       scripts=[
-          'bin/TEtranscripts',
-          'bin/TEpeaks'
+          'bin/TEtranscripts'
       ]
 )
