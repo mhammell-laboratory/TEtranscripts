@@ -207,7 +207,12 @@ def readInAlignment(filename, format, sortByPos,prj_name):
 
                 cur_time = time.time()
                 bam_tmpfile = '.'+str(cur_time)
-                pysam.sort("-n",filename,bam_tmpfile)
+                if tuple(map(int, pysam.__version__.split(".")[0:2])) < tuple([0, 9]):
+                    # pysam < 0.9 / samtools < 1.3
+                    pysam.sort("-n",filename,bam_tmpfile)
+                else:
+                    # pysam >= 0.9 / samtools >= 1.3
+                    pysam.sort("-n","-o",bam_tmpfile+".bam",filename)
                 #samfile = pysam.AlignmentFile(samtools_in.stdout,'r')
                 samfile = pysam.AlignmentFile(bam_tmpfile+".bam",'r')
                 if len(samfile.header) ==0:
