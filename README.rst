@@ -3,13 +3,13 @@ TEToolkit
 
 Version: X.X.X
 
-*NOTE* TEtranscripts rely on specially curated GTF files, which are not
+*NOTE* TEtranscripts and TEcount rely on specially curated GTF files, which are not
 packaged with this software due to their size. Please go to 
 `our website <http://hammelllab.labsites.cshl.edu/software#TEToolkit>`_
 for instructions to download the curated GTF files.
 
-TEtranscripts takes RNA-seq (and similar data) and annotates reads to both
-genes & transposable elements. It then performs differential analysis using
+TEtranscripts and TEcount takes RNA-seq (and similar data) and annotates reads to both
+genes & transposable elements. TEtranscripts then performs differential analysis using
 DESeq.
 
 
@@ -21,7 +21,7 @@ DESeq.
 
 Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
 
-Copyright (C) 2014-2015 Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell
+Copyright (C) 2014-2018 Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell
 
 Contact: Ying Jin (yjin@cshl.edu)
 
@@ -34,7 +34,7 @@ pysam:      0.9.x or greater
 
 R:          2.15.x or greater
 
-DESeq2:     1.10.x or greater (recommended)
+DESeq2:     1.10.x or greater
 
 
 Installation
@@ -107,16 +107,20 @@ Usage
       -L | --fragmentLength [fragLength]
          Average length of fragment used for single-end sequencing
          DEFAULT: For paired-end, estimated from the input alignment file. For single-end, ignored by default.
-      -n | --norm [normalization]
-         Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts), quant (quantile normalization). 
-         DEFAULT: DESeq_default
       -i | --iteration 
-         maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 10
+         maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 100
       -p | --padj [pvalue]
          FDR cutoff for significance. DEFAULT: 0.05
       -f | --foldchange [foldchange]
          Fold-change ratio (absolute) cutoff for differential expression. 
          DEFAULT: 1
+
+      *DESeq1 compatibility options*
+      --DESeq
+         Use DESeq (instead of DESeq2) for differential analysis.
+      -n | --norm [normalization]
+         Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts), quant (quantile normalization). Only applicable if DESeq is used instead of DESeq2.
+         DEFAULT: DESeq_default
 
       *Other options*
       -h | --help
@@ -144,6 +148,75 @@ If BAM files are unsorted, or sorted by queryname::
 If BAM files are sorted by coordinates/position::
 
     TEtranscripts --sortByPos --format BAM --mode multi -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --project sample_sorted_test
+
+
+TEcount
+=============
+
+Usage
+-----
+
+::
+
+    usage: TEcount -b RNAseq BAM 
+                   --GTF genic-GTF-file
+                   --TE TE-GTF-file 
+                   [optional arguments]
+
+    Required arguments:
+      -b | --BAM alignment-file  RNAseq alignment file (BAM preferred)
+      --GTF genic-GTF-file       GTF file for gene annotations
+      --TE TE-GTF-file           GTF file for transposable element annotations
+
+    Optional arguments:
+
+      *Input/Output options*
+      --format [input file format]
+         Input file format: BAM or SAM. DEFAULT: BAM
+      --stranded [option]   Is this a stranded library? (yes, no, or reverse).
+                            DEFAULT: yes.
+      --sortByPos           Input file is sorted by chromosome position.
+      --project [name]      Prefix used for output files (e.g. project name)
+                            DEFAULT: TEcount_out
+
+      *Analysis options*
+      --mode [TE counting mode]
+         How to count TE:
+            uniq        (unique mappers only)
+            multi       (distribute among all alignments).
+         DEFAULT: multi
+      -L | --fragmentLength [fragLength]
+         Average length of fragment used for single-end sequencing
+         DEFAULT: For paired-end, estimated from the input alignment file. For single-end, ignored by default.
+      -i | --iteration 
+         maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 100
+
+      *Other options*
+      -h | --help
+         Show help message
+      --verbose [number]
+         Set verbose level.
+           0: only show critical messages
+           1: show additional warning messages
+           2: show process information
+           3: show debug messages
+         DEFAULT: 2
+      --version
+         Show program's version and exit
+
+*NOTE* BAM files must be either unsorted or sorted by queryname. If the BAM files are sorted by position, please use the '--sortByPos' option
+
+
+Example Command Lines
+---------------------
+
+If BAM files are unsorted, or sorted by queryname:: 
+
+    TEcount --format BAM --mode multi -b RNAseq.bam --project sample_nosort_test
+
+If BAM files are sorted by coordinates/position::
+
+    TEtranscripts --sortByPos --format BAM --mode multi -b RNAseq.bam --project sample_sorted_test
 
 
 Recommendations for TEToolkit input files
