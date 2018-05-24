@@ -1,7 +1,7 @@
 TEToolkit
 =========
 
-Version: 1.5.1
+Version: X.X.X
 
 *NOTE* TEtranscripts rely on specially curated GTF files, which are not
 packaged with this software due to their size. Please go to 
@@ -30,11 +30,11 @@ Requirements
 
 Python:     2.6.x or 2.7.x (not tested in Python 3.x)
 
-pysam:      0.8.2.1 or greater
+pysam:      0.9.x or greater
 
 R:          2.15.x or greater
 
-DESeq:      1.5.x or greater
+DESeq2:     1.10.x or greater (recommended)
 
 
 Installation
@@ -186,7 +186,7 @@ optimal value for their experiment.
 Copying & distribution
 ======================
 
-TEtranscripts is part of TEToolKit.
+TEtranscripts and TEcount are part of TEToolKit.
 
 TEToolKit is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

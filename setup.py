@@ -5,7 +5,7 @@ def readme():
 	       return f.read()
 
 setup(name='TEToolkit',
-      version='1.5.1',
+      version='X.X.X',
       description='Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions',
       long_description=readme(),
       classifiers=[
@@ -35,11 +35,12 @@ setup(name='TEToolkit',
       ],
       install_requires=[
           'argparse',
-          'pysam>=0.8'
+          'pysam>=0.9'
       ],
       include_package_data=True,
       zip_safe=False,
       scripts=[
           'bin/TEtranscripts'
+          'bin/TEcount'
       ]
 )

@@ -8,7 +8,7 @@ Created on Jan 27, 2014
 @author: Oliver Tam
 @contact tam@cshl.edu
 @status: 
-@version: 1.5.1
+@version: 2.0.0
 '''
 # python module
 import sys
@@ -59,19 +59,21 @@ def prepare_parser():
                         help='Fold-change ratio (absolute) cutoff for differential expression. DEFAULT: 1')
     parser.add_argument('--minread',metavar='min_read',dest='min_read',nargs='?',type=int,default=1,
                         help='read count cutoff. genes/TEs with reads less than the cutoff will not be considered. DEFAULT: 1')
+    parser.add_argument('--DESeq', dest = 'DESeq', action="store_true",
+                        help='Use DESeq (instead of DESeq2) for differential analysis.')
     parser.add_argument('-n', '--norm', metavar='normalization', dest='norm', nargs='?', default='DESeq_default', choices=['DESeq_default','TC','quant'],
-                        help='Normalization method : DESeq_default (DEseq default normalization method), TC (total annotated counts), quant (quantile normalization). DEFAULT: DESeq_default')
+                        help='Normalization method : DESeq_default (DESeq default normalization method), TC (total annotated counts), quant (quantile normalization). Only applicable if DESeq is used instead of DESeq2. DEFAULT: DESeq_default')
     parser.add_argument('--sortByPos', dest = 'sortByPos', action="store_true",
                         help='Alignment files are sorted by chromosome position.')
-    parser.add_argument('-i', '--iteration', metavar='iteration', dest='numItr', nargs='?', type=int,  default=10,
-                        help='number of iteration to run the optimization. DEFAULT: 10')
+    parser.add_argument('-i', '--iteration', metavar='iteration', dest='numItr', nargs='?', type=int,  default=100,
+                        help='number of iteration to run the optimization. DEFAULT: 100')
     parser.add_argument('--maxL',metavar='maxL',dest='maxL',nargs='?',type=int,default=500,help='maximum fragment length. DEFAULT:500')
     parser.add_argument('--minL',metavar='minL',dest='minL',nargs='?',type=int,default=0,help='minimum fragment length. DEFAULT:0')
     parser.add_argument('-L', '--fragmentLength', metavar='fragLength', dest='fragLength', nargs='?', type=int,  default=0,
                         help='average fragment length for single end reads. For paired-end, estimated from the input alignment file. DEFAULT: for paired-end, estimate from the input alignment file; for single-end, ignored by default.')
     parser.add_argument('--verbose', metavar='verbose', dest='verbose', type=int, nargs='?', default=2,
                         help='Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2')
-    parser.add_argument('--version', action='version', version='%(prog)s 1.5.1')
+    parser.add_argument('--version', action='version', version='%(prog)s 2.0.0')
 
     return parser
 
@@ -207,7 +209,8 @@ def readInAlignment(filename, format, sortByPos,prj_name):
 
                 cur_time = time.time()
                 bam_tmpfile = '.'+str(cur_time)
-                pysam.sort("-n",filename,bam_tmpfile)
+                #pysam.sort("-n",filename,bam_tmpfile) # For pysam v0.8.X or earlier
+                pysam.sort("-n","-T",bam_tmpfile,"-o",bam_tmpfile+".bam",filename)  # For pysam v0.9.0+ and using htlibs/samtools 1.3+
                 #samfile = pysam.AlignmentFile(samtools_in.stdout,'r')
                 samfile = pysam.AlignmentFile(bam_tmpfile+".bam",'r')
                 if len(samfile.header) ==0:
@@ -600,7 +603,7 @@ def output_norm(sf, name, error):
         f.close()
 
 
-def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, norm, pval, fc, rpm_val,min_read):
+def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, DESeq1, norm, pval, fc, rpm_val,min_read):
     # Assembling R-code for analysis
     rscript = ''
     rscript += '\n'
@@ -609,76 +612,93 @@ def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, norm, pval, fc, rpm_val,mi
     rscript += 'min_read <- %s\n' % (min_read)
     # Counts filtering (hard coded to 20)
     rscript += 'data <- data[apply(data,1,function(x){max(x)}) > min_read,]\n'
-    # Quantile normalization to calculate fold change
-    if norm == 'quant':
-        rscript += 'colnum <- length(data)\n'
-        rscript += 'rownum <- length(data[,1])\n'
-        rscript += 'ordMatrix <- matrix(nrow=rownum,ncol=colnum)\n'
-        rscript += 'ordIdx <- matrix(nrow=rownum,ncol=colnum)\n'
-        rscript += 'for (i in 1:colnum){\n'
-        rscript += '  a.sort <- sort(data[,i],index.return=T)\n'
-        rscript += '  ordMatrix[,i] <- a.sort$x\n'
-        rscript += '  ordIdx[,i] <- a.sort$ix\n'
-        rscript += '}\n'
-        rscript += 'rowAvg <- rowMeans(ordMatrix)\n'
-        rscript += 'data.q.norm <- matrix(nrow=rownum,ncol=colnum)\n'
-        rscript += 'for (i in 1:colnum){\n'
-        rscript += '  data.q.norm[,i] <- rowAvg[order(ordIdx[,i])]\n'
-        rscript += '}\n'
-        rscript += 'colnames(data.q.norm) <- colnames(data)\n'
-        rscript += 'rownames(data.q.norm) <- rownames(data)\n'
-        if len(tfiles) > 1:
-            rscript += 'sample1Mean <- rowMeans(data.q.norm[,1:%s],na.rm=T)\n' % (len(tfiles))
+    
+    # Choose between DESeq2 (default) or DESeq
+    if not DESeq1:
+        # Differential analysis using DESeq2 and their internal normalization method
+        rscript += 'sampleInfo <- data.frame(groups,row.names=colnames(data))\n'
+        rscript += 'library(DESeq2, quietly=T)\n'
+        rscript += 'dds <- DESeqDataSetFromMatrix(countData = data, colData = sampleInfo, design = ~ groups)\n'
+        rscript += 'dds$condition = relevel(dds$groups,"CGroup")\n'
+        rscript += 'dds <- DESeq(dds)\n'
+        rscript += 'res <- results(dds, alpha=1.0)\n'
+        rscript += 'write.table(res, file="%s_gene_TE_analysis.txt", sep="\\t",quote=F)\n' % (prj_name)
+
+        l2fc = math.log(fc,2)
+        rscript += 'resSig <- res[(!is.na(res$padj) & (res$padj < %f) & (abs(res$log2FoldChange)> %f)), ]\n' % (pval, l2fc)
+        rscript += 'write.table(resSig, file="%s_sigdiff_gene_TE.txt",sep="\\t", quote=F)\n' % (prj_name)
+        
+    else:
+        # Quantile normalization to calculate fold change
+        if norm == 'quant':
+            rscript += 'colnum <- length(data)\n'
+            rscript += 'rownum <- length(data[,1])\n'
+            rscript += 'ordMatrix <- matrix(nrow=rownum,ncol=colnum)\n'
+            rscript += 'ordIdx <- matrix(nrow=rownum,ncol=colnum)\n'
+            rscript += 'for (i in 1:colnum){\n'
+            rscript += '  a.sort <- sort(data[,i],index.return=T)\n'
+            rscript += '  ordMatrix[,i] <- a.sort$x\n'
+            rscript += '  ordIdx[,i] <- a.sort$ix\n'
+            rscript += '}\n'
+            rscript += 'rowAvg <- rowMeans(ordMatrix)\n'
+            rscript += 'data.q.norm <- matrix(nrow=rownum,ncol=colnum)\n'
+            rscript += 'for (i in 1:colnum){\n'
+            rscript += '  data.q.norm[,i] <- rowAvg[order(ordIdx[,i])]\n'
+            rscript += '}\n'
+            rscript += 'colnames(data.q.norm) <- colnames(data)\n'
+            rscript += 'rownames(data.q.norm) <- rownames(data)\n'
+            if len(tfiles) > 1:
+                rscript += 'sample1Mean <- rowMeans(data.q.norm[,1:%s],na.rm=T)\n' % (len(tfiles))
+            else:
+                rscript += 'sample1Mean <- data.q.norm[,1]\n'
+            group2_start = len(tfiles) + 1
+            group2_stop = group2_start + len(cfiles)
+            if len(cfiles) > 1:
+                rscript += 'sample2Mean <- rowMeans(data.q.norm[,%s:%s,na.rm=T)\n' % (group2_start, group2_stop)
+            else:
+                rscript += 'sample2Mean <- data.q.norm[,%s]\n' % (group2_start)
+            rscript += 'FoldChange <- (sample2Mean/sample1Mean)\n'
+            rscript += 'log2FoldChange <- log2(FoldChange)\n'
+            
+        # Normalize by RPM (reads per million mapped)
+        if norm == 'TC'  :
+            min_libSize = min(rpm_val)
+            rpm_vec = ','.join(str(x/min_libSize) for x in rpm_val)
+            rscript += 'tc <- c(%s)\n' % (rpm_vec)
+            
+            
+        # Performing differential analysis using DESeq
+        rscript += 'library(DESeq, quietly=T)\n'
+        rscript += 'cds <- newCountDataSet(data,groups)\n'
+        if norm == 'TC':
+            rscript += 'cds$sizeFactor = tc\n'
         else:
-            rscript += 'sample1Mean <- data.q.norm[,1]\n'
-        group2_start = len(tfiles) + 1
-        group2_stop = group2_start + len(cfiles)
-        if len(cfiles) > 1:
-            rscript += 'sample2Mean <- rowMeans(data.q.norm[,%s:%s,na.rm=T)\n' % (group2_start, group2_stop)
+            rscript += 'cds <- estimateSizeFactors(cds)\n'
+        if(len(tfiles)==1 and len(cfiles) ==1):
+            rscript += 'cds <- estimateDispersions(cds,method="blind",sharingMode="fit-only",fitType="local")\n'
+        elif(len(tfiles) > 1 and len(cfiles) > 1):
+            rscript += 'cds <- estimateDispersions(cds,method="per-condition")\n'
+        else :
+            rscript += 'cds <- estimateDispersions(cds,method="pooled")\n'
+
+        rscript += 'res <- nbinomTest(cds,"CGroup","TGroup")\n'
+
+        # Generating output table
+        if norm == 'quant':
+            rscript += 'res_fc <- cbind(res$id,sample1Mean,sample2Mean,FoldChange,log2FoldChange,res$pval,res$padj)\n'
+            rscript += 'colnames(res_fc) = c("id","sample1Mean","sample2Mean","FoldChange","log2FoldChange","pval", "padj")\n'
         else:
-            rscript += 'sample2Mean <- data.q.norm[,%s]\n' % (group2_start)
-        rscript += 'FoldChange <- (sample2Mean/sample1Mean)\n'
-        rscript += 'log2FoldChange <- log2(FoldChange)\n'
+            rscript += 'res_fc <- res\n'
+        rscript += 'write.table(res_fc, file="%s_gene_TE_analysis.txt", sep="\\t",quote=F,row.names=F)\n' % (prj_name)
 
-    # Normalize by RPM (reads per million mapped)
-    if norm == 'TC'  :
-        min_libSize = min(rpm_val)
-        rpm_vec = ','.join(str(x/min_libSize) for x in rpm_val)
-        rscript += 'tc <- c(%s)\n' % (rpm_vec)
-
-
-    # Performing differential analysis using DESeq
-    rscript += 'library(DESeq, quietly=T)\n'
-    rscript += 'cds <- newCountDataSet(data,groups)\n'
-    if norm == 'TC':
-        rscript += 'cds$sizeFactor = tc\n'
-    else:
-        rscript += 'cds <- estimateSizeFactors(cds)\n'
-    if(len(tfiles)==1 and len(cfiles) ==1):
-        rscript += 'cds <- estimateDispersions(cds,method="blind",sharingMode="fit-only",fitType="local")\n'
-    elif(len(tfiles) > 1 and len(cfiles) > 1):
-        rscript += 'cds <- estimateDispersions(cds,method="per-condition")\n'
-    else :
-        rscript += 'cds <- estimateDispersions(cds,method="pooled")\n'
-
-    rscript += 'res <- nbinomTest(cds,"CGroup","TGroup")\n'
-
-    # Generating output table
-    if norm == 'quant':
-        rscript += 'res_fc <- cbind(res$id,sample1Mean,sample2Mean,FoldChange,log2FoldChange,res$pval,res$padj)\n'
-        rscript += 'colnames(res_fc) = c("id","sample1Mean","sample2Mean","FoldChange","log2FoldChange","pval", "padj")\n'
-    else:
-        rscript += 'res_fc <- res\n'
-    rscript += 'write.table(res_fc, file="%s_gene_TE_analysis.txt", sep="\\t",quote=F,row.names=F)\n' % (prj_name)
-
-    # Generating table of "significant" results
-
-    l2fc = math.log(fc,2)
-    if norm == 'quant':
-        rscript += 'resSig <- res_fc[(!is.na(res_fc[,7]) & (res_fc[,7] < %f) & (abs(as.numeric(res_fc[,5])) > %f)), ]\n' % (pval, l2fc)
-    else:
-        rscript += 'resSig <- res_fc[(!is.na(res_fc$padj) & (res_fc$padj < %f) & (abs(res_fc$log2FoldChange)> %f)), ]\n' % (pval, l2fc)
-    rscript += 'write.table(resSig, file="%s_sigdiff_gene_TE.txt",sep="\\t", quote=F, row.names=F)\n' % (prj_name)
+        # Generating table of "significant" results
+        
+        l2fc = math.log(fc,2)
+        if norm == 'quant':
+            rscript += 'resSig <- res_fc[(!is.na(res_fc[,7]) & (res_fc[,7] < %f) & (abs(as.numeric(res_fc[,5])) > %f)), ]\n' % (pval, l2fc)
+        else:
+            rscript += 'resSig <- res_fc[(!is.na(res_fc$padj) & (res_fc$padj < %f) & (abs(res_fc$log2FoldChange)> %f)), ]\n' % (pval, l2fc)
+        rscript += 'write.table(resSig, file="%s_sigdiff_gene_TE.txt",sep="\\t", quote=F, row.names=F)\n' % (prj_name)
 
     return rscript
 
@@ -733,9 +753,13 @@ def main():
     #info("Calculating differential expression ...\n")
     # Obtaining R-code for differential analysis
 
-    rscript = write_R_code(f_cnt_tbl, args.tfiles, args.cfiles, args.prj_name, args.norm, args.pval, args.fc, rpm_val,args.min_read)
+    rscript = write_R_code(f_cnt_tbl, args.tfiles, args.cfiles, args.prj_name, args.DESeq, args.norm, args.pval, args.fc, rpm_val,args.min_read)
 
-    f_rscript = args.prj_name + '_DESeq.R'
+    if not args.DESeq:
+        f_rscript = args.prj_name + '_DESeq2.R'
+    else:
+        f_rscript = args.prj_name + '_DESeq.R'
+    
     rcode = open('%s' % (f_rscript) , 'w')
     rcode.write(rscript)
     rcode.close()
