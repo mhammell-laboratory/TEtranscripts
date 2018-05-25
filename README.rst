@@ -10,7 +10,7 @@ for instructions to download the curated GTF files.
 
 TEtranscripts and TEcount takes RNA-seq (and similar data) and annotates reads to both
 genes & transposable elements. TEtranscripts then performs differential analysis using
-DESeq.
+DESeq2.
 
 
 `Github Page <https://github.com/mhammell-laboratory/tetoolkit>`_
