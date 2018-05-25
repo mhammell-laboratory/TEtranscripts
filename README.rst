@@ -1,7 +1,7 @@
 TEToolkit
 =========
 
-Version: 2.0.1
+Version: 2.0.2
 
 *NOTE* TEtranscripts and TEcount rely on specially curated GTF files, which are not
 packaged with this software due to their size. Please go to 
