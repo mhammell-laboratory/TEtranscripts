@@ -532,7 +532,7 @@ def output_count_tbl(t_tbl, c_tbl, fname):
     try:
         f = open(fname, 'w')
     except IOError:
-        error("Cannot create report file %s !\n" % (fname))
+        sys.stderr.write("Cannot create report file %s !\n" % (fname))
         sys.exit(1)
     else:
         cnt_tbl = {}
@@ -585,12 +585,12 @@ def output_count_tbl(t_tbl, c_tbl, fname):
 
     return
 
-def output_norm(sf, name, error):
+def output_norm(sf, name):
     fname = name + ".norm"
     try:
         f = open(fname, 'w')
     except IOError:
-        error("Cannot create report file %s !\n" % (fname))
+        sys.stderr.write("Cannot create report file %s !\n" % (fname))
         sys.exit(1)
     else:
         cnt = 1
@@ -768,9 +768,9 @@ def main():
     try:
         sts = subprocess.call(['Rscript', f_rscript])
     except:
-        error("Error in running differential analysis!\n")
-        error("Error: %s\n" % str(sys.exc_info()[1]))
-        error( "[Exception type: %s, raised in %s:%d]\n" % ( sys.exc_info()[1].__class__.__name__,
+        sys.stderr.write("Error in running differential analysis!\n")
+        sys.stderr.write("Error: %s\n" % str(sys.exc_info()[1]))
+        sys.stderr.write( "[Exception type: %s, raised in %s:%d]\n" % ( sys.exc_info()[1].__class__.__name__,
                 os.path.basename(traceback.extract_tb( sys.exc_info()[2] )[-1][0]),
                 traceback.extract_tb( sys.exc_info()[2] )[-1][1] ) )
         sys.exit(1)

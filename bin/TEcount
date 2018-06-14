@@ -484,7 +484,7 @@ def output_count_tbl(tbl, prefix):
     try:
         f = open("{}.cntTable".format(prefix), 'w')
     except IOError:
-        error("Cannot create report file %s !\n" % (fname))
+        sys.stderr.write("Cannot create report file %s !\n" % (fname))
         sys.exit(1)
     else:
         cnt_tbl = {}
@@ -521,7 +521,7 @@ def output_count_tbl(tbl, prefix):
 
 # Main function of script
 def main():
-    """Start TEtranscripts......parse options......"""
+    """Start TEcount......parse options......"""
 
     args = read_opts3(prepare_parser())
 
