@@ -1,5 +1,5 @@
 Name: TEToolkit
-Version: 2.0.1
+Version: 2.0.2
 Summary: Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions
 Home-page: http://hammelllab.labsites.cshl.edu/software#TEToolkit
 Author: Ying Jin, Eric Paniagua, Oliver Tam and Molly Hammell
@@ -8,7 +8,7 @@ License: GPLv3
 Description: TEToolkit
         =========
         
-        Version: 2.0.1
+        Version: 2.0.2
         
         TEToolkit is composed of two tools, TEtranscripts and TEcounts
         

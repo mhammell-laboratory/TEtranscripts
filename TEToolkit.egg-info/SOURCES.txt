@@ -1,5 +1,7 @@
+.gitignore
 COPYING
 MANIFEST.in
+PKG-INFO
 README.rst
 setup.cfg
 setup.py
@@ -9,8 +11,6 @@ TEToolkit/EMAlgorithm.py
 TEToolkit/GeneFeatures.py
 TEToolkit/IntervalTree.py
 TEToolkit/Normalization.py
-TEToolkit/PeakDetect.py
-TEToolkit/PeakModel.py
 TEToolkit/Prob.py
 TEToolkit/TEindex.py
 TEToolkit/__init__.py
@@ -21,10 +21,15 @@ TEToolkit.egg-info/not-zip-safe
 TEToolkit.egg-info/requires.txt
 TEToolkit.egg-info/top_level.txt
 TEToolkit/IO/FeatIO.py
+TEToolkit/IO/FeatIO.pyc
 TEToolkit/IO/ReadInputs.py
+TEToolkit/IO/ReadInputs.pyc
 TEToolkit/IO/__init__.py
+TEToolkit/IO/__init__.pyc
 TEToolkit/ShortRead/ParseBEDFile.py
+TEToolkit/ShortRead/ParseBEDFile.pyc
 TEToolkit/ShortRead/__init__.py
-bin/TEpeaks
+TEToolkit/ShortRead/__init__.pyc
+bin/TEcount
 bin/TEtranscripts
 doc/TEToolkit_manual.doc

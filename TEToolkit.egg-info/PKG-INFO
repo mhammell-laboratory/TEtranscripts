@@ -1,26 +1,25 @@
 Metadata-Version: 1.1
 Name: TEToolkit
-Version: X.X.X
+Version: 2.0.2
 Summary: Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions
 Home-page: http://hammelllab.labsites.cshl.edu/software#TEToolkit
 Author: Ying Jin, Eric Paniagua, Oliver Tam, Molly Hammell
 Author-email: yjin@cshl.edu
 License: GPLv3
+Description-Content-Type: UNKNOWN
 Description: TEToolkit
         =========
         
-        Version: X.X.X
+        Version: 2.0.2
         
-	TEToolkit is composed of two tools, TEtranscripts and TEcount.
-
-        *NOTE* Both programs rely on specially curated GTF files, which
-        are not packaged with this software due to their size. Please go to 
+        *NOTE* TEtranscripts and TEcount rely on specially curated GTF files, which are not
+        packaged with this software due to their size. Please go to 
         `our website <http://hammelllab.labsites.cshl.edu/software#TEToolkit>`_
         for instructions to download the curated GTF files.
         
-        TEtranscripts and TEcount takes RNA-seq (and similar data) and annotates reads
-        to both genes & transposable elements. TEtranscripts then performs differential
-        analysis using DESeq.
+        TEtranscripts and TEcount takes RNA-seq (and similar data) and annotates reads to both
+        genes & transposable elements. TEtranscripts then performs differential analysis using
+        DESeq2.
         
         
         `Github Page <https://github.com/mhammell-laboratory/tetoolkit>`_
@@ -31,7 +30,7 @@ Description: TEToolkit
         
         Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
         
-        Copyright (C) 2014-2015 Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell
+        Copyright (C) 2014-2018 Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell
         
         Contact: Ying Jin (yjin@cshl.edu)
         
@@ -40,12 +39,12 @@ Description: TEToolkit
         
         Python:     2.6.x or 2.7.x (not tested in Python 3.x)
         
-        pysam:      0.9.0 or greater
+        pysam:      0.9.x or greater
         
         R:          2.15.x or greater
         
-        DESeq2:     1.10.x or greater (recommended)
-
+        DESeq2:     1.10.x or greater
+        
         
         Installation
         ------------
@@ -124,14 +123,14 @@ Description: TEToolkit
               -f | --foldchange [foldchange]
                  Fold-change ratio (absolute) cutoff for differential expression. 
                  DEFAULT: 1
-
-              *DESeq1 compatability options        
+        
+              *DESeq1 compatibility options*
               --DESeq
                  Use DESeq (instead of DESeq2) for differential analysis.
               -n | --norm [normalization]
                  Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts), quant (quantile normalization). Only applicable if DESeq is used instead of DESeq2.
                  DEFAULT: DESeq_default
-
+        
               *Other options*
               -h | --help
                  Show help message
@@ -167,10 +166,10 @@ Description: TEToolkit
         -----
         
         ::
-
-            usage: TEcount -b RNAseq BAM
+        
+            usage: TEcount -b RNAseq BAM 
                            --GTF genic-GTF-file
-                           --TE TE-GTF-file
+                           --TE TE-GTF-file 
                            [optional arguments]
         
             Required arguments:
@@ -188,7 +187,7 @@ Description: TEToolkit
               --sortByPos           Input file is sorted by chromosome position.
               --project [name]      Prefix used for output files (e.g. project name)
                                     DEFAULT: TEcount_out
-
+        
               *Analysis options*
               --mode [TE counting mode]
                  How to count TE:
@@ -198,9 +197,9 @@ Description: TEToolkit
               -L | --fragmentLength [fragLength]
                  Average length of fragment used for single-end sequencing
                  DEFAULT: For paired-end, estimated from the input alignment file. For single-end, ignored by default.
-              -i | --iteration
+              -i | --iteration 
                  maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 100
-
+        
               *Other options*
               -h | --help
                  Show help message
@@ -213,19 +212,19 @@ Description: TEToolkit
                  DEFAULT: 2
               --version
                  Show program's version and exit
-
+        
         *NOTE* BAM files must be either unsorted or sorted by queryname. If the BAM files are sorted by position, please use the '--sortByPos' option
         
         
         Example Command Lines
         ---------------------
-
+        
         If BAM files are unsorted, or sorted by queryname:: 
-
+        
             TEcount --format BAM --mode multi -b RNAseq.bam --project sample_nosort_test
-
+        
         If BAM files are sorted by coordinates/position::
-
+        
             TEtranscripts --sortByPos --format BAM --mode multi -b RNAseq.bam --project sample_sorted_test
         
         
