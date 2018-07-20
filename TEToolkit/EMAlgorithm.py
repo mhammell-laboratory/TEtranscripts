@@ -33,7 +33,7 @@ def normalizeMeans(meansIn):
    #     for i in range(len(means)) :
    #         means[i] = 1.0*means[i]/total
 
-    #sys.stderr.write("after normalization toatl means = "+str(sum(meansOut))+"\n")
+    #sys.stderr.write("after normalization total means = "+str(sum(meansOut))+"\n")
     return meansOut
     
 def EMUpdate(meansIn, te_features,uniq_counts,multi_reads,estimatedReadLength):
@@ -57,7 +57,7 @@ def EMUpdate(meansIn, te_features,uniq_counts,multi_reads,estimatedReadLength):
         
                   
     meansOut = normalizeMeans(meansOut)
-    sys.stderr.write("after normalization toatl means = "+str(sum(meansOut))+"\n")
+    sys.stderr.write("after normalization total means = "+str(sum(meansOut))+"\n")
    
     return meansOut
 
@@ -141,7 +141,7 @@ def EMestimate(te_features,multi_reads,uniq_counts,multi_counts,numItr,estimated
     
     # relative abundance    
     means0 = normalizeMeans(means0)
-    sys.stderr.write("after normalization toatl means0 = "+str(sum(means0))+"\n")
+    sys.stderr.write("after normalization total means0 = "+str(sum(means0))+"\n")
     '''
     /**
          * Defaults for these values taken from the R implementation of
