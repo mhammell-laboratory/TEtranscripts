@@ -419,6 +419,8 @@ class TEfeatures:
             linenum = 0
             for line in f :
                 line = line.strip()
+                if line.startswith("#"):
+                    continue
                 items = line.split('\t')
                 chrom = items[0]
                 start = int(items[3])
