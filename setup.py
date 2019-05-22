@@ -2,7 +2,7 @@ from setuptools import setup
 
 def readme():
       with open('README.rst') as f:
-	       return f.read()
+               return f.read()
 
 setup(name='TEToolkit',
       version='2.0.3',
@@ -17,7 +17,7 @@ setup(name='TEToolkit',
           'Topic :: Scientific/Engineering :: Bio-Informatics',
           'Programming Language :: Python :: 2.7',
           'Operating System :: MacOS',
-          'Operating System :: Unix'	   
+          'Operating System :: Unix'
       ],
       keywords='TE transposable element differential enrichment',
       url='http://hammelllab.labsites.cshl.edu/software#TEToolkit',

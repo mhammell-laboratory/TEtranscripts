@@ -303,7 +303,7 @@ def count_transcript_abundance(filename, format, geneIdx, teIdx, stranded, te_mo
                                 pos1 = read1.reference_start
                                 pos2 = read2.reference_start
                                 if abs(pos1-pos2) <= maxL :
-			            avgReadLength += abs(pos1-pos2)+read2.query_length
+                                    avgReadLength += abs(pos1-pos2)+read2.query_length
                                     tmp_cnt += 1
 
                         alignments_per_read.append((read1,read2))
@@ -619,7 +619,7 @@ def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, DESeq1, norm, pval, fc, rp
         rscript += 'sampleInfo <- data.frame(groups,row.names=colnames(data))\n'
         rscript += 'library(DESeq2, quietly=T)\n'
         rscript += 'dds <- DESeqDataSetFromMatrix(countData = data, colData = sampleInfo, design = ~ groups)\n'
-        rscript += 'dds$condition = relevel(dds$groups,"CGroup")\n'
+        rscript += 'dds$groups = relevel(dds$groups,"CGroup")\n'
         rscript += 'dds <- DESeq(dds)\n'
         rscript += 'res <- results(dds,independentFiltering=F)\n'
         rscript += 'write.table(res, file="%s_gene_TE_analysis.txt", sep="\\t",quote=F)\n' % (prj_name)

@@ -544,7 +544,7 @@ class FWTrackII:
                 return self.__minuscounts[chromosome]
             else:
                 #raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
-		return tmp;
+                return tmp;
        
     def get_chr_names (self):
         """Return all the chromosome names stored in this track object.
@@ -554,7 +554,7 @@ class FWTrackII:
         return l
 
     def length (self):
-        """Total sequenced length = total number of tags * width of tag		
+        """Total sequenced length = total number of tags * width of tag
         """
         return self.total*self.fw
     
@@ -686,7 +686,7 @@ class FWTrackII:
             self.__locations[chrom] = [new_plus_tags,[]]
             self.total += len(new_plus_tags)
 
-		
+
     def sample (self, percent):
         """Sample the tags for a given percentage.
 
@@ -782,7 +782,7 @@ class FWTrackIII:
         return self.chr
 
     def length (self):
-        """Total sequenced length = total number of tags * width of tag		
+        """Total sequenced length = total number of tags * width of tag
         """
         return self.total*self.fw
 
@@ -850,7 +850,7 @@ class FWTrackIII:
         self.__locations = [new_plus_tags, []]
         self.total += len(new_plus_tags)
 
-		
+
     def sample (self, percent):
         """Sample the tags for a given percentage.
 

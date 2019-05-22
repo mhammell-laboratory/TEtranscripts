@@ -67,15 +67,15 @@ class SAMFile :
       short reads in sam format
       saved by chromosome
    '''
-		
-		
+    
+    
     def __init__(self, srcfile,chroms):
-	
+        
         self.__srcfile = srcfile
         self.__fileList = dict()
         self.size = 0
         self.__binTags = []
-	        
+                
 class BEDFile(GenericParser) :
     '''
       short reads in bed format

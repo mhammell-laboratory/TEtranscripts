@@ -32,4 +32,4 @@ TEToolkit/ShortRead/__init__.py
 TEToolkit/ShortRead/__init__.pyc
 bin/TEcount
 bin/TEtranscripts
-doc/TEToolkit_manual.doc
+doc/TEToolkit_manual.docx
