@@ -619,7 +619,7 @@ def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, DESeq1, norm, pval, fc, rp
         rscript += 'sampleInfo <- data.frame(groups,row.names=colnames(data))\n'
         rscript += 'library(DESeq2, quietly=T)\n'
         rscript += 'dds <- DESeqDataSetFromMatrix(countData = data, colData = sampleInfo, design = ~ groups)\n'
-        rscript += 'dds$groups = relevel(dds$groups,"CGroup")\n'
+        rscript += 'dds$groups = relevel(dds$groups,ref="CGroup")\n'
         rscript += 'dds <- DESeq(dds)\n'
         rscript += 'res <- results(dds,independentFiltering=F)\n'
         rscript += 'write.table(res, file="%s_gene_TE_analysis.txt", sep="\\t",quote=F)\n' % (prj_name)
