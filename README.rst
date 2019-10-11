@@ -1,11 +1,11 @@
-TEToolkit
+TEtranscripts
 =========
 
 Version: 2.0.3
 
 *NOTE* TEtranscripts and TEcount rely on specially curated GTF files, which are not
 packaged with this software due to their size. Please go to 
-`our website <http://hammelllab.labsites.cshl.edu/software#TEToolkit>`_
+`our website <http://hammelllab.labsites.cshl.edu/software#TEtranscripts>`_
 for instructions to download the curated GTF files.
 
 TEtranscripts and TEcount takes RNA-seq (and similar data) and annotates reads to both
@@ -13,9 +13,9 @@ genes & transposable elements. TEtranscripts then performs differential analysis
 DESeq2.
 
 
-`Github Page <https://github.com/mhammell-laboratory/tetoolkit>`_
+`Github Page <https://github.com/mhammell-laboratory/TEtranscripts>`_
 
-`Pypi Page <https://pypi.python.org/pypi/TEToolkit>`_
+`Pypi Page <https://pypi.python.org/pypi/TEtranscripts>`_
 
 `MHammell Lab <http://hammelllab.labsites.cshl.edu/software>`_
 
@@ -219,10 +219,10 @@ If BAM files are sorted by coordinates/position::
     TEtranscripts --sortByPos --format BAM --mode multi -b RNAseq.bam --project sample_sorted_test
 
 
-Recommendations for TEToolkit input files
+Recommendations for TEtranscripts input files
 =========================================
 
-TEToolkit can perform transposable element quantification from alignment results (e.g. BAM files) generated from a variety of programs. 
+TEtranscripts can perform transposable element quantification from alignment results (e.g. BAM files) generated from a variety of programs. 
 Given the variety of experimental systems, we could not provide an optimal alignment strategy for every approach. Therefore,
 we recommend that users identify the optimal parameters for their particular genome and alignment program in order to get the best
 results.
@@ -242,8 +242,8 @@ It is common that the specific laboratory strains used in an experiment contains
 While this can be mitigated through allowing mismatches during alignments, certain lab strains (e.g. Drosophila melanogaster) have
 diverged significantly from the reference genomes. We highly recommend that users should refine their alignment procedures to better
 account for the expected variations between their lab strains and the reference genome, which will accordingly improve their analysis
-with TEToolkit. Users can also align to a custom genome build specific to their organism, though they would need GTF annotations for 
-genes and transposable elements that are compatible with their custom genome in order to utilize TEToolkit. Please contact us if you
+with TEtranscripts. Users can also align to a custom genome build specific to their organism, though they would need GTF annotations for 
+genes and transposable elements that are compatible with their custom genome in order to utilize TEtranscripts. Please contact us if you
 require advice in generating these annotation files.
 
 *Specific recommendations when using STAR*
@@ -259,9 +259,9 @@ optimal value for their experiment.
 Copying & distribution
 ======================
 
-TEtranscripts and TEcount are part of TEToolKit.
+TEtranscripts and TEcount are part of `TEToolkit suite <http://hammelllab.labsites.cshl.edu/software/>`_.
 
-TEToolKit is free software: you can redistribute it and/or modify
+TEtranscripts is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
@@ -272,6 +272,6 @@ but *WITHOUT ANY WARRANTY*; without even the implied warranty of
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with TEToolKit.  If not, see `this website <http://www.gnu.org/licenses/>`_.
+along with TEtranscripts.  If not, see `this website <http://www.gnu.org/licenses/>`_.
 
 

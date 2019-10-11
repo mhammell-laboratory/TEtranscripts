@@ -4,7 +4,7 @@ def readme():
       with open('README.rst') as f:
                return f.read()
 
-setup(name='TEToolkit',
+setup(name='TEtranscripts',
       version='2.0.3',
       description='Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions',
       long_description=readme(),
@@ -20,7 +20,7 @@ setup(name='TEToolkit',
           'Operating System :: Unix'
       ],
       keywords='TE transposable element differential enrichment',
-      url='http://hammelllab.labsites.cshl.edu/software#TEToolkit',
+      url='http://hammelllab.labsites.cshl.edu/software#TEtranscripts',
       author='Ying Jin, Eric Paniagua, Oliver Tam, Molly Hammell',
       author_email='yjin@cshl.edu',
       license='GPLv3',
