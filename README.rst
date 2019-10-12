@@ -1,5 +1,5 @@
 TEtranscripts
-=========
+=============
 
 Version: 2.0.4
 
@@ -151,7 +151,7 @@ If BAM files are sorted by coordinates/position::
 
 
 TEcount
-=============
+=======
 
 Usage
 -----
@@ -220,7 +220,7 @@ If BAM files are sorted by coordinates/position::
 
 
 Recommendations for TEtranscripts input files
-=========================================
+=============================================
 
 TEtranscripts can perform transposable element quantification from alignment results (e.g. BAM files) generated from a variety of programs. 
 Given the variety of experimental systems, we could not provide an optimal alignment strategy for every approach. Therefore,
