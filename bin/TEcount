@@ -8,7 +8,7 @@ Created on Dec 6, 2017
 @author: Oliver Tam
 @contact tam@cshl.edu
 @status:
-@version: 2.0.3
+@version: 2.0.4
 '''
 # python module
 import sys
