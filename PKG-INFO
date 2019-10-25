@@ -100,7 +100,10 @@ Description: TEtranscripts
               --format [input file format]
                  Input file format: BAM or SAM. DEFAULT: BAM
               --stranded [option]   Is this a stranded library? (yes, no, or reverse).
-                                    DEFAULT: yes.
+                         no      -  Library is unstranded
+                         yes     -  "Second-strand cDNA library (e.g. ScriptSeq)
+                         reverse -  "First-strand" cDNA library (e.g. Illumina TruSeq)
+                                    DEFAULT: no.
               --sortByPos           Input file is sorted by chromosome position.
               --project [name]      Prefix used for output files (e.g. project name)
                                     DEFAULT: TEtranscript_out
@@ -182,7 +185,10 @@ Description: TEtranscripts
               --format [input file format]
                  Input file format: BAM or SAM. DEFAULT: BAM
               --stranded [option]   Is this a stranded library? (yes, no, or reverse).
-                                    DEFAULT: yes.
+                         no      -  Library is unstranded
+                         yes     -  "Second-strand cDNA library (e.g. ScriptSeq)
+                         reverse -  "First-strand" cDNA library (e.g. Illumina TruSeq)
+                                    DEFAULT: no.
               --sortByPos           Input file is sorted by chromosome position.
               --project [name]      Prefix used for output files (e.g. project name)
                                     DEFAULT: TEcount_out

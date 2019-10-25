@@ -46,8 +46,8 @@ def prepare_parser():
                         help='GTF file for transposable element annotations')
     parser.add_argument('--format', metavar='input file format', dest='format', type=str, nargs='?', default='BAM', choices=['BAM','SAM'],
                         help='Input file format: BAM or SAM. DEFAULT: BAM')
-    parser.add_argument('--stranded', metavar='option', dest='stranded', nargs='?', type=str, default="yes", choices=['yes','no','reverse'],
-                        help='Is this a stranded library? (yes, no, or reverse). DEFAULT: yes.')
+    parser.add_argument('--stranded', metavar='option', dest='stranded', nargs='?', type=str, default="no", choices=['yes','no','reverse'],
+                        help='Is this a stranded library? (yes, no, or reverse). For "first-strand" cDNA libraries (e.g. TruSeq), choose reverse. For "second-strand" cDNA libraries (e.g. ScriptSeq), choose yes. DEFAULT: no.')
     parser.add_argument('--mode', metavar='TE counting mode', dest='te_mode', nargs='?', type=str, const="multi", default='multi', choices=['uniq','multi'],
                         help='How to count TE: uniq (unique mappers only), or multi (distribute among all alignments).\
                         DEFAULT: multi')
