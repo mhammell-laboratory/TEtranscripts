@@ -152,6 +152,11 @@ If BAM files are sorted by coordinates/position::
 
     TEtranscripts --sortByPos --format BAM --mode multi -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --project sample_sorted_test
 
+Cluster Usage Recommendation
+----------------------------
+
+In our experience, we recommend around 20-30Gb of memory for analyzing human samples (hg19) with around 20-30 million mapped reads when running on a cluster.
+
 
 TEcount
 =======
@@ -223,6 +228,12 @@ If BAM files are unsorted, or sorted by queryname::
 If BAM files are sorted by coordinates/position::
 
     TEtranscripts --sortByPos --format BAM --mode multi -b RNAseq.bam --project sample_sorted_test
+
+Cluster Usage Recommendations
+-----------------------------
+
+TEcount is better suited than TEtranscripts for usage in the cluster environment, as each sample (e.g. replicates of an experiment) can be quantified on separate nodes. The output can then be merged into a single count table for differential analysis.
+In our experience, we recommend around 20-30Gb of memory for analyzing human samples (hg19) with around 20-30 million mapped reads when running on a cluster.
 
 
 Recommendations for TEtranscripts input files
