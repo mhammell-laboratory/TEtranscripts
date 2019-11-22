@@ -652,7 +652,7 @@ def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, DESeq1, norm, pval, fc, rp
     if not DESeq1:
         # Differential analysis using DESeq2 and their internal normalization method
         rscript += 'sampleInfo <- data.frame(groups,row.names=colnames(data))\n'
-        rscript += 'library(DESeq2, quietly=T)\n'
+        rscript += 'suppressPackageStartupMessages(library(DESeq2))\n'
         rscript += 'dds <- DESeqDataSetFromMatrix(countData = data, colData = sampleInfo, design = ~ groups)\n'
         rscript += 'dds$groups = relevel(dds$groups,ref="CGroup")\n'
         rscript += 'dds <- DESeq(dds)\n'
@@ -703,7 +703,7 @@ def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, DESeq1, norm, pval, fc, rp
             rscript += 'tc <- c(%s)\n' % rpm_vec
 
         # Performing differential analysis using DESeq
-        rscript += 'library(DESeq, quietly=T)\n'
+        rscript += 'suppressPackageStartupMessages(library(DESeq))\n'
         rscript += 'cds <- newCountDataSet(data,groups)\n'
         if norm == 'TC':
             rscript += 'cds$sizeFactor = tc\n'
@@ -828,7 +828,6 @@ def main():
     output_count_tbl(tsamples_tbl, csamples_tbl, f_cnt_tbl)
     rpm_val = tsamples_rpm + csamples_rpm
 
-    # info("Calculating differential expression ...\n")
     # Obtaining R-code for differential analysis
 
     rscript = write_R_code(f_cnt_tbl, args.tfiles, args.cfiles, args.prj_name, args.DESeq, args.norm, args.pval,
@@ -844,6 +843,7 @@ def main():
     rcode.close()
 
     # Running R-code for differential analysis
+    info("Performing differential analysis ...\n")
     try:
         subprocess.call(['Rscript', f_rscript])
     except:
