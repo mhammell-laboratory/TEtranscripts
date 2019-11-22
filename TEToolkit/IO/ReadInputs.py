@@ -126,14 +126,12 @@ def read_opts(parser):
     if args.TEmode != 'multi' and args.TEmode != 'uniq' :
         logging.error("Does not support TE mode : %s !\n" % (args.TEmode))
     # file parser
-    if args.format == "BAM" :
+    if args.fileformat == "BAM" :
         args.parser = BAMFile
-#    elif args.format == "SAM" :
-#        args.parser = SAMFile
-    elif args.format == "BED" :
+    elif args.fileformat == "BED" :
         args.parser = BEDFile
     else :
-        logging.error("Does not support such file format: %s !\n" %(args.format))
+        logging.error("Does not support such file format: %s !\n" %(args.fileformat))
         sys.exit(1)
     #window size
     if args.wsize < 0 :
@@ -259,12 +257,12 @@ def read_opts2(parser):
             logging.error("No such file: %s !\n" % (args.cfiles[i]))
             sys.exit(1)
     # Identify file format for subsequent processing (parsing)
-    if args.format == "BAM" :
+    if args.fileformat == "BAM" :
         args.parser = "BAM"
-    elif args.format == "SAM" :
+    elif args.fileformat == "SAM" :
         args.parser = "SAM"
     else :
-        logging.error("Does not support such file format: %s !\n" % (args.format))
+        logging.error("Does not support such file format: %s !\n" % (args.fileformat))
         sys.exit(1)
     # What type of RNA-Seq experiment (stranded or not)
     if args.stranded not in ['yes', 'no', 'reverse'] :
@@ -374,12 +372,12 @@ def read_opts3(parser):
         logging.error("No such file: %s !\n" % (args.bam))
         sys.exit(1)
     # Identify file format for subsequent processing (parsing)
-    if args.format == "BAM" :
+    if args.fileformat == "BAM" :
         args.parser = "BAM"
-    elif args.format == "SAM" :
+    elif args.fileformat == "SAM" :
         args.parser = "SAM"
     else :
-        logging.error("Does not support such file format: %s !\n" % (args.format))
+        logging.error("Does not support such file format: %s !\n" % (args.fileformat))
         sys.exit(1)
     # What type of RNA-Seq experiment (stranded or not)
     if args.stranded not in ['yes', 'no', 'reverse'] :
@@ -588,3 +586,4 @@ def __assignWeight(sample,suffix,error):
     of.close()
     return dest
     
+
