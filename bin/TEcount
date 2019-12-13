@@ -51,7 +51,7 @@ def prepare_parser():
     parser.add_argument('--mode', metavar='TE counting mode', dest='te_mode', type=str, default='multi',
                         choices=['uniq', 'multi'], help='How to count TE: uniq (unique mappers only), \
                         or multi (distribute among all alignments). DEFAULT: multi')
-    parser.add_argument('--project', metavar='name', dest='prefix', default='TEcount_out',
+    parser.add_argument('--project', metavar='name', dest='prefix', default='TEcount_out')
     parser.add_argument('--format', metavar='input file format', dest='format', type=str, default='BAM', choices=['BAM', 'SAM'],
                         help='Input file format: BAM or SAM. DEFAULT: BAM')
     parser.add_argument('--stranded', metavar='option', dest='stranded', type=str, default="no", choices=['yes', 'no', 'reverse'],
