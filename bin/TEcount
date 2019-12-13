@@ -42,17 +42,7 @@ def prepare_parser():
                         help='GTF file for gene annotations')
     parser.add_argument('--TE', metavar='TE-GTF-file', dest='tefile', type=str, required=True,
                         help='GTF file for transposable element annotations')
-    parser.add_argument('--format', metavar='input file format', dest='fileformat', type=str, default='BAM',
-                        choices=['BAM', 'SAM'], help='Input file format: BAM or SAM. DEFAULT: BAM')
-    parser.add_argument('--stranded', metavar='option', dest='stranded', type=str, default="no",
-                        choices=['yes', 'no', 'reverse'], help='Is this a stranded library? (yes, no, or reverse). \
-                        For "first-strand" cDNA libraries (e.g. TruSeq stranded), choose reverse. \
-                        For "second-strand" cDNA libraries (e.g. NEBNext directional), choose yes. DEFAULT: no.')
-    parser.add_argument('--mode', metavar='TE counting mode', dest='te_mode', type=str, default='multi',
-                        choices=['uniq', 'multi'], help='How to count TE: uniq (unique mappers only), \
-                        or multi (distribute among all alignments). DEFAULT: multi')
-    parser.add_argument('--project', metavar='name', dest='prefix', default='TEcount_out')
-    parser.add_argument('--format', metavar='input file format', dest='format', type=str, default='BAM', choices=['BAM', 'SAM'],
+    parser.add_argument('--format', metavar='input file format', dest='fileformat', type=str, default='BAM', choices=['BAM', 'SAM'],
                         help='Input file format: BAM or SAM. DEFAULT: BAM')
     parser.add_argument('--stranded', metavar='option', dest='stranded', type=str, default="no", choices=['yes', 'no', 'reverse'],
                         help='Is this a stranded library? (yes, no, or reverse). For "first-strand" cDNA libraries (e.g. TruSeq stranded), choose reverse. For "second-strand" cDNA libraries (e.g. NEBNext directional), choose yes. DEFAULT: no.')
