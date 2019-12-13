@@ -62,7 +62,6 @@ def prepare_parser():
     parser.add_argument('--mode', metavar='TE counting mode', dest='te_mode', nargs='?', type=str, const="multi", default='multi', choices=['uniq','multi'],
                         help='How to count TE: uniq (unique mappers only), or multi (distribute among all alignments).\
                         DEFAULT: multi')
->>>>>>> ffde29c5623cb0761356bc6c35c2be791d75d2f7
     parser.add_argument('--project', metavar='name', dest='prj_name', nargs='?', default='TEtranscripts_out',
                         help='Name of this project. DEFAULT: TEtranscripts_out')
     parser.add_argument('-p', '--padj', metavar='pvalue', dest='pval', nargs='?', type=float, const=0.1, default=0.05,
