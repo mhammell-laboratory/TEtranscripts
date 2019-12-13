@@ -46,12 +46,21 @@ def prepare_parser():
                         choices=['BAM', 'SAM'], help='Input file format: BAM or SAM. DEFAULT: BAM')
     parser.add_argument('--stranded', metavar='option', dest='stranded', type=str, default="no",
                         choices=['yes', 'no', 'reverse'], help='Is this a stranded library? (yes, no, or reverse). \
-                        For "first-strand" cDNA libraries (e.g. TruSeq), choose reverse. \
-                        For "second-strand" cDNA libraries (e.g. ScriptSeq), choose yes. DEFAULT: no.')
+                        For "first-strand" cDNA libraries (e.g. TruSeq stranded), choose reverse. \
+                        For "second-strand" cDNA libraries (e.g. NEBNext directional), choose yes. DEFAULT: no.')
     parser.add_argument('--mode', metavar='TE counting mode', dest='te_mode', type=str, default='multi',
                         choices=['uniq', 'multi'], help='How to count TE: uniq (unique mappers only), \
                         or multi (distribute among all alignments). DEFAULT: multi')
     parser.add_argument('--project', metavar='name', dest='prefix', default='TEcount_out',
+    parser.add_argument('--format', metavar='input file format', dest='format', type=str, default='BAM', choices=['BAM', 'SAM'],
+                        help='Input file format: BAM or SAM. DEFAULT: BAM')
+    parser.add_argument('--stranded', metavar='option', dest='stranded', type=str, default="no", choices=['yes', 'no', 'reverse'],
+                        help='Is this a stranded library? (yes, no, or reverse). For "first-strand" cDNA libraries (e.g. TruSeq stranded), choose reverse. For "second-strand" cDNA libraries (e.g. NEBNext directional), choose yes. DEFAULT: no.')
+    parser.add_argument('--mode', metavar='TE counting mode', dest='te_mode', type=str, default='multi', choices=['uniq', 'multi'],
+                        help='How to count TE: uniq (unique mappers only), or multi (distribute among all alignments).\
+                        DEFAULT: multi')
+    parser.add_argument('--project', metavar='name', dest='prefix', default='TEtranscripts_out',
+>>>>>>> ffde29c5623cb0761356bc6c35c2be791d75d2f7
                         help='Name of this project. DEFAULT: TEcount_out')
     parser.add_argument('--sortByPos', dest='sortByPos', action="store_true",
                         help='Alignment file is sorted by chromosome position.')

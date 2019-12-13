@@ -93,8 +93,10 @@ Usage
          Input file format: BAM or SAM. DEFAULT: BAM
       --stranded [option]   Is this a stranded library? (yes, no, or reverse).
                  no      -  Library is unstranded   
-                 yes     -  "Second-strand cDNA library (e.g. ScriptSeq)
-                 reverse -  "First-strand" cDNA library (e.g. Illumina TruSeq)
+                 yes     -  "Second-strand cDNA library 
+                            (e.g. NEBNext directional)
+                 reverse -  "First-strand" cDNA library 
+                            (e.g. Illumina TruSeq stranded)
                             DEFAULT: no.
       --sortByPos           Input file is sorted by chromosome position.
       --project [name]      Prefix used for output files (e.g. project name)
@@ -183,8 +185,10 @@ Usage
          Input file format: BAM or SAM. DEFAULT: BAM
       --stranded [option]   Is this a stranded library? (yes, no, or reverse).
                  no      -  Library is unstranded   
-                 yes     -  "Second-strand cDNA library (e.g. ScriptSeq)
-                 reverse -  "First-strand" cDNA library (e.g. Illumina TruSeq)
+                 yes     -  "Second-strand cDNA library 
+                            (e.g. NEBNext directional)
+                 reverse -  "First-strand" cDNA library 
+                            (e.g. Illumina TruSeq stranded)
                             DEFAULT: no.
       --sortByPos           Input file is sorted by chromosome position.
       --project [name]      Prefix used for output files (e.g. project name)
