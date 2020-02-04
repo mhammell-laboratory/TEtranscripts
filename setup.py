@@ -5,7 +5,7 @@ def readme():
                return f.read()
 
 setup(name='TEtranscripts',
-      version='2.1.3',
+      version='2.1.4',
       description='Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions',
       long_description=readme(),
       classifiers=[

@@ -1,7 +1,7 @@
 TEtranscripts
 =============
 
-Version: 2.1.3
+Version: 2.1.4
 
 *NOTE* TEtranscripts and TEcount rely on specially curated GTF files, which are not
 packaged with this software due to their size. Please go to 
