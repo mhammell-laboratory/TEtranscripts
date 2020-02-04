@@ -93,7 +93,7 @@ Usage
          Input file format: BAM or SAM. DEFAULT: BAM
       --stranded [option]   Is this a stranded library? (no, forward, or reverse).
                  no      -  Library is unstranded   
-                 forward -  "Second-strand cDNA library 
+                 forward -  "Second-strand" cDNA library 
                             (e.g. QIAseq stranded)
                  reverse -  "First-strand" cDNA library 
                             (e.g. Illumina TruSeq stranded)
@@ -185,7 +185,7 @@ Usage
          Input file format: BAM or SAM. DEFAULT: BAM
       --stranded [option]   Is this a stranded library? (no, forward, or reverse).
                  no      -  Library is unstranded   
-                 forward -  "Second-strand cDNA library 
+                 forward -  "Second-strand" cDNA library 
                             (e.g. QIAseq stranded)
                  reverse -  "First-strand" cDNA library 
                             (e.g. Illumina TruSeq stranded)
