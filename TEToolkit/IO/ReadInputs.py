@@ -265,7 +265,7 @@ def read_opts2(parser):
         logging.error("Does not support such file format: %s !\n" % (args.fileformat))
         sys.exit(1)
     # What type of RNA-Seq experiment (stranded or not)
-    if args.stranded not in ['yes', 'no', 'reverse'] :
+    if args.stranded not in ['forward', 'no', 'reverse'] :
         logging.error("Does not support such stranded value: %s !\n" % (args.stranded))
         sys.exit(1)
 
@@ -380,7 +380,7 @@ def read_opts3(parser):
         logging.error("Does not support such file format: %s !\n" % (args.fileformat))
         sys.exit(1)
     # What type of RNA-Seq experiment (stranded or not)
-    if args.stranded not in ['yes', 'no', 'reverse'] :
+    if args.stranded not in ['forward', 'no', 'reverse'] :
         logging.error("Does not support such stranded value: %s !\n" % (args.stranded))
         sys.exit(1)
 
