@@ -1,5 +1,5 @@
 Name: TEtranscripts
-Version: 2.1.4
+Version: 2.2.0
 Summary: Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions
 Home-page: http://hammelllab.labsites.cshl.edu/software#TEtranscripts
 Author: Ying Jin, Eric Paniagua, Oliver Tam and Molly Hammell
@@ -8,7 +8,7 @@ License: GPLv3
 Description: TEtranscripts
         =========
         
-        Version: 2.1.4
+        Version: 2.2.0
         
         TEtranscripts is composed of two tools, TEtranscripts and TEcounts
         
