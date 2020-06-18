@@ -213,7 +213,7 @@ def __poisson_cdf (k,a):
         return 0                        # special cases
     next = exp( -a )
     cdf = next
-    for i in xrange(1,k+1):
+    for i in range(1,k+1):
         last = next
         next = last * a / i
         cdf = cdf + next
@@ -234,7 +234,7 @@ def __poisson_cdf_large_lambda ( k,a ):
     next = EXPSTEP
     num_parts -= 1
     cdf = next
-    for i in xrange(1,k+1):
+    for i in range(1,k+1):
         last = next
         next = last * a / i
         cdf = cdf + next
@@ -247,7 +247,7 @@ def __poisson_cdf_large_lambda ( k,a ):
                cdf *= lastexp
                lastexp = 1
 
-    for i in xrange(num_parts):
+    for i in range(num_parts):
         cdf *= EXPSTEP
     cdf *= lastexp
     return cdf
@@ -261,7 +261,7 @@ def __poisson_cdf_Q (k,a):
         return 1                        # special cases
     next = exp( -a )
 
-    for i in xrange(1,k+1):
+    for i in range(1,k+1):
         last = next
         next = last * a / i
 
@@ -287,7 +287,7 @@ def __poisson_cdf_Q_large_lambda (k,a):
     next = EXPSTEP
     num_parts -= 1
 
-    for i in xrange(1,k+1):
+    for i in range(1,k+1):
         last = next
         next = last * a / i
         if next > EXPTHRES:
@@ -313,7 +313,7 @@ def __poisson_cdf_Q_large_lambda (k,a):
                cdf *= lastexp
                lastexp = 1
 
-    for i in xrange(num_parts):
+    for i in range(num_parts):
         cdf *= EXPSTEP
     cdf *= lastexp
     return cdf
@@ -338,7 +338,7 @@ def poisson_cdf_inv ( cdf, lam, maximum=1000):
 #     if cdf <= sum2:
 #         return i
 
-    for i in xrange(1,maximum+1):
+    for i in range(1,maximum+1):
         sumold = sum2
 #         if i == 0:
 #             newval = exp( -a )
@@ -372,7 +372,7 @@ def poisson_cdf_Q_inv ( cdf, lam, maximum=1000):
     newval = exp( -lam )
     sum2 = newval
 
-    for i in xrange(1,maximum+1):
+    for i in range(1,maximum+1):
         sumold = sum2
         last = newval
         newval = last * lam / i
@@ -407,7 +407,7 @@ def binomial_coef (n,k):
     else:
         mx = max(k,n-k)
         cnk = float(mx+1)
-        for i in xrange(2,mn+1):
+        for i in range(2,mn+1):
             cnk = cnk * (mx+i) / i
     return cnk
 
@@ -437,7 +437,7 @@ def _binomial_cdf_r (x,a,b):
             seedpdf=binomial_pdf(argmax,a,b)
             pdf=seedpdf
             cdf = pdf
-            for i in xrange(argmax-1,x,-1):
+            for i in range(argmax-1,x,-1):
                 pdf/=(a-i)*b/(1-b)/(i+1)
                 if pdf==0.0: break
                 cdf += pdf
@@ -484,13 +484,13 @@ def _binomial_cdf_f (x,a,b):
             seedpdf=binomial_pdf(argmax,a,b)
             pdf=seedpdf
             cdf = pdf
-            for i in xrange(argmax-1,-1,-1):
+            for i in range(argmax-1,-1,-1):
                 pdf/=(a-i)*b/(1-b)/(i+1)
                 if pdf==0.0: break
                 cdf += pdf
             
             pdf = seedpdf
-            for i in xrange(argmax,x):
+            for i in range(argmax,x):
                 pdf*=(a-i)*b/(1-b)/(i+1)
                 if pdf==0.0: break
                 cdf+=pdf
@@ -500,7 +500,7 @@ def _binomial_cdf_f (x,a,b):
         else:
             pdf=binomial_pdf(x,a,b)
             cdf = pdf
-            for i in xrange(x-1,-1,-1):
+            for i in range(x-1,-1,-1):
                 pdf/=(a-i)*b/(1-b)/(i+1)
                 if pdf==0.0: break
                 cdf += pdf
@@ -517,7 +517,7 @@ def binomial_cdf_inv ( cdf, a, b ):
         raise Exception("CDF must >= 0 or <= 1")
     cdf2 = 0
     a = int(a)
-    for x in xrange(0,a+1):
+    for x in range(0,a+1):
         pdf = binomial_pdf (x,a,b)
         cdf2 = cdf2 + pdf
         if cdf < cdf2:
@@ -551,7 +551,7 @@ def binomial_pdf( x, a, b):
             mx=a-x
         pdf=1
         t = 0
-        for q in xrange(1,mn+1):
+        for q in range(1,mn+1):
             pdf*=(a-q+1)*p/(mn-q+1)
             if pdf < 1e-100:
                 while pdf < 1e-3:
@@ -562,7 +562,7 @@ def binomial_pdf( x, a, b):
                     pdf *= 1-p
                     t+=1
             #print "pdf:", pdf
-        for i in xrange(mx-t):
+        for i in range(mx-t):
             pdf *= 1-p
         #print pdf,1-p,mx-t
         #pdf*=(1-p)**(mx-t)
@@ -577,7 +577,7 @@ def facotrial (n):
     if n < 0:
         return 0
     fact = 1
-    for i in xrange(2,n+1):
+    for i in range(2,n+1):
         fact = fact * i
     return fact
 
@@ -594,7 +594,7 @@ def test():
 #    print binomial_pdf(2,10,0.002)
 #    print binomial_cdf(6520,12988,5.96064e-01)
 #    print binomial_cdf(15,20,5.96064e-01)
-    print ( 1-binomial_cdf(11679,12988,1.77023e-01) )
+    print(1-binomial_cdf(11679,12988,1.77023e-01))
                        
 if __name__ == '__main__':
     test()

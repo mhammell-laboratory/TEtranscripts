@@ -108,7 +108,7 @@ class BEDFile(GenericParser) :
             start = r.start-100
             end = r.start + 100
             famID = teIdx.getFamilyID(chr,start,end)
-            if not famlist.has_key(famID) :
+            if famID not in famlist :
                 famlist[famID] = []
             famlist[famID].append(r)
             
@@ -117,7 +117,7 @@ class BEDFile(GenericParser) :
         max_fam2 = ""
         max_fam1_cnt = 0
         max_fam2_cnt = 0
-        for k in famlist.keys() :
+        for k in famlist:
             k_len = len(famlist[k])
             if max_fam1_cnt < k_len :
                 max_fam1_cnt = k_len
@@ -390,7 +390,7 @@ class BEDFile(GenericParser) :
             f.close()   
         self.__tsize = int(seq_len/seq_len_count)      
         # Close all files.
-        for fh in fhandels.values():
+        for fh in list(fhandels.values()):
             fh.close()
            
     def del_chrom_bed(self,chrom):
@@ -409,7 +409,7 @@ class BEDFile(GenericParser) :
         reads = array('f',(0,) * int(ceil(1.0 *chrsize/bin_size)))
         sizeOfArray = len(reads)
         
-        if not self.__fileList.has_key(chrom):
+        if chrom not in self.__fileList:
             logging.warn("No reads at chromosome %s. Skip!\n" %(chrom))
             return None
         else:
@@ -504,7 +504,7 @@ class BAMFile(GenericParser) :
             start = r.start - 100
             end = r.end + 100
             famID = teIdx.getFamilyID(chr,start,end)
-            if not famlist.has_key(famID) :
+            if famID not in famlist :
                 famlist[famID] = []
             famlist[famID].append(r)
             
@@ -513,7 +513,7 @@ class BAMFile(GenericParser) :
         max_fam2 = ""
         max_fam1_cnt = 0
         max_fam2_cnt = 0
-        for k in famlist.keys() :
+        for k in famlist:
             k_len = len(famlist[k])
             if max_fam1_cnt < k_len :
                 max_fam1_cnt = k_len
@@ -856,7 +856,7 @@ class BAMFile(GenericParser) :
                         w = 1/len(multi_reads)
                         for k in range(len(multi_reads)) :
                             rr = multi_reads[k]
-                            if fhandels.has_key(rr.chrom):
+                            if rr.chrom in fhandels:
                                 fh = fhandels[rr.chrom] 
                                 fh.write(rr.chrom+"\t"+str(rr.start)+"\t"+str(rr.end)+"\t"+rr.name+"\t"+str(rr.qual)+"\t"+rr.strand+"\t"+str(w)+"\n")
                                 self.size += w    
@@ -885,7 +885,7 @@ class BAMFile(GenericParser) :
             w = 1/len(multi_reads)
             for k in range(len(multi_reads)) :
                 rr = multi_reads[k]
-                if fhandels.has_key(rr.chrom):
+                if rr.chrom in fhandels:
                     fh = fhandels[rr.chrom] 
                     fh.write(rr.chrom+"\t"+str(rr.start)+"\t"+str(rr.end)+"\t"+rr.name+"\t"+str(rr.qual)+"\t"+rr.strand+"\t"+str(w)+"\n")
                     self.size += w 
@@ -894,7 +894,7 @@ class BAMFile(GenericParser) :
         self.__tsize = int(seq_len/seq_len_count)
         
         # Close all files.
-        for fh in fhandels.values():
+        for fh in list(fhandels.values()):
             fh.close()
     
     def __binary_parse (self, data ):

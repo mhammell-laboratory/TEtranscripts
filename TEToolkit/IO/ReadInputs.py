@@ -90,7 +90,7 @@ class SAM_Reader( FileOrSequence ):
             continue
          try:
             (qname, flag, rname, pos, mapq, cigar, rnext, pnext, tlen, seq, trash) = line.split("\t", 10)
-         except ValueError, e:
+         except ValueError as e:
             e.args = e.args + ( self.get_line_number_string(), )
             raise
          yield (qname, int(flag), rname, int(pos)-1, mapq, cigar, rnext, pnext, seq.upper())

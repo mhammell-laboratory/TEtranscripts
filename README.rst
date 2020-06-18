@@ -28,7 +28,8 @@ Contact: Ying Jin (yjin@cshl.edu)
 Requirements
 ------------
 
-Python:     2.6.x or 2.7.x (not tested in Python 3.x)
+Python:     2.6.x or 2.7.x or 3.x 
+           (tested on Python 2.7.11 and 3.7.7)
 
 pysam:      0.9.x or greater
 
@@ -58,10 +59,12 @@ run this command instead::
 
 to the PATH variable, and
 
-     /local/home/usr/lib/python2.X/site-packages 
+     /local/home/usr/lib/pythonX.Y/site-packages
 
-to the PYTHONPATH variable, where python2.X refers to the 
-python version (e.g. python2.7 if using python version 2.7.x).
+to the PYTHONPATH variable, where X refers to the major
+python version, and Y refers to the minor python version.
+(e.g. `python2.7` if using python version 2.7.x, and
+`python3.6` if using python version 3.6.x)
 
 
 TEtranscripts

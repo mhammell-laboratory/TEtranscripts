@@ -53,7 +53,7 @@ class PeakIO:
         height, number of tags in peak region, peak pvalue, peak
         fold_enrichment, fdr) <-- tuple type
         """
-        if not self.peaks.has_key(chromosome):
+        if chromosome not in self.peaks:
             self.peaks[chromosome]=[]
         self.peaks[chromosome].append((start,end,end-start,summit,
                                        peak_height,number_tags,
@@ -62,7 +62,7 @@ class PeakIO:
     def filter_pvalue (self, pvalue_cut ):
         peaks = self.peaks
         new_peaks = {}
-        chrs = peaks.keys()
+        chrs = list(peaks.keys())
         chrs.sort()
         for chrom in chrs:
             new_peaks[chrom]=[p for p in peaks[chrom] if p[6] >= pvalue_cut]
@@ -76,7 +76,7 @@ class PeakIO:
         """
         peaks = self.peaks
         new_peaks = {}
-        chrs = peaks.keys()
+        chrs = list(peaks.keys())
         chrs.sort()
         if fc_up:
             for chrom in chrs:
@@ -88,7 +88,7 @@ class PeakIO:
 
     def total (self):
         peaks = self.peaks
-        chrs = peaks.keys()
+        chrs = list(peaks.keys())
         chrs.sort()
         x = 0
         for chrom in chrs:
@@ -97,7 +97,7 @@ class PeakIO:
     
     def ave_fold_enrichment (self):
         peaks = self.peaks
-        chrs = peaks.keys()
+        chrs = list(peaks.keys())
         chrs.sort()
         x = 0
         t = 0
@@ -112,7 +112,7 @@ class PeakIO:
         
         """
         peaks = self.peaks
-        chrs = peaks.keys()
+        chrs = list(peaks.keys())
         chrs.sort()
         x = 0
         for chrom in chrs:
@@ -125,7 +125,7 @@ class PeakIO:
     
     def tobed (self):
         text = ""
-        chrs = self.peaks.keys()
+        chrs = list(self.peaks.keys())
         chrs.sort()
         for chrom in chrs:
             for peak in self.peaks[chrom]:
@@ -134,7 +134,7 @@ class PeakIO:
 
     def towig (self):
         text = ""
-        chrs = self.peaks.keys()
+        chrs = list(self.peaks.keys())
         chrs.sort()
         for chrom in chrs:
             for peak in self.peaks[chrom]:
@@ -147,7 +147,7 @@ class PeakIO:
         
         """
         self.peaks = {}
-        chrs = data.keys()
+        chrs = list(data.keys())
         chrs.sort()
         for chrom in chrs:
             self.peaks[chrom]=[]
@@ -161,14 +161,14 @@ class PeakIO:
         """
         peaks = self.peaks
         new_peaks = {}
-        chrs = peaks.keys()
+        chrs = list(peaks.keys())
         chrs.sort()
         for chrom in chrs:
             new_peaks[chrom]=[]
             n_append = new_peaks[chrom].append
             prev_peak = None
             peaks_chr = peaks[chrom]
-            for i in xrange(len(peaks_chr)):
+            for i in range(len(peaks_chr)):
                 if not prev_peak:
                     prev_peak = peaks_chr[i]
                     continue
@@ -204,8 +204,8 @@ class PeakIO:
         if isinstance(peaks2,PeakIO):
             peaks2 = peaks2.peaks
         total_num = 0
-        chrs1 = peaks1.keys()
-        chrs2 = peaks2.keys()
+        chrs1 = list(peaks1.keys())
+        chrs2 = list(peaks2.keys())
         for k in chrs1:
             if not chrs2.count(k):
                 continue
@@ -213,8 +213,8 @@ class PeakIO:
             rl2_k = iter(peaks2[k])
             tmp_n = False
             try:
-                r1 = rl1_k.next()
-                r2 = rl2_k.next()
+                r1 = next(rl1_k)
+                r2 = next(rl2_k)
                 while (True):
                     if r2[0] < r1[1] and r1[0] < r2[1]:
                         a = sorted([r1[0],r1[1],r2[0],r2[1]])
@@ -223,10 +223,10 @@ class PeakIO:
                                 total_num+=1
                                 tmp_n = True
                     if r1[1] < r2[1]:
-                        r1 = rl1_k.next()
+                        r1 = next(rl1_k)
                         tmp_n = False
                     else:
-                        r2 = rl2_k.next()
+                        r2 = next(rl2_k)
             except StopIteration:
                 continue
         return total_num
@@ -379,7 +379,7 @@ class FWTrackII:
         reads = []
         pos = []
         
-        if not self.__fileList.has_key(chrom):
+        if chrom not in self.__fileList:
             logging.warn("No reads at chromosome %s. Skip!\n" %(chrom))
             return None
         else:
@@ -436,7 +436,7 @@ class FWTrackII:
         strand     -- 0: plus, 1: minus
         """
         #if not self.__locations.has_key(chromosome):
-        if not self.__pluscounts.has_key(chromosome) :
+        if chromosome not in self.__pluscounts :
             #self.__locations[chromosome] = [array(BYTE4,[]),array(BYTE4,[])] # for (+strand, -strand)
             self.__minuscounts[chromosome] = [] #[0]*100000 #[array(BYTE4,[])]
             self.__pluscounts[chromosome] = [] #[0]*100000 #[array(BYTE4,[])]
@@ -457,7 +457,7 @@ class FWTrackII:
 
         """
       
-        if self.__pluscounts.has_key(chromosome):
+        if chromosome in self.__pluscounts:
             
             return (self.__pluscounts[chromosome],self.__minuscounts[chromosome])
         else:
@@ -468,7 +468,7 @@ class FWTrackII:
 
         """
 
-        if self.__pluscounts.has_key(chromosome):
+        if chromosome in self.__pluscounts:
             tagpos = []
             cnts = []
             pre_pos = -1
@@ -505,7 +505,7 @@ class FWTrackII:
 
         """
 
-        if self.__pluscounts.has_key(chromosome):
+        if chromosome in self.__pluscounts:
             tagpos = []
             cnts = []
             pre_pos = -1
@@ -535,12 +535,12 @@ class FWTrackII:
 
         """
         if strand ==0:
-            if self.__pluscounts.has_key(chromosome):
+            if chromosome in self.__pluscounts:
                 return self.__pluscounts[chromosome]
             else:
                 raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
         else:
-            if self.__minuscounts.has_key(chromosome):
+            if chromosome in self.__minuscounts:
                 return self.__minuscounts[chromosome]
             else:
                 #raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
@@ -549,7 +549,7 @@ class FWTrackII:
     def get_chr_names (self):
         """Return all the chromosome names stored in this track object.
         """
-        l = self.__pluscounts.keys()
+        l = list(self.__pluscounts.keys())
         l.sort()
         return l
 
@@ -568,7 +568,7 @@ class FWTrackII:
         """Naive sorting for locations.
         
         """
-        for k in self.__pluscounts.keys():
+        for k in list(self.__pluscounts.keys()):
             
             (tmparrayplus,tmparrayminus) = self.get_locations_by_chr(k)
             self.__pluscounts[k] = sorted(tmparrayplus)
@@ -594,7 +594,7 @@ class FWTrackII:
         if not self.__sorted:
             self.sort()
         self.total = 0
-        for k in self.__locations.keys(): # for each chromosome
+        for k in self.__locations: # for each chromosome
             # + strand
             plus = self.__locations[k][0]
             if len(plus) <1:
@@ -641,7 +641,7 @@ class FWTrackII:
         
         """
         #for chrom in self.__locations.keys():
-        for chrom in self.__pluscounts.keys() :
+        for chrom in self.__pluscounts:
             #(plus_tags,minus_tags) = self.__locations[chrom]
             #self.__locations[chrom][0].extend(self.__locations[chrom][1])
             #self.__locations[chrom][0] = sorted(self.__locations[chrom][0])
@@ -662,7 +662,7 @@ class FWTrackII:
         """
         if not self.__sorted:
             self.sort()
-        for chrom in self.__locations.keys():
+        for chrom in self.__locations:
             (plus_tags,minus_tags) = self.__locations[chrom]
             new_plus_tags = array(BYTE4,[])
             ip = 0
@@ -693,7 +693,7 @@ class FWTrackII:
         Warning: the current object is changed!
         """
         self.total = 0
-        for key in self.__locations.keys():
+        for key in self.__locations:
             num = int(len(self.__locations[key][0])*percent)
             self.__locations[key][0]=array(BYTE4,sorted(random_sample(self.__locations[key][0],num)))
             num = int(len(self.__locations[key][1])*percent)
@@ -708,7 +708,7 @@ class FWTrackII:
         
         """
         t = "track type=wiggle_0 name=\"tag list\" description=\"%s\"\n" % (self.annotation)
-        for k in self.__locations.keys():
+        for k in self.__locations:
             if self.__locations[k][0]:
                 t += "variableStep chrom=%s span=%d strand=0\n" % (k,self.fw)
                 for i in self.__locations[k][0]:
@@ -790,7 +790,7 @@ class FWTrackIII:
         """Naive sorting for locations.
         
         """
-        for k in self.__locations.keys():
+        for k in self.__locations:
             (tmparrayplus,tmparrayminus) = self.get_locations_by_chr(k)
             self.__locations[k][0] = sorted(tmparrayplus)
             tmparray = self.get_counts_by_chr(k, 0) #Ying
@@ -857,7 +857,7 @@ class FWTrackIII:
         Warning: the current object is changed!
         """
         self.total = 0
-        for key in self.__locations.keys():
+        for key in self.__locations:
             num = int(len(self.__locations[key][0])*percent)
             self.__locations[key][0]=array(BYTE4,sorted(random_sample(self.__locations[key][0],num)))
             num = int(len(self.__locations[key][1])*percent)
@@ -872,7 +872,7 @@ class FWTrackIII:
         
         """
         t = "track type=wiggle_0 name=\"tag list\" description=\"%s\"\n" % (self.annotation)
-        for k in self.__locations.keys():
+        for k in self.__locations:
             if self.__locations[k][0]:
                 t += "variableStep chrom=%s span=%d strand=0\n" % (k,self.fw)
                 for i in self.__locations[k][0]:

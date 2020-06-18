@@ -50,13 +50,13 @@ class Node:
         return  self.parent and self.parent.right == self
 
     def getStart(self):
-        bin_startID = self.__start/TEindex_BINSIZE
+        bin_startID = self.__start//TEindex_BINSIZE
         if self.__start == bin_startID * TEindex_BINSIZE:
             bin_startID -= 1
         return bin_startID
 
     def getEnd(self):
-        bin_endID = self.__end/TEindex_BINSIZE
+        bin_endID = self.__end//TEindex_BINSIZE
         return bin_endID
 
     def getName(self):
@@ -109,7 +109,7 @@ class BinaryTree:
         @param data node data object to insert
         """
         root = node
-        binstart = start/TEindex_BINSIZE
+        binstart = start//TEindex_BINSIZE
         if start == binstart * TEindex_BINSIZE:
             binstart -= 1
 
@@ -298,10 +298,10 @@ class TEfeatures:
             return -1
 
     def getFamilyID(self, chromosome, start, end):
-        binID = start/TEindex_BINSIZE
-        endbinID = end/TEindex_BINSIZE + 1
+        binID = start//TEindex_BINSIZE
+        endbinID = end//TEindex_BINSIZE + 1
 
-        if self.indexlist.has_key(chromosome):
+        if chromosome in self.indexlist:
             index = self.indexlist[chromosome]
             (node, RBnode) = index.lookup(binID, index.root, None, None)
 
@@ -316,13 +316,13 @@ class TEfeatures:
             return None
 
     def findOvpTE(self, chrom, start, end):
-        startbinID = start/TEindex_BINSIZE
-        endbinID = end/TEindex_BINSIZE
+        startbinID = start//TEindex_BINSIZE
+        endbinID = end//TEindex_BINSIZE
         if start == startbinID * TEindex_BINSIZE:
             startbinID -= 1
         name_idx_list = []
 
-        if self.indexlist.has_key(chrom):
+        if chrom in self.indexlist:
             index = self.indexlist[chrom]
         else:
             return None
@@ -364,7 +364,7 @@ class TEfeatures:
     def groupByEle(self, te_inst_counts):
 
         TEs = self.getElements()
-        te_ele_counts = dict(zip(TEs, [0]*len(TEs)))
+        te_ele_counts = dict(list(zip(TEs, [0]*len(TEs))))
 
         for i in range(len(te_inst_counts)):
             ele_name = self.getEleName(i)
@@ -444,8 +444,8 @@ class TEfeatures:
             if chrom in self.indexlist:
                 index = self.indexlist[chrom]
 
-                bin_startID = start/TEindex_BINSIZE
-                bin_endID = end/TEindex_BINSIZE
+                bin_startID = start//TEindex_BINSIZE
+                bin_endID = end//TEindex_BINSIZE
 
                 if start == bin_startID * TEindex_BINSIZE:
                     bin_startID -= 1
@@ -458,8 +458,8 @@ class TEfeatures:
 
             else:
                 index = BinaryTree()
-                bin_startID = start/TEindex_BINSIZE
-                bin_endID = end/TEindex_BINSIZE
+                bin_startID = start//TEindex_BINSIZE
+                bin_endID = end//TEindex_BINSIZE
 
                 if start == bin_startID * TEindex_BINSIZE:
                     bin_startID -= 1

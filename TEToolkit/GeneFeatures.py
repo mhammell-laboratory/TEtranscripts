@@ -61,10 +61,10 @@ class GFF_Reader( ):
 
        for pairs in attributeStr.split(';') :
            if pairs.count('"') not in [0,2] :
-               raise ValueError, "The attribute string seems to contain mismatched quotes."
+               raise ValueError("The attribute string seems to contain mismatched quotes.")
            nv = self._re_attr_main.match(pairs)
            if not nv :
-               raise ValueError, "Failure parsing GFF attribute line."
+               raise ValueError("Failure parsing GFF attribute line.")
            val = nv.group(2)
            name = nv.group(1)
            if name == id_interested :
@@ -145,24 +145,24 @@ class GeneFeatures:
             sys.stderr.write("Warning: No features of type '%s' found in gene GTF file.\n" % feature_type)
 
         #build interval trees
-        for each_chrom in temp_plus.keys():
+        for each_chrom in temp_plus:
             inputlist = []
-            for each_gene in temp_plus[each_chrom].keys():
+            for each_gene in temp_plus[each_chrom]:
                     for (start,end) in temp_plus[each_chrom][each_gene]:
                         inputlist.append(Interval(each_gene,start,end))
             self.featureIdxs_plus[each_chrom] = IntervalTree(inputlist)
 
 
-        for each_chrom in temp_minus.keys():
+        for each_chrom in temp_minus:
             inputlist = []
-            for each_gene in temp_minus[each_chrom].keys():
+            for each_gene in temp_minus[each_chrom]:
                 for (start,end) in temp_minus[each_chrom][each_gene]:
                     inputlist.append(Interval(each_gene,start,end))
             self.featureIdxs_minus[each_chrom] = IntervalTree(inputlist)
 
-        for each_chrom in temp_nostrand.keys():
+        for each_chrom in temp_nostrand:
             inputlist = []
-            for each_gene in temp_nostrand[each_chrom].keys():
+            for each_gene in temp_nostrand[each_chrom]:
                 for (start,end) in temp_nostrand[each_chrom][each_gene]:
                     inputlist.append(Interval(each_gene,start,end))
             self.featureIdxs_nostrand[each_chrom] = IntervalTree(inputlist)
@@ -173,8 +173,9 @@ class GeneFeatures:
 
     def Gene_annotation(self,itv_list):
         genes = []
-        fs = []
+        #fs = []
         for itv in itv_list :
+            fs = []
             try:
                 if itv[3] == "+" :
                     if itv[0] in self.featureIdxs_plus :

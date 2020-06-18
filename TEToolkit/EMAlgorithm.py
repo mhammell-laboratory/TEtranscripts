@@ -27,9 +27,9 @@ from TEToolkit.Constants import *
 def normalizeMeans(meansIn):
     total = sum(meansIn)
     meansOut = [0]*len(meansIn)
-    sys.stderr.write("total means = " + str(total) +"\n")    
+    sys.stderr.write("total means = " + repr(int(total)) +"\n")    
     if total > 0 :
-        meansOut = map(lambda x: 1.0*x/total, meansIn)
+        meansOut = [1.0*x/total for x in meansIn]
    #     for i in range(len(means)) :
    #         means[i] = 1.0*means[i]/total
 
@@ -42,7 +42,7 @@ def EMUpdate(meansIn, te_features,uniq_counts,multi_reads,estimatedReadLength):
     meansOut = [0] *len(meansIn)
 
     multi_counts = computeAbundances(meansIn,multi_reads)    
-    sys.stderr.write("total multi counts = "+ str(sum(multi_counts))+"\n")   
+    sys.stderr.write("total multi counts = "+ repr(int(sum(multi_counts)))+"\n")   
     for tid in range(len(meansIn)) :
         tlen = te_features.getLength(tid)
         if tlen <0 :
@@ -50,14 +50,14 @@ def EMUpdate(meansIn, te_features,uniq_counts,multi_reads,estimatedReadLength):
             raise
         effectiveLength = tlen - estimatedReadLength + 1
         if effectiveLength > 0 : 
-            meansOut[tid] = (uniq_counts[tid] + multi_counts[tid])/effectiveLength
+            meansOut[tid] = (uniq_counts[tid] + multi_counts[tid])/(1.0*effectiveLength)
         else :
          #   sys.stderr.write("effective length is less than read length\n")
             meansOut[tid] = 0.0
         
                   
     meansOut = normalizeMeans(meansOut)
-    sys.stderr.write("after normalization total means = "+str(sum(meansOut))+"\n")
+    sys.stderr.write("after normalization total means = "+repr(sum(meansOut))+"\n")
    
     return meansOut
 
@@ -123,7 +123,7 @@ def EMestimate(te_features,multi_reads,uniq_counts,multi_counts,numItr,estimated
    # estimatedReadLength = averageReadLength(multi_reads)
     
     #density per base
-    sys.stderr.write("multi-reads = %s " % (str(len(multi_reads))))
+    sys.stderr.write("multi-reads = %s " % repr(int(len(multi_reads))))
     means0 = []
     for tid in range(len(uniq_counts)) :
         tlen = te_features.getLength(tid)
@@ -141,7 +141,7 @@ def EMestimate(te_features,multi_reads,uniq_counts,multi_counts,numItr,estimated
     
     # relative abundance    
     means0 = normalizeMeans(means0)
-    sys.stderr.write("after normalization total means0 = "+str(sum(means0))+"\n")
+    sys.stderr.write("after normalization total means0 = "+repr(sum(means0))+"\n")
     '''
     /**
          * Defaults for these values taken from the R implementation of
@@ -226,7 +226,7 @@ def EMestimate(te_features,multi_reads,uniq_counts,multi_counts,numItr,estimated
         
         # Stabilization step
         if abs(alphaS - 1.0) > 0.01 :
-            sys.stderr.write("alpha = " + str(alphaS) + ".\n ")
+            sys.stderr.write("alpha = " + repr(alphaS) + ".\n ")
             sys.stderr.write("Performing a stabilization step.\n")
             try :
                 meansPrime = EMUpdate(meansPrime, te_features,uniq_counts,multi_reads,estimatedReadLength)
@@ -252,7 +252,7 @@ def EMestimate(te_features,multi_reads,uniq_counts,multi_counts,numItr,estimated
                     maxStep = max(maxStep0, maxStep/mStep)
                     alphaS = 1.0
                 
-        sys.stderr.write("alpha = " + str(alphaS) + ", ")
+        sys.stderr.write("alpha = " + repr(alphaS) + ", ")
         
         if alphaS == maxStep :
             maxStep = mStep * maxStep
@@ -277,7 +277,7 @@ def computeAbundances(meansIn,multi_reads):
     size = len(meansIn)
     multi_counts = [0] * size
     
-    sys.stderr.write("num of multi reads = "+str(len(multi_reads))+"\n")
+    sys.stderr.write("num of multi reads = "+repr(int(len(multi_reads)))+"\n")
     for kid in range(len(multi_reads)) :
         TE_transcripts = multi_reads[kid]
         totalMass = 0.0
@@ -292,5 +292,5 @@ def computeAbundances(meansIn,multi_reads):
         for tid in TE_transcripts :
               multi_counts[tid] += meansIn[tid] * norm
     
-    sys.stderr.write("total multi counts = "+ str(sum(multi_counts))+"\n")
+    sys.stderr.write("total multi counts = "+ repr(int(sum(multi_counts)))+"\n")
     return multi_counts
