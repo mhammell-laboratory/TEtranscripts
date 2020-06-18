@@ -2,7 +2,7 @@ Name: TEtranscripts
 Version: 2.2.0
 Summary: Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions
 Home-page: http://hammelllab.labsites.cshl.edu/software#TEtranscripts
-Author: Ying Jin, Eric Paniagua, Oliver Tam and Molly Hammell
+Author: Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam and Molly Hammell
 Author-email: yjin@cshl.edu
 License: GPLv3
 Description: TEtranscripts
@@ -30,13 +30,13 @@ Description: TEtranscripts
         
         Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
         
-        Copyright (C) 2014-2018 Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell
+        Copyright (C) 2014-2020 Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam & Molly Hammell
         Contact: Ying Jin (yjin@cshl.edu)
         
         Requirements
         ------------
         
-        Python:     2.6.x or 2.7.x (not tested in Python 3.x)
+        Python:     2.6.x or 2.7.x or 3.x (tested on Python 2.7.11 and Python 3.7.7)
         
         pysam:      0.9.0 or greater
         
@@ -68,8 +68,10 @@ Description: TEtranscripts
         
              /local/home/usr/lib/python2.X/site-packages 
         
-        to the PYTHONPATH variable, where python2.X refers to the 
-        python version (e.g. python2.7 if using python version 2.7.x).
+        to the PYTHONPATH variable, , where X refers to the
+        major python version, and Y refers to the minor 
+        python version. (e.g. python2.7 if using python version
+        2.7.x, and python3.6 if using python version 3.6.x)
         
         
         TEtranscripts
@@ -292,4 +294,4 @@ Description: TEtranscripts
         
 Keywords: TE transposable element differential enrichment
 Platform: Linux
-Platform: MacOS
+Platform: MacOSX
