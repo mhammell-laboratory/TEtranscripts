@@ -89,7 +89,7 @@ def prepare_parser():
                         default=0, help='average fragment length for single end reads. \
                         For paired-end, estimated from the input alignment file. DEFAULT: for paired-end, \
                         estimate from the input alignment file; for single-end, ignored by default.')
-    parser.add_argument('--verbose', metavar='verbose', dest='verbose', type=int, nargs='?', default=2,
+    parser.add_argument('--verbose', metavar='verbose', dest='verbose', type=int, nargs='?', default=2, const=3,
                         help='Set verbose level. 0: only show critical message, 1: show additional warning message, \
                         2: show process information, 3: show debug messages. DEFAULT:2')
     parser.add_argument('--version', action='version', version='%(prog)s 2.2.0')
