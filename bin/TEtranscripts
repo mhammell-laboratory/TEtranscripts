@@ -10,7 +10,7 @@ Created on Jan 27, 2014
 @author: Talitha Forcier
 @contact: talitha@cshl.edu
 @status: 
-@version: 2.2.0
+@version: 2.2.1
 '''
 # python module
 import sys
@@ -92,7 +92,7 @@ def prepare_parser():
     parser.add_argument('--verbose', metavar='verbose', dest='verbose', type=int, nargs='?', default=2, const=3,
                         help='Set verbose level. 0: only show critical message, 1: show additional warning message, \
                         2: show process information, 3: show debug messages. DEFAULT:2')
-    parser.add_argument('--version', action='version', version='%(prog)s 2.2.0')
+    parser.add_argument('--version', action='version', version='%(prog)s 2.2.1')
 
     return parser
 
