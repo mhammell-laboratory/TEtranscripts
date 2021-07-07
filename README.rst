@@ -307,6 +307,6 @@ Citation
 If using the software in a publication, please cite the
 `following <https://pubmed.ncbi.nlm.nih.gov/26206304/>`_:
 
-Jin Y, Tam OH, Paniagua E, Hammell M. (2015) `TEtranscripts: a package
+Jin Y, Tam OH, Paniagua E, Hammell M. (2015) TEtranscripts: a package
 for including transposable elements in differential expression
 analysis of RNA-seq datasets. Bioinformatics. 31(22):3593-9.
