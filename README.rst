@@ -21,9 +21,9 @@ DESeq2.
 
 Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
 
-Copyright (C) 2014-2020 Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam & Molly Hammell
+Copyright (C) 2014-2021 Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam & Molly Hammell
 
-Contact: Ying Jin (yjin@cshl.edu)
+Contact: Oliver Tam (tam@cshl.edu) or Talitha Forcier (talitha@cshl.edu)
 
 Requirements
 ------------
@@ -301,4 +301,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with TEtranscripts.  If not, see `this website <http://www.gnu.org/licenses/>`_.
 
+Citation
+======================
 
+If using the software in a publication, please cite the following
+`publication <https://pubmed.ncbi.nlm.nih.gov/26206304/>`_:
+
+Jin Y, Tam OH, Paniagua E, Hammell M. (2015) `TEtranscripts: a package
+for including transposable elements in differential expression
+analysis of RNA-seq datasets. Bioinformatics. 31(22):3593-9.
