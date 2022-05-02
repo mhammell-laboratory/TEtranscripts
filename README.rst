@@ -28,7 +28,7 @@ Contact: Oliver Tam (tam@cshl.edu) or Talitha Forcier (talitha@cshl.edu)
 Requirements
 ------------
 
-Python:     2.6.x or 2.7.x or 3.x (tested on Python 2.7.11 and 3.7.7)
+Python:     2.7.x or 3.2.x (tested on Python 2.7.11 and 3.7.7)
 
 pysam:      0.9.x or greater
 
