@@ -35,7 +35,6 @@ setup(name='TEtranscripts',
           'MacOS'
       ],
       install_requires=[
-          'argparse',
           'pysam>=0.9'
       ],
       include_package_data=True,
