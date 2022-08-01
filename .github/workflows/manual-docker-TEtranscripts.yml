@@ -15,7 +15,7 @@ jobs:
     - uses: mr-smithers-excellent/docker-build-push@v5
       name: Build & push Docker image
       with:
-        image: <input_docker_account_here>/tetranscripts
+        image: mhammelllab/tetranscripts
         tags: v1, latest
         registry: docker.io
         dockerfile: Dockerfile
