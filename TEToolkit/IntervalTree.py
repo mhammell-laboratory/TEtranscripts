@@ -29,7 +29,7 @@ class IntervalTree(object):
 
         this provides an extreme and satisfying performance improvement
         over searching manually over all 3 elements in the list (like
-        a sucker). 
+        a sucker).
 
         the IntervalTree class now also supports the iterator protocol
         so it's easy to loop over all elements in the tree:
@@ -41,13 +41,13 @@ class IntervalTree(object):
 
         NOTE: any object with start and stop attributes can be used
         in the incoming intervals list.
-        """ 
+        """
 
         depth -= 1
         if (depth == 0 or len(intervals) < minbucket) and len(intervals) < maxbucket:
             self.intervals = intervals
             self.left = self.right = None
-            return 
+            return
 
         if _extent is None:
             # sorting the first time through allows it to get
@@ -67,7 +67,7 @@ class IntervalTree(object):
                 rights.append(interval)
             else:  # overlapping.
                 self.intervals.append(interval)
-                
+
         self.left = lefts and IntervalTree(lefts,  depth, minbucket, (intervals[0].start, center)) or None
         self.right = rights and IntervalTree(rights, depth, minbucket, (center, right)) or None
         self.center = center
