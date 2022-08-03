@@ -11,7 +11,7 @@ RUN apt-get --assume-yes update \
 
 #MAIN
 
-RUN apt-get --assume-yes install r-base 
+RUN apt-get --assume-yes install r-base
 
 RUN  R -e "install.packages('BiocManager', dependencies=TRUE, repos='http://cran.rstudio.com/'); BiocManager::install()" \
 	&& R -e "BiocManager::install(\"DESeq2\")" \

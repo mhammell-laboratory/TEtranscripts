@@ -177,7 +177,7 @@ def ovp_annotation(references, multi_reads, geneIdx, teIdx, stranded, fileformat
                 annot_TE.append(TEs)
 
             if len(genes) > 0:
-                annot_gene.append(list(set(genes)))   
+                annot_gene.append(list(set(genes)))
         except:
             sys.stderr.write("Error occurred during read assignments \n")
             raise

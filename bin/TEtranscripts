@@ -9,7 +9,7 @@ Created on Jan 27, 2014
 @contact tam@cshl.edu
 @author: Talitha Forcier
 @contact: talitha@cshl.edu
-@status: 
+@status:
 @version: 2.2.1
 '''
 # python module
@@ -114,7 +114,7 @@ def count_reads(samples, fileformat, geneIdx, teIdx, stranded, te_mode, sortByPo
         for filename in samples:
             (gene_counts, te_instance_counts) = count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded,
                                                                            te_mode, sortByPos, numItr, fragLength, maxL)
-            
+
             # summarize on elements
             te_ele_counts = teIdx.groupByEle(te_instance_counts)
             # save gene counts and TE counts into count table
@@ -194,7 +194,7 @@ def ovp_annotation(references, multi_reads, geneIdx, teIdx, stranded, fileformat
         itv_list = []
         if r1 is not None:
             itv_list = fetch_exon(chrom1, r1.pos, r1.cigartuples, direction, fileformat)
-   
+
         if chrom2 != "":  # paired-end, both mates are mapped
             itv_list2 = fetch_exon(chrom2, r2.pos, r2.cigar, direction, fileformat)
             itv_list.extend(itv_list2)
@@ -281,7 +281,7 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
 
             if aligned_read.is_unmapped or aligned_read.is_duplicate or aligned_read.is_qcfail:
                 continue
-           
+
             cur_read_name = aligned_read.query_name
 
             if aligned_read.is_paired:  # this is not reliable if read mate is unmapped
@@ -290,9 +290,9 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
                     added_flag_pos = len(aligned_read.query_name)
                     if aligned_read.query_name.endswith(".1") or aligned_read.query_name.endswith(".2"):
                         added_flag_pos = len(aligned_read.query_name) - 2
-                
+
                 cur_read_name = aligned_read.query_name[:added_flag_pos]
-                
+
                 paired = True
                 if cur_read_name == prev_read_name or prev_read_name == "":
                     prev_read_name = cur_read_name
@@ -646,7 +646,7 @@ def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, DESeq1, norm, pval, fc, rp
     rscript += 'min_read <- %s\n' % min_read
     # Counts filtering (hard coded to 20)
     rscript += 'data <- data[apply(data,1,function(x){max(x)}) > min_read,]\n'
-    
+
     # Choose between DESeq2 (default) or DESeq
     if not DESeq1:
         # Differential analysis using DESeq2 and their internal normalization method
@@ -662,7 +662,7 @@ def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, DESeq1, norm, pval, fc, rp
         rscript += 'resSig <- res[(!is.na(res$padj) & (res$padj < %f) & \
         (abs(res$log2FoldChange)> %f)), ]\n' % (pval, l2fc)
         rscript += 'write.table(resSig, file="%s_sigdiff_gene_TE.txt",sep="\\t", quote=F)\n' % prj_name
-        
+
     else:
         # Quantile normalization to calculate fold change
         if norm == 'quant':
@@ -694,7 +694,7 @@ def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, DESeq1, norm, pval, fc, rp
                 rscript += 'sample2Mean <- data.q.norm[,%s]\n' % group2_start
             rscript += 'FoldChange <- (sample2Mean/sample1Mean)\n'
             rscript += 'log2FoldChange <- log2(FoldChange)\n'
-            
+
         # Normalize by RPM (reads per million mapped)
         if norm == 'TC':
             min_libSize = min(rpm_val)
@@ -727,7 +727,7 @@ def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, DESeq1, norm, pval, fc, rp
         rscript += 'write.table(res_fc, file="%s_gene_TE_analysis.txt", sep="\\t",quote=F,row.names=F)\n' % prj_name
 
         # Generating table of "significant" results
-        
+
         l2fc = math.log(fc, 2)
         if norm == 'quant':
             rscript += 'resSig <- res_fc[(!is.na(res_fc[,7]) & (res_fc[,7] < %f) & \
@@ -818,7 +818,7 @@ def main():
 
     (csamples_tbl, csamples_rpm) = count_reads(args.cfiles, args.fileformat, geneIdx, teIdx, args.stranded,
                                                args.te_mode, args.sortByPos, args.numItr, args.fragLength, args.maxL)
-    
+
     info("Finished processing sample files")
 
     info("Generating counts table")
@@ -836,7 +836,7 @@ def main():
         f_rscript = args.prj_name + '_DESeq2.R'
     else:
         f_rscript = args.prj_name + '_DESeq.R'
-    
+
     rcode = open('%s' % f_rscript, 'w')
     rcode.write(rscript)
     rcode.close()
