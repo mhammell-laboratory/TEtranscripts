@@ -66,6 +66,21 @@ python version, and Y refers to the minor python version.
 `python3.6` if using python version 3.6.x)
 
 
+Alternative Singularity Installation for HPC
+--------------------------------------------
+
+Many High Performance Compunting clusters (HPCs) have
+access to singularity which allows for the download and
+exectuation of containers, TEtranscripts also has a
+container through docker, it can be downloaded by
+singularity thusly:
+
+``singularity pull tetranscripts.sif docker://mhammelllab/tetranscripts:latest``
+
+Execution is then through singularity as well:
+
+``singularity exec tetranscripts.sif TEtranscripts -t <treatment sample> -c <control sample> --GTF <genic-GTF-file> --TE <TE-GTF-file>``
+
 TEtranscripts
 =============
 
