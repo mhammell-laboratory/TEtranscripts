@@ -32,7 +32,7 @@ efgsize = {"hg":2.7e9,
 
 NORM_METHOD = 'sd'
 STAT_METHOD = 'gt'
-BIN_SIZE = 10000 # for computing bin correlation 
+BIN_SIZE = 10000 # for computing bin correlation
 P_VAL = 1e-5
 
 
@@ -86,11 +86,11 @@ tm24_chrom_lengths = {'ch00':21805821,
                          'ch10':64834305,
                          'ch11':53386025,
                          'ch12':65486253}
-                         
+
 species_chrom_lengths={
                        'mm9':mm9_chrom_lengths,
                        'hg19':hg19_chrom_lengths,
                        'dm3':dm3_chrom_lengths,
                        'tm24':tm24_chrom_lengths};
-                       
+
 

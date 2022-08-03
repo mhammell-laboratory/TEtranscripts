@@ -4,7 +4,7 @@ TEtranscripts
 Version: 2.2.1
 
 *NOTE* TEtranscripts and TEcount rely on specially curated GTF files, which are not
-packaged with this software due to their size. Please go to 
+packaged with this software due to their size. Please go to
 `our website <http://hammelllab.labsites.cshl.edu/software#TEtranscripts>`_
 for instructions to download the curated GTF files.
 
@@ -74,10 +74,10 @@ Usage
 
 ::
 
-    usage: TEtranscripts -t treatment sample [treatment sample ...] 
+    usage: TEtranscripts -t treatment sample [treatment sample ...]
                          -c control sample [control sample ...]
                          --GTF genic-GTF-file
-                         --TE TE-GTF-file 
+                         --TE TE-GTF-file
                          [optional arguments]
 
     Required arguments:
@@ -94,10 +94,10 @@ Usage
       --format [input file format]
          Input file format: BAM or SAM. DEFAULT: BAM
       --stranded [option]   Is this a stranded library? (no, forward, or reverse).
-                 no      -  Library is unstranded   
-                 forward -  "Second-strand" cDNA library 
+                 no      -  Library is unstranded
+                 forward -  "Second-strand" cDNA library
                             (e.g. QIAseq stranded)
-                 reverse -  "First-strand" cDNA library 
+                 reverse -  "First-strand" cDNA library
                             (e.g. Illumina TruSeq stranded)
                             DEFAULT: no.
       --sortByPos           Input file is sorted by chromosome position.
@@ -114,12 +114,12 @@ Usage
       -L | --fragmentLength [fragLength]
          Average length of fragment used for single-end sequencing
          DEFAULT: For paired-end, estimated from the input alignment file. For single-end, ignored by default.
-      -i | --iteration 
+      -i | --iteration
          maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 100
       -p | --padj [pvalue]
          FDR cutoff for significance. DEFAULT: 0.05
       -f | --foldchange [foldchange]
-         Fold-change ratio (absolute) cutoff for differential expression. 
+         Fold-change ratio (absolute) cutoff for differential expression.
          DEFAULT: 1
 
       *DESeq1 compatibility options*
@@ -148,7 +148,7 @@ Usage
 Example Command Lines
 ---------------------
 
-If BAM files are unsorted, or sorted by queryname:: 
+If BAM files are unsorted, or sorted by queryname::
 
     TEtranscripts --format BAM --mode multi -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --project sample_nosort_test
 
@@ -170,9 +170,9 @@ Usage
 
 ::
 
-    usage: TEcount -b RNAseq BAM 
+    usage: TEcount -b RNAseq BAM
                    --GTF genic-GTF-file
-                   --TE TE-GTF-file 
+                   --TE TE-GTF-file
                    [optional arguments]
 
     Required arguments:
@@ -186,10 +186,10 @@ Usage
       --format [input file format]
          Input file format: BAM or SAM. DEFAULT: BAM
       --stranded [option]   Is this a stranded library? (no, forward, or reverse).
-                 no      -  Library is unstranded   
-                 forward -  "Second-strand" cDNA library 
+                 no      -  Library is unstranded
+                 forward -  "Second-strand" cDNA library
                             (e.g. QIAseq stranded)
-                 reverse -  "First-strand" cDNA library 
+                 reverse -  "First-strand" cDNA library
                             (e.g. Illumina TruSeq stranded)
                             DEFAULT: no.
       --sortByPos           Input file is sorted by chromosome position.
@@ -205,7 +205,7 @@ Usage
       -L | --fragmentLength [fragLength]
          Average length of fragment used for single-end sequencing
          DEFAULT: For paired-end, estimated from the input alignment file. For single-end, ignored by default.
-      -i | --iteration 
+      -i | --iteration
          maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 100
 
       *Other options*
@@ -227,7 +227,7 @@ Usage
 Example Command Lines
 ---------------------
 
-If BAM files are unsorted, or sorted by queryname:: 
+If BAM files are unsorted, or sorted by queryname::
 
     TEcount --format BAM --mode multi -b RNAseq.bam --project sample_nosort_test
 
@@ -245,7 +245,7 @@ In our experience, we recommend around 20-30Gb of memory for analyzing human sam
 Recommendations for TEtranscripts input files
 =============================================
 
-TEtranscripts can perform transposable element quantification from alignment results (e.g. BAM files) generated from a variety of programs. 
+TEtranscripts can perform transposable element quantification from alignment results (e.g. BAM files) generated from a variety of programs.
 Given the variety of experimental systems, we could not provide an optimal alignment strategy for every approach. Therefore,
 we recommend that users identify the optimal parameters for their particular genome and alignment program in order to get the best
 results.
@@ -254,9 +254,9 @@ When optimizing the alignment parameters, we recommend taking these points into 
 
 *Allowing sufficient number of multi-mappers during alignment*
 
-Most alignment programs provide only 1 alignment per read by default. We recommend reporting multiple alignments per read. We have found 
-that reporting a maximum of 100 alignments per read provides an optimal compromise between the size of the alignment file and recovery 
-of multi-mappers in many genome builds. However, we highly suggest that users optimize this parameter for their particular experiment, 
+Most alignment programs provide only 1 alignment per read by default. We recommend reporting multiple alignments per read. We have found
+that reporting a maximum of 100 alignments per read provides an optimal compromise between the size of the alignment file and recovery
+of multi-mappers in many genome builds. However, we highly suggest that users optimize this parameter for their particular experiment,
 as this could significantly improve the quality of transposable element quantification.
 
 *Optimizing alignment parameters for non-reference strains*
@@ -265,7 +265,7 @@ It is common that the specific laboratory strains used in an experiment contains
 While this can be mitigated through allowing mismatches during alignments, certain lab strains (e.g. Drosophila melanogaster) have
 diverged significantly from the reference genomes. We highly recommend that users should refine their alignment procedures to better
 account for the expected variations between their lab strains and the reference genome, which will accordingly improve their analysis
-with TEtranscripts. Users can also align to a custom genome build specific to their organism, though they would need GTF annotations for 
+with TEtranscripts. Users can also align to a custom genome build specific to their organism, though they would need GTF annotations for
 genes and transposable elements that are compatible with their custom genome in order to utilize TEtranscripts. Please contact us if you
 require advice in generating these annotation files.
 
@@ -275,11 +275,11 @@ For paired-end libraries, it is recommended that only alignments from properly p
 
 *Specific recommendations when using STAR*
 
-`STAR <https://github.com/alexdobin/STAR>`_ utilizes two parameters for optimal identification of multi-mappers `--outFilterMultimapNmax` and `--outAnchorMultimapNmax`. 
-The author of STAR recommends that `--winAnchorMultimapNmax` should be set at twice the value used in `--outFilterMultimapNmax`, 
-but no less than 50. In our study, we used the same number for both parameters (100), and found negligible differences in identifying 
+`STAR <https://github.com/alexdobin/STAR>`_ utilizes two parameters for optimal identification of multi-mappers `--outFilterMultimapNmax` and `--outAnchorMultimapNmax`.
+The author of STAR recommends that `--winAnchorMultimapNmax` should be set at twice the value used in `--outFilterMultimapNmax`,
+but no less than 50. In our study, we used the same number for both parameters (100), and found negligible differences in identifying
 multi-mappers. Upon further discussion with the author of STAR, we recommend that setting the same value for `--winAnchorMultimapNmax`
-and `--outFilterMultimapNmax`, though we highly suggest users test multiple values of `--winAnchorMultimapNmax` to identify the 
+and `--outFilterMultimapNmax`, though we highly suggest users test multiple values of `--winAnchorMultimapNmax` to identify the
 optimal value for their experiment.
 
 

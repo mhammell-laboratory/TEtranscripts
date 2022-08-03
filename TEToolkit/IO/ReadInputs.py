@@ -4,9 +4,9 @@ Created on Oct 12, 2011
 this code is for reading input parameters.
 
 @author: Ying Jin
-@status: 
+@status:
 @contact: yjin@cshl.edu
-@version: 
+@version:
 '''
 # python modules
 import sys
@@ -26,23 +26,23 @@ from TEToolkit.ShortRead.ParseBEDFile import BEDFile,BAMFile,SAMFile
 class FileOrSequence( object ):
    """ The construcutor takes one argument, which may either be a string,
    which is interpreted as a file name (possibly with path), or a
-   connection, by which we mean a text file opened for reading, or 
-   any other object that can provide an iterator over strings 
+   connection, by which we mean a text file opened for reading, or
+   any other object that can provide an iterator over strings
    (lines of the file).
-   
+
    The advantage of passing a file name instead of an already opened file
    is that if an iterator is requested several times, the file will be
    re-opened each time. If the file is already open, its lines can be read
-   only once, and then, the iterator stays exhausted.      
-   
+   only once, and then, the iterator stays exhausted.
+
    Furthermore, if a file name is passed that end in ".gz" or ".gzip"
    (case insensitive), it is transparently gunzipped.
    """
-   
-   def __init__( self, filename_or_sequence ):      
+
+   def __init__( self, filename_or_sequence ):
       self.fos = filename_or_sequence
       self.line_no = None
-      
+
    def __iter__( self ):
       self.line_no = 1
       if isinstance( self.fos, str ):
@@ -58,15 +58,15 @@ class FileOrSequence( object ):
       if isinstance( self.fos, str ):
          lines.close()
       self.line_no = None
-         
+
    def __repr__( self ):
       if isinstance( self.fos, str ):
          return "<%s object, connected to file name '%s'>" % (
             self.__class__.__name__, self.fos )
       else:
          return "<%s object, connected to %s >" % (
-            self.__class__.__name__, repr( self.fos ) )   
-            
+            self.__class__.__name__, repr( self.fos ) )
+
    def get_line_number_string( self ):
       if self.line_no is None:
          if isinstance( self.fos, str ):
@@ -97,21 +97,21 @@ class SAM_Reader( FileOrSequence ):
 
 def read_opts(parser):
     ''' object parser contains parsed options '''
-    
+
     args = parser.parse_args()
-    
+
     #treatment files
     for i in range(len(args.tfiles)) :
         if not os.path.isfile(args.tfiles[i]) :
             logging.error("No such file: %s !\n" % (args.tfiles[i]))
             sys.exit(1)
-        
+
     if not os.path.isfile(args.tinputs[0]) :
             logging.error("No such file: %s !\n" % (args.tinputs))
             sys.exit(1)
-    
-    #control files 
-    if args.cfiles != None :      
+
+    #control files
+    if args.cfiles != None :
         for i in range(len(args.cfiles)) :
             if not os.path.isfile(args.cfiles[i]) :
                 logging.error("No such file: %s !\n" % (args.cfiles[i]))
@@ -122,7 +122,7 @@ def read_opts(parser):
                     sys.exit(1)
     else :
         args.cinputs = None
-        
+
     if args.TEmode != 'multi' and args.TEmode != 'uniq' :
         logging.error("Does not support TE mode : %s !\n" % (args.TEmode))
     # file parser
@@ -136,36 +136,36 @@ def read_opts(parser):
     #window size
     if args.wsize < 0 :
         logging.error("window size should be greater than 0, default value %d was used\n" % (WIN_SIZE))
-        args.wsize = WIN_SIZE 
-    
+        args.wsize = WIN_SIZE
+
     #step size
     if args.step < 0 :
         logging.error("step size should be greater than 0, default value  %d was used\n" % (STEP))
         args.step = STEP
-        
+
     if args.step > args.wsize :
         logging.error("step should be smaller than window size,default value %d was used\n" % (STEP))
         args.step = STEP
-    
+
     #cutoff
     if args.minread < 0 :
         args.minread = 0
     if args.minread > 20 :
         args.minread = 20
-    
+
     #species
     if args.species[0] not in ['hg','mm','dm','tm'] :
         logging.error("species not found %s \n" %(args.species[0]))
         parser.print_help()
         sys.exit(1)
-        
+
     args.gsize = efgsize[args.species[0]]
-    args.gsize = float(args.gsize)     
+    args.gsize = float(args.gsize)
     if args.species[0] == 'hg' :
         args.chrom = HS_CHROM
         args.species[0] = 'hg19'
-       
-        
+
+
     elif args.species[0] == 'mm' :
         args.chrom = MM_CHROM
         args.species[0] = 'mm9'
@@ -174,31 +174,31 @@ def read_opts(parser):
         args.species[0] = 'dm3'
     elif args.species[0] == 'tm' :
         args.chrom = TM_CHROM
-    
+
     #normalization
     if args.norm not in ['sd','bc'] :
         logging.error("normalization method %s not supported\n" % (args.norm))
         parser.print_help()
         sys.exit(1)
-    
+
     #p-value
     if args.pval < 0 or args.pval > 1 :
         logging.error("p-value should be a value in [0,1]\n")
-        sys.exit(1)            
+        sys.exit(1)
     args.log_pvalue = log(args.pval,10)*-10
     #gap size
     if args.gap < 0 :
         logging.error("gap size should be greater than 0, default value was used\n")
         args.gap = GAP
-    
+
     #fragment size
     if args.fragsize < 0 :
         logging.error("fragment size should be greater than 0, default value %d was used\n" % (FRAG_SIZE))
         args.fragsize = FRAG_SIZE
-    
+
     #output filenames
     args.dfbs = args.prj_name+"_dfbs"
-    
+
     # logging object
     logging.basicConfig(level=(4-args.verbose)*10,
                         format='%(levelname)-5s @ %(asctime)s: %(message)s ',
@@ -206,16 +206,16 @@ def read_opts(parser):
                         stream=sys.stderr,
                         filemode="w"
                         )
-    
+
     args.error   = logging.critical        # function alias
     args.warn    = logging.warning
     args.debug   = logging.debug
     args.info    = logging.info
-    
+
     cinput = None
     if args.cinputs != None:
         cinput = args.cinputs[0]
-        
+
     args.argtxt = "\n".join((
         "# ARGUMENTS LIST:",\
         "# name = %s" % (args.prj_name),\
@@ -235,8 +235,8 @@ def read_opts(parser):
         "# TEmode = %s " % (args.TEmode)
      #   "# TE annotation file = %s \n" % (args.TEannotation)
         ))
-    
-    return args  
+
+    return args
 
 def read_opts2(parser):
     args = parser.parse_args()
@@ -299,7 +299,7 @@ def read_opts2(parser):
         args.fc = 1.0/args.fc
     else:
         args.fc = 1.0 * args.fc
-    
+
     if args.sortByPos:
         args.sortByPos=True
     else:
@@ -324,12 +324,12 @@ def read_opts2(parser):
         format='%(levelname)-5s @ %(asctime)s: %(message)s ',
         datefmt='%a, %d %b %Y %H:%M:%S',
     stream=sys.stderr, filemode="w")
-    
+
     args.error = logging.critical        # function alias
     args.warn = logging.warning
     args.debug = logging.debug
     args.info = logging.info
-    
+
     args.argtxt = "\n".join(("# ARGUMENTS LIST:", \
                 "# name = %s" % (args.prj_name), \
                 "# treatment files = %s" % (args.tfiles), \
@@ -357,7 +357,7 @@ def read_opts2(parser):
                     "# number of iteration = %d" % (args.numItr), \
                     "# Alignments grouped by read ID = %s\n" % (not args.sortByPos)
         ))
-    return args 
+    return args
 
 def read_opts3(parser):
     args = parser.parse_args()
@@ -389,7 +389,7 @@ def read_opts3(parser):
         logging.error("multi-mapper counting mode %s not supported\n" % (args.te_mode))
         parser.print_help()
         sys.exit(1)
-    
+
     if args.sortByPos:
         args.sortByPos=True
     else:
@@ -412,12 +412,12 @@ def read_opts3(parser):
         format='%(levelname)-5s @ %(asctime)s: %(message)s ',
         datefmt='%a, %d %b %Y %H:%M:%S',
         stream=sys.stderr, filemode="w")
-    
+
     args.error = logging.critical        # function alias
     args.warn = logging.warning
     args.debug = logging.debug
     args.info = logging.info
-    
+
     args.argtxt = "\n".join(("# ARGUMENTS LIST:", \
         "# name = %s" % (args.prefix), \
         "# BAM file = %s" % (args.bam), \
@@ -428,11 +428,11 @@ def read_opts3(parser):
         "# number of iteration = %d" % (args.numItr), \
         "# Alignments grouped by read ID = %s\n" % (not args.sortByPos)
     ))
-    return args 
+    return args
 
 def read_chrlen_tbl(chrfile,error,info):
     ''' read in chrom_size file '''
- 
+
     if not os.path.isfile(chrfile) :
         error("No such file: %s !\n" % (chrfile))
         sys.exit(1)
@@ -455,13 +455,13 @@ def read_chrlen_tbl(chrfile,error,info):
             else :
                 info("Format error at %s, line %d: %s. Skip!\n" % (chrfile,cnt,line))
         f.close()
-        
+
     return chrlen_map
 
 
 def read_short_reads(samples,parser,TEmode):
     '''read short reads from single or multple samples and stored in short read objects '''
-    
+
     shortReads = []
  #   chroms = chrlen_tbl.keys()
     for i in range(len(samples)) :
@@ -478,12 +478,12 @@ def read_short_reads(samples,parser,TEmode):
         b = parser(s)
         t = b.build_fwtrack(TEmode)
         shortReads.append(t)
-   
+
     return shortReads
 
 def read_short_reads_sameFam(samples,parser,teIdx):
     '''read short reads from single or multple samples and stored in short read objects '''
-    
+
     shortReads = []
  #   chroms = chrlen_tbl.keys()
     for i in range(len(samples)) :
@@ -500,12 +500,12 @@ def read_short_reads_sameFam(samples,parser,teIdx):
         b = parser(s)
         t = b.build_fwtrack_v2(teIdx)
         shortReads.append(t)
-   
+
     return shortReads
-   
+
 #def read_alignments(samples,chrlen_tbl,parser):
 #    '''read alignments from single or multple SAM or BAM files '''
-    
+
 #    shortReads = []
 #    chroms = chrlen_tbl.keys()
 #    for i in range(len(samples)) :
@@ -520,9 +520,9 @@ def read_short_reads_sameFam(samples,parser,teIdx):
         #b = BEDFile(sbed,chroms)
         #b = parser(s,chroms)
 #        shortReads.append(b)
-   
-#    return shortReads     
-   
+
+#    return shortReads
+
 def __bam2bed(sample,pairend,error):
     res = sample + ".bed"
     if pairend == 0 : #single end
@@ -532,7 +532,7 @@ def __bam2bed(sample,pairend,error):
         except :
             error("file format error %s !\n" %(sample))
             sys.exit(0)
-        
+
     else :
         try:
             os.system("bamToBED -bedpe -i sample >res")
@@ -540,9 +540,9 @@ def __bam2bed(sample,pairend,error):
         except :
             error("file format error %s !\n" %(sample))
             sys.exit(0)
-    
-    
-    return res 
+
+
+    return res
 
 def __assignWeight(sample,suffix,error):
 
@@ -552,14 +552,14 @@ def __assignWeight(sample,suffix,error):
     lines = []
     cur_seqid = "-1"
     multi_num = 0
-    
+
     try:
         f = open(src,'r')
         of = open(dest,'w')
     except IOError :
         error("open file %s error !\n" %(src))
         sys.exit(1)
-    else :       
+    else :
         for line in f :
             line = line.strip()
             arr = line.split('\t')
@@ -567,7 +567,7 @@ def __assignWeight(sample,suffix,error):
                 lines.append(line)
                 multi_num += 1
             else :
-        
+
                 if multi_num > 0 :
                     val = 1/multi_num
                     for record in lines :
@@ -585,5 +585,5 @@ def __assignWeight(sample,suffix,error):
 
     of.close()
     return dest
-    
+
 

@@ -83,7 +83,7 @@ def normal_cdf_inv(p, mu = None, sigma2 = None, lower=True):
     upper = not lower
     if p < 0 or p > 1:
         raise Exception("Illegal argument %f for qnorm(p)." % p)
-    
+
     split = 0.42
     a0 = 2.50662823884
     a1 = -18.61500062529
@@ -100,10 +100,10 @@ def normal_cdf_inv(p, mu = None, sigma2 = None, lower=True):
     d1 = 3.54388924762
     d2 = 1.63706781897
     q = p - 0.5
-    
+
     r = 0.0
     ppnd = 0.0
-    
+
     if abs(q) <= split:
         r = q * q
         ppnd = q * (((a3 * r + a2) * r + a1) * r + a0) / ((((b4 * r + b3) * r + b2) * r + b1) * r + 1)
@@ -111,30 +111,30 @@ def normal_cdf_inv(p, mu = None, sigma2 = None, lower=True):
         r = p
         if q > 0:
             r = 1 - p
-        
+
         if r > 0:
             r = math.sqrt(- math.log(r))
             ppnd = (((c3 * r + c2) * r + c1) * r + c0) / ((d2 * r + d1) * r + 1)
-            
+
             if q < 0:
                 ppnd = - ppnd
         else:
             ppnd = 0
-            
+
     if upper:
         ppnd = - ppnd
-    
+
     if mu != None and sigma2 != None:
         return ppnd * math.sqrt(sigma2) + mu
     else:
         return ppnd
 
 def normal_cdf (z, mu = 0.0, sigma2 = 1.0, lower=True):
-    
+
     upper = not lower
 
     z = (z - mu) / math.sqrt(sigma2)
-    
+
     ltone = 7.0
     utzero = 18.66
     con = 1.28
@@ -160,11 +160,11 @@ def normal_cdf (z, mu = 0.0, sigma2 = 1.0, lower=True):
 
     y = 0.0
     alnorm = 0.0
-    
+
     if z < 0:
         upper = not upper
         z = - z
-    
+
     if z <= ltone or upper and z <= utzero:
         y = 0.5 * z * z
         if z > con:
@@ -221,10 +221,10 @@ def __poisson_cdf (k,a):
         return 1
     else:
         return cdf
-    
+
 def __poisson_cdf_large_lambda ( k,a ):
     """Slower poisson cdf for large lambda.
-    
+
     """
     if k < 0:
         return 0                        # special cases
@@ -277,7 +277,7 @@ def __poisson_cdf_Q (k,a):
 def __poisson_cdf_Q_large_lambda (k,a):
     """Slower internal Poisson CDF evaluater for upper tail with large
     lambda.
-    
+
     """
     if k < 0:
         return 1                        # special cases
@@ -351,7 +351,7 @@ def poisson_cdf_inv ( cdf, lam, maximum=1000):
         sum2 = sum2 + newval
         if sumold <= cdf and cdf <= sum2:
             return i
-    
+
     return maximum
 
 def poisson_cdf_Q_inv ( cdf, lam, maximum=1000):
@@ -379,7 +379,7 @@ def poisson_cdf_Q_inv ( cdf, lam, maximum=1000):
         sum2 = sum2 + newval
         if sumold <= cdf and cdf <= sum2:
             return i
-    
+
     return maximum
 
 def poisson_pdf ( k, a ):
@@ -392,7 +392,7 @@ def poisson_pdf ( k, a ):
     if a <= 0:
         return 0
     return exp(-a) * pow (a, k) / factorial (k)
-    
+
 
 def binomial_coef (n,k):
     """BINOMIAL_COEF computes the Binomial coefficient C(N,K)
@@ -441,7 +441,7 @@ def _binomial_cdf_r (x,a,b):
                 pdf/=(a-i)*b/(1-b)/(i+1)
                 if pdf==0.0: break
                 cdf += pdf
-            
+
             pdf = seedpdf
             i = argmax
             while True:
@@ -488,7 +488,7 @@ def _binomial_cdf_f (x,a,b):
                 pdf/=(a-i)*b/(1-b)/(i+1)
                 if pdf==0.0: break
                 cdf += pdf
-            
+
             pdf = seedpdf
             for i in range(argmax,x):
                 pdf*=(a-i)*b/(1-b)/(i+1)
@@ -524,12 +524,12 @@ def binomial_cdf_inv ( cdf, a, b ):
             return x
     return x
 
-    
+
 def binomial_pdf( x, a, b):
     """binomial PDF by H. Gene Shin
-    
+
     """
-    
+
     if a<1:
         return 0
     elif x<0 or a<x:
@@ -566,13 +566,13 @@ def binomial_pdf( x, a, b):
             pdf *= 1-p
         #print pdf,1-p,mx-t
         #pdf*=(1-p)**(mx-t)
-        
+
         pdf=float("%.10e" %pdf)
         return pdf
 
 def facotrial (n):
     """N!.
-    
+
     """
     if n < 0:
         return 0
@@ -595,7 +595,7 @@ def test():
 #    print binomial_cdf(6520,12988,5.96064e-01)
 #    print binomial_cdf(15,20,5.96064e-01)
     print(1-binomial_cdf(11679,12988,1.77023e-01))
-                       
+
 if __name__ == '__main__':
     test()
-    
+

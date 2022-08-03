@@ -45,9 +45,9 @@ class PeakIO:
     """
     def __init__ (self):
         self.peaks = {}
-    
-    def add (self, chromosome, start, end, summit=None, 
-             peak_height=None, number_tags=None, 
+
+    def add (self, chromosome, start, end, summit=None,
+             peak_height=None, number_tags=None,
              pvalue=None, fold_enrichment=None, fdr=None):
         """items: (peak start,peak end, peak length, peak summit, peak
         height, number of tags in peak region, peak pvalue, peak
@@ -72,7 +72,7 @@ class PeakIO:
         """Filter peaks in a given fc range.
 
         If fc_low and fc_up is assigned, the peaks with fc in [fc_low,fc_up)
-        
+
         """
         peaks = self.peaks
         new_peaks = {}
@@ -94,7 +94,7 @@ class PeakIO:
         for chrom in chrs:
             x += len(peaks[chrom])
         return x
-    
+
     def ave_fold_enrichment (self):
         peaks = self.peaks
         chrs = list(peaks.keys())
@@ -109,7 +109,7 @@ class PeakIO:
 
     def max_fold_enrichment (self):
         """Return the maximum fc.
-        
+
         """
         peaks = self.peaks
         chrs = list(peaks.keys())
@@ -121,8 +121,8 @@ class PeakIO:
                 if m>x:
                     x=m
         return x
-        
-    
+
+
     def tobed (self):
         text = ""
         chrs = list(self.peaks.keys())
@@ -140,11 +140,11 @@ class PeakIO:
             for peak in self.peaks[chrom]:
                 text+= "%s\t%d\t%d\n" % (peak[0],peak[1])
         return text
-        
+
     def init_from_dict (self, data):
         """Initialize the data from a dictionary. Improper assignment
         will damage the data structure.
-        
+
         """
         self.peaks = {}
         chrs = list(data.keys())
@@ -230,16 +230,16 @@ class PeakIO:
             except StopIteration:
                 continue
         return total_num
-        
+
 class PosCnt:
     def __init__(self,pos,cnt):
         self.pos = pos
         self.cnt = cnt
-        
+
     def __repr__(self):
         return repr((self.pos, self.cnt))
 
-        
+
 class FWTrackII:
     """Fixed Width Locations Track class II along the whole genome
     (commonly with the same annotation type), which are stored in a
@@ -250,7 +250,7 @@ class FWTrackII:
     """
     def __init__ (self,filename = "", fw=0,anno=""):
         """fw is the fixed-width for all locations.
-        
+
         """
         self.fw = fw
         self.__locations = {}           # locations
@@ -265,39 +265,39 @@ class FWTrackII:
 
     def get_name(self):
         return self.__srcfile
-    
+
     def clear_bins(self):
         del self.__binTags[:]
-        
+
     def read_in_bins (self,species):
 
         size = 0.0
         idx_map = dict() #maps of chrom to index
-        
+
         chrom_lengths = species_chrom_lengths[species]
-        
+
        # for i in chrom_lengths.values() :
        #     size += i
-        
+
         chrname = 'chr1'
         if species == 'dm3' :
             chrname = 'chr2L'
-        
-        size = chrom_lengths[chrname]    
-        
+
+        size = chrom_lengths[chrname]
+
         for i in range(int(ceil(size/BIN_SIZE))):
             self.__binTags.append(0)
-            
+
         pos = 0
         idx_map[chrname] = pos
 
-        #read the bed file  
+        #read the bed file
 
                 #    logging.warn("chrom %s does not exist in chrom_size file\n" %(c))
                 #else :
-        
+
         for poscnts in self.__pluscounts[chrname] :
-            #start = poscnts.pos 
+            #start = poscnts.pos
             start = floor(poscnts)
             cnt = poscnts - start
             if start == poscnts :
@@ -306,28 +306,28 @@ class FWTrackII:
             offset = idx_map[chrname]+floor(start/BIN_SIZE)
             #self.__binTags[int(offset)] += poscnts.cnt
             self.__binTags[int(offset)] += cnt
-        
+
         for poscnts in self.__minuscounts[chrname] :
             #start = poscnts.pos
             start = floor(poscnts)
             cnt = poscnts - start
             if start == poscnts :
                 start -= 1
-                cnt = 1            
+                cnt = 1
             offset = idx_map[chrname]+floor(start/BIN_SIZE)
             #self.__binTags[int(offset)] += poscnts.cnt
-            self.__binTags[int(offset)] += cnt   
-        
-            
-        
-      
+            self.__binTags[int(offset)] += cnt
+
+
+
+
     def get_bins(self,idx):
-        
+
         cnts = array('f')
         pos = 0
-      
+
         # idx is a byte array, each bit represent an element of self.__binTags
-        
+
         for i in range(len(idx)):
             a = idx[i]
             pos = i * 8
@@ -335,18 +335,18 @@ class FWTrackII:
                 b = a >> j
                 if b & 1 ==1 :
                     cnts.append(1.0 * self.__binTags[pos+j])
-        
+
         return cnts
-    
+
     # return indices of bins with values fall in the fraction
     def get_bins_idx(self,fraction):
-        
+
         idx = array('B')
-        for i in range(MAX_BIT): 
+        for i in range(MAX_BIT):
             idx.append(0x00)
        # qt  = robjects.r['quantile']
         #val = qt(robjects.FloatVector(self.__binTags),prob=fraction)
-       
+
         for i in range(len(self.__binTags)):
             pos = int(floor(i/8))
             offset = i % 8
@@ -354,31 +354,31 @@ class FWTrackII:
             if self.__binTags[i] > 0  :
                 a = 1 << offset
                 idx[pos] = idx[pos] | a
-            
+
         return idx
-    
+
     def get_all_bins_idx(self):
-        
+
         idx = array('B')
-        for i in range(MAX_BIT): 
+        for i in range(MAX_BIT):
             idx.append(0x00)
-       
+
         for i in range(len(self.__binTags)):
             pos = int(floor(i/8))
             offset = i % 8
             if self.__binTags[i] > 0 :
                 a = 1 << offset
                 idx[pos] = idx[pos] | a
-            
-        return idx            
+
+        return idx
 
     def get_bin_rc_v2 (self,chrom,fragsize):
-        
+
         #reads = array('f',(0,) * int(ceil(1.0 *chrsize/bin_size)))
         #sizeOfArray = len(reads)
         reads = []
         pos = []
-        
+
         if chrom not in self.__fileList:
             logging.warn("No reads at chromosome %s. Skip!\n" %(chrom))
             return None
@@ -397,7 +397,7 @@ class FWTrackII:
                         logging.warn("Format error at %s line: %s. Skip!\n" %(fn,line))
                     else:
                         start = int(items[1])
-                        end = int(items[2]) 
+                        end = int(items[2])
                         strand = items[5]
                         w = 1
                         if len(items) > 6 : # weight for each tag
@@ -405,32 +405,32 @@ class FWTrackII:
                         # Shift read location by fragment size.
                         loc = 0
                         if strand == '+' :
-                            loc = start + int(fragsize/2) 
+                            loc = start + int(fragsize/2)
                         else :
-                            loc = end - int(fragsize/2) 
+                            loc = end - int(fragsize/2)
                         # Increment read count in bin.
-                         
-                        #binIdx = int(floor(1.0*loc/bin_size))   
-                       
+
+                        #binIdx = int(floor(1.0*loc/bin_size))
+
                         #if(binIdx >= sizeOfArray) :
                         #    logging.error("%s  %d array index out of range! species may not match." %(items[0],pos))
                         #    sys.exit(0)
                         #reads[pos] += w
-                        
-                        pos.append(loc)   
-                       
+
+                        pos.append(loc)
+
                         reads.append(w)
-                        
+
                 fh.close()
-                return (reads,pos)    
+                return (reads,pos)
 
 
     def libsize(self):
         return self.total
-    
+
     def add_loc (self, chromosome, fiveendpos, strand, cnt):
         """Add a location to the list according to the sequence name.
-        
+
         chromosome -- mostly the chromosome name
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         strand     -- 0: plus, 1: minus
@@ -441,28 +441,28 @@ class FWTrackII:
             self.__minuscounts[chromosome] = [] #[0]*100000 #[array(BYTE4,[])]
             self.__pluscounts[chromosome] = [] #[0]*100000 #[array(BYTE4,[])]
         #self.__locations[chromosome][strand].append(fiveendpos)
-        #poscnt = PosCnt(fiveendpos,cnt)        
+        #poscnt = PosCnt(fiveendpos,cnt)
         if strand == 0:  # Ying
-        
+
             self.__pluscounts[chromosome].append(fiveendpos + cnt)
         else:
             self.__minuscounts[chromosome].append(fiveendpos + cnt)
-        
+
         #self.total+=1
-       
-        self.total +=cnt # Ying total counts  
+
+        self.total +=cnt # Ying total counts
 
     def get_locations_by_chr (self, chromosome):
         """Return a tuple of two lists of locations for certain chromosome.
 
         """
-      
+
         if chromosome in self.__pluscounts:
-            
+
             return (self.__pluscounts[chromosome],self.__minuscounts[chromosome])
         else:
             raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
-        
+
     def get_locations_by_chr_v3 (self, chromosome):
         """Return a tuple of two lists of locations for certain chromosome.
 
@@ -494,7 +494,7 @@ class FWTrackII:
             if pre_pos != -1 :
                 tagpos.append(pre_pos)
                 cnts.append(cnt_sum)
-                    
+
             return (tagpos, cnts)
             #return (self.__pluscounts[chromosome],self.__pluscounts[chromosome])
         else:
@@ -517,19 +517,19 @@ class FWTrackII:
                 if pos == poscnt :
                     pos -= 1
                     cnt = 1
- 
+
                 tagpos.append(pos)
                 cnts.append(cnt)
-                    
+
             return (tagpos, cnts)
             #return (self.__pluscounts[chromosome],self.__pluscounts[chromosome])
         else:
             raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
-            
-            
+
+
     def clean(self,chr):
         self.__pluscounts[chr] = []
-        
+
     def get_counts_by_chr (self, chromosome,strand=0): #Ying
         """Return a tuple of two lists of locations for certain chromosome.
 
@@ -545,7 +545,7 @@ class FWTrackII:
             else:
                 #raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
                 return tmp;
-       
+
     def get_chr_names (self):
         """Return all the chromosome names stored in this track object.
         """
@@ -557,32 +557,32 @@ class FWTrackII:
         """Total sequenced length = total number of tags * width of tag
         """
         return self.total*self.fw
-    
+
     def setTsize(self,tsize):
         self.__tagsize = tsize
-        
+
     def tsize(self):
         return self.__tagsize
 
     def sort (self):
         """Naive sorting for locations.
-        
+
         """
         for k in list(self.__pluscounts.keys()):
-            
+
             (tmparrayplus,tmparrayminus) = self.get_locations_by_chr(k)
             self.__pluscounts[k] = sorted(tmparrayplus)
             self.__minuscounts[k] = sorted(tmparrayminus)
             #tmparray = self.get_counts_by_chr(k, 0) #Ying
             #self.__pluscounts[k] = sorted(tmparray,key=lambda poscnt: poscnt.pos)
- 
+
             if len(tmparrayplus) < 1:
                 logging.warning("NO records for chromosome %s, plus strand!" % (k))
             #self.__locations[k][1] = sorted(tmparrayminus)
             #tmparray = []
             #tmparray = self.get_counts_by_chr(k, 1) #Ying
             #self.__minuscounts[k] = sorted(tmparray,key=lambda poscnt: poscnt.pos)
-            if len(tmparrayminus) < 1:            
+            if len(tmparrayminus) < 1:
                 logging.warning("NO records for chromosome %s, minus strand!" % (k))
         self.__sorted = True
 
@@ -638,7 +638,7 @@ class FWTrackII:
 
     def merge_plus_minus_locations_naive (self):
         """Merge plus and minus strand locations
-        
+
         """
         #for chrom in self.__locations.keys():
         for chrom in self.__pluscounts:
@@ -651,7 +651,7 @@ class FWTrackII:
             self.__pluscounts[chrom] = sorted(self.__pluscounts[chrom]) #,key=lambda x: x.pos)
             self.__minuscounts[chrom] = []
 
-            
+
 
     def merge_plus_minus_locations (self):
         """Merge plus and minus strand locations.
@@ -682,7 +682,7 @@ class FWTrackII:
             if ip < lenp:
                 # add rest of plus tags
                 new_plus_tags.extend(plus_tags[ip:])
-                    
+
             self.__locations[chrom] = [new_plus_tags,[]]
             self.total += len(new_plus_tags)
 
@@ -699,13 +699,13 @@ class FWTrackII:
             num = int(len(self.__locations[key][1])*percent)
             self.__locations[key][1]=array(BYTE4,sorted(random_sample(self.__locations[key][1],num)))
             self.total += len(self.__locations[key][0]) + len(self.__locations[key][1])
-            
+
     def __str__ (self):
         return self.__to_wiggle()
-        
+
     def __to_wiggle (self):
         """Use a lot of memory!
-        
+
         """
         t = "track type=wiggle_0 name=\"tag list\" description=\"%s\"\n" % (self.annotation)
         for k in self.__locations:
@@ -729,7 +729,7 @@ class FWTrackIII:
     """
     def __init__ (self,fw=0,anno=""):
         """fw is the fixed-width for all locations.
-        
+
         """
         self.fw = fw
         self.chr =""
@@ -742,29 +742,29 @@ class FWTrackIII:
 
     def add_loc (self, fiveendpos, strand, cnt):
         """Add a location to the list according to the sequence name.
-        
-       
+
+
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         strand     -- 0: plus, 1: minus
         """
-        
+
         self.__locations[strand].append(fiveendpos)
-        poscnt = PosCnt(fiveendpos,cnt)        
+        poscnt = PosCnt(fiveendpos,cnt)
         if strand == 0:  # Ying
             self.__pluscounts.append(poscnt)
         else:
             self.__minuscounts.append(poscnt)
-        
+
         #self.total+=1
-        self.total +=cnt # Ying total counts  
+        self.total +=cnt # Ying total counts
 
     def get_locations(self):
         """Return a tuple of two lists of locations for certain chromosome.
 
         """
-        
+
         return self.__locations
-        
+
 
     def get_counts (self, strand): #Ying
         """Return a tuple of two lists of locations for certain chromosome.
@@ -774,8 +774,8 @@ class FWTrackIII:
             return self.__pluscounts[chromosome]
         else:
             return self.__minuscounts[chromosome]
-            
-       
+
+
     def get_chr_names (self):
         """Return all the chromosome names stored in this track object.
         """
@@ -788,7 +788,7 @@ class FWTrackIII:
 
     def sort (self):
         """Naive sorting for locations.
-        
+
         """
         for k in self.__locations:
             (tmparrayplus,tmparrayminus) = self.get_locations_by_chr(k)
@@ -801,13 +801,13 @@ class FWTrackIII:
             tmparray = []
             tmparray = self.get_counts_by_chr(k, 1) #Ying
             self.__minuscounts[k] = sorted(tmparray,key=lambda poscnt: poscnt.pos)
-            if len(tmparrayminus) < 1:            
+            if len(tmparrayminus) < 1:
                 logging.warning("NO records for chromosome %s, minus strand!" % (k))
         self.__sorted = True
 
     def merge_plus_minus_locations_naive (self):
         """Merge plus and minus strand locations
-        
+
         """
         #(plus_tags,minus_tags) = self.__locations
         self.__locations[0].extend(self.__locations[1])
@@ -816,7 +816,7 @@ class FWTrackIII:
             #Ying
         self.__pluscounts.extend(self.__minuscounts)
         self.__pluscounts.sorted(self.__pluscounts,key=lambda x: x.pos)
-        self.__minuscounts = []         
+        self.__minuscounts = []
 
     def merge_plus_minus_locations (self):
         """Merge plus and minus strand locations.
@@ -846,7 +846,7 @@ class FWTrackIII:
         if ip < lenp:
                # add rest of plus tags
            new_plus_tags.extend(plus_tags[ip:])
-                   
+
         self.__locations = [new_plus_tags, []]
         self.total += len(new_plus_tags)
 
@@ -863,13 +863,13 @@ class FWTrackIII:
             num = int(len(self.__locations[key][1])*percent)
             self.__locations[key][1]=array(BYTE4,sorted(random_sample(self.__locations[key][1],num)))
             self.total += len(self.__locations[key][0]) + len(self.__locations[key][1])
-            
+
     def __str__ (self):
         return self.__to_wiggle()
-        
+
     def __to_wiggle (self):
         """Use a lot of memory!
-        
+
         """
         t = "track type=wiggle_0 name=\"tag list\" description=\"%s\"\n" % (self.annotation)
         for k in self.__locations:
@@ -882,4 +882,4 @@ class FWTrackIII:
                 for i in self.__locations[k][1]:
                     t += "%d\t1\n" % i
         return t
-        
+
