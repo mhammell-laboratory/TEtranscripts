@@ -200,6 +200,7 @@ def read_opts(parser):
     if args.outdir != "NULL" :
        if not os.path.isdir(args.outdir) :
            logging.error("output directory (%s) provided does not exist. Please create it before re-running\n" % (args.outdir))
+           sys.exit(1)
 
     #output filenames
     args.dfbs = args.prj_name+"_dfbs"
@@ -309,6 +310,7 @@ def read_opts2(parser):
     if args.outdir != "NULL" :
        if not os.path.isdir(args.outdir) :
            logging.error("output directory (%s) provided does not exist. Please create it before re-running\n" % (args.outdir))
+           sys.exit(1)
 
     if args.sortByPos:
         args.sortByPos=True

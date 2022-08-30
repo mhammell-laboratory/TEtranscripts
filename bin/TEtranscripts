@@ -63,7 +63,7 @@ def prepare_parser():
                         or multi (distribute among all alignments). DEFAULT: multi')
     parser.add_argument('--project', metavar='name', dest='prj_name', nargs='?', default='TEtranscripts_out',
                         help='Name of this project. DEFAULT: TEtranscripts_out')
-    parser.add_argument('--outdir', metavar='outputdirectory' dest='outdir' nargs='?' default = 'NULL', help='Directory for output files. DEFAULT: current directory'
+    parser.add_argument('--outdir', metavar='directory', dest='outdir', nargs='?', default = 'NULL', help='Directory for output files. DEFAULT: current directory')
     parser.add_argument('-p', '--padj', metavar='pvalue', dest='pval', nargs='?', type=float, const=0.1, default=0.05,
                         help='FDR cutoff for significance. DEFAULT: 0.05')
     parser.add_argument('-f', '--foldchange', metavar='foldchange', dest='fc', nargs='?', type=float, const=2.0,
@@ -841,9 +841,6 @@ def main():
     else:
         f_rscript = args.prj_name + '_DESeq.R'
 
-    if args.outdir != "NULL":
-        f_rscript = os.path.join(args.outdir,f_rscript)
-                        
     rcode = open('%s' % f_rscript, 'w')
     rcode.write(rscript)
     rcode.close()
