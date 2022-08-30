@@ -196,6 +196,11 @@ def read_opts(parser):
         logging.error("fragment size should be greater than 0, default value %d was used\n" % (FRAG_SIZE))
         args.fragsize = FRAG_SIZE
 
+    #output directory check
+    if args.outdir != "NULL" :
+       if not os.path.isdir(args.outdir) :
+           logging.error("output directory (%s) provided does not exist. Please create it before re-running\n" % (args.outdir))
+
     #output filenames
     args.dfbs = args.prj_name+"_dfbs"
 
@@ -300,6 +305,11 @@ def read_opts2(parser):
     else:
         args.fc = 1.0 * args.fc
 
+    #output directory check
+    if args.outdir != "NULL" :
+       if not os.path.isdir(args.outdir) :
+           logging.error("output directory (%s) provided does not exist. Please create it before re-running\n" % (args.outdir))
+
     if args.sortByPos:
         args.sortByPos=True
     else:
@@ -389,6 +399,11 @@ def read_opts3(parser):
         logging.error("multi-mapper counting mode %s not supported\n" % (args.te_mode))
         parser.print_help()
         sys.exit(1)
+
+    #output directory check
+    if args.outdir != "NULL" :
+       if not os.path.isdir(args.outdir) :
+           logging.error("output directory (%s) provided does not exist. Please create it before re-running\n" % (args.outdir))
 
     if args.sortByPos:
         args.sortByPos=True

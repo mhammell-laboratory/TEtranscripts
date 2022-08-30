@@ -57,6 +57,7 @@ def prepare_parser():
                         DEFAULT: multi')
     parser.add_argument('--project', metavar='name', dest='prefix', default='TEtranscripts_out',
                         help='Name of this project. DEFAULT: TEcount_out')
+    parser.add_argument('--outdir', metavar='outputdirectory' dest='outdir' nargs='?' default = 'NULL', help='Directory for output files. DEFAULT: current directory'
     parser.add_argument('--sortByPos', dest='sortByPos', action="store_true",
                         help='Alignment file is sorted by chromosome position.')
     parser.add_argument('-i', '--iteration', metavar='iteration', dest='numItr', type=int, default=100,
@@ -612,6 +613,8 @@ def main():
                       args.numItr, args.fragLength, args.maxL)
     info("Finished processing sample file")
 
+    if args.outdir != "NULL" :
+         os.chdir(args.outdir)
     output_count_tbl(tbl, args.prefix)
 
 
