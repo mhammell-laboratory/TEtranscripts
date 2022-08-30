@@ -826,7 +826,7 @@ def main():
 
     if args.outdir != "NULL":
         os.chdir(args.outdir)
-    
+
     f_cnt_tbl = args.prj_name + ".cntTable"
     output_count_tbl(tsamples_tbl, csamples_tbl, f_cnt_tbl)
     rpm_val = tsamples_rpm + csamples_rpm
