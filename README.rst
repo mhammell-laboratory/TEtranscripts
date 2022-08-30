@@ -118,6 +118,8 @@ Usage
       --sortByPos           Input file is sorted by chromosome position.
       --project [name]      Prefix used for output files (e.g. project name)
                             DEFAULT: TEtranscript_out
+      --outdir [directory]  Directory for output files.
+                            DEFAULT: current directory
 
       *Analysis options*
       --mode [TE counting mode]
@@ -210,6 +212,8 @@ Usage
       --sortByPos           Input file is sorted by chromosome position.
       --project [name]      Prefix used for output files (e.g. project name)
                             DEFAULT: TEcount_out
+      --outdir [directory]  Directory for output files.
+                            DEFAULT: current directory
 
       *Analysis options*
       --mode [TE counting mode]
