@@ -16,7 +16,7 @@ jobs:
       name: Build & push Docker image
       with:
         image: mhammelllab/tetranscripts
-        tags: 2.2.2, latest
+        tags: 2.2.3, latest
         registry: docker.io
         dockerfile: Dockerfile
         username: ${{ secrets.DOCKER_USERNAME }}
