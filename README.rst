@@ -71,7 +71,7 @@ Alternative Singularity Installation for HPC
 
 Many High Performance Compunting clusters (HPCs) have
 access to singularity which allows for the download and
-exectuation of containers, TEtranscripts also has a
+execution of containers, TEtranscripts also has a
 container through docker, it can be downloaded by
 singularity thusly:
 
