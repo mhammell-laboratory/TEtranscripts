@@ -252,7 +252,7 @@ If BAM files are unsorted, or sorted by queryname::
 
 If BAM files are sorted by coordinates/position::
 
-    TEtranscripts --sortByPos --format BAM --mode multi -b RNAseq.bam --project sample_sorted_test
+    TEcount --sortByPos --format BAM --mode multi -b RNAseq.bam --project sample_sorted_test
 
 Cluster Usage Recommendations
 -----------------------------
