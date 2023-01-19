@@ -21,7 +21,7 @@ DESeq2.
 
 Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
 
-Copyright (C) 2014-2021 Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam & Molly Hammell
+Copyright (C) 2014-2023 Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam & Molly Hammell
 
 Contact: Oliver Tam (tam@cshl.edu) or Talitha Forcier (talitha@cshl.edu)
 
