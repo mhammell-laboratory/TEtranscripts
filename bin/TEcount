@@ -55,7 +55,7 @@ def prepare_parser():
     parser.add_argument('--mode', metavar='TE counting mode', dest='te_mode', type=str, default='multi', choices=['uniq', 'multi'],
                         help='How to count TE: uniq (unique mappers only), or multi (distribute among all alignments).\
                         DEFAULT: multi')
-    parser.add_argument('--project', metavar='name', dest='prefix', default='TEtranscripts_out',
+    parser.add_argument('--project', metavar='name', dest='prefix', default='TEcount_out',
                         help='Name of this project. DEFAULT: TEcount_out')
     parser.add_argument('--outdir', metavar='directory', dest='outdir', nargs='?', default = 'NULL', help='Directory for output files. DEFAULT: current directory')
     parser.add_argument('--sortByPos', dest='sortByPos', action="store_true",
