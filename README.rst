@@ -19,11 +19,11 @@ DESeq2.
 
 `MHammell Lab <http://hammelllab.labsites.cshl.edu/software>`_
 
-Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
+Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Gale Hammell, February 2014
 
-Copyright (C) 2014-2023 Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam & Molly Hammell
+Copyright (C) 2014-2023 Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam & Molly Gale Hammell
 
-Contact: Oliver Tam (tam@cshl.edu) or Talitha Forcier (talitha@cshl.edu)
+Contact: mghcompbio@gmail.com
 
 Requirements
 ------------
