@@ -53,17 +53,19 @@ run this command instead::
     $ python setup.py install --prefix /local/home/usr
 
 *NOTE* In the above example, you must add
+::
 
     /local/home/usr/bin
 
-to the PATH variable, and
+to the ``PATH`` variable, and
+::
 
      /local/home/usr/lib/pythonX.Y/site-packages
 
-to the PYTHONPATH variable, where X refers to the major
-python version, and Y refers to the minor python version.
-(e.g. `python2.7` if using python version 2.7.x, and
-`python3.6` if using python version 3.6.x)
+to the ``PYTHONPATH`` variable, where ``X`` refers to the major
+python version, and ``Y`` refers to the minor python version.
+(e.g. ``python2.7`` if using python version 2.7.x, and
+``python3.6`` if using python version 3.6.x)
 
 
 Alternative Singularity Installation for HPC
@@ -73,13 +75,13 @@ Many High Performance Compunting clusters (HPCs) have
 access to singularity which allows for the download and
 execution of containers, TEtranscripts also has a
 container through docker, it can be downloaded by
-singularity thusly:
+singularity thusly::
 
-``singularity pull tetranscripts.sif docker://mhammelllab/tetranscripts:latest``
+singularity pull tetranscripts.sif docker://mhammelllab/tetranscripts:latest
 
-Execution is then through singularity as well:
+Execution is then through singularity as well::
 
-``singularity exec tetranscripts.sif TEtranscripts -t <treatment sample> -c <control sample> --GTF <genic-GTF-file> --TE <TE-GTF-file>``
+singularity exec tetranscripts.sif TEtranscripts -t <treatment sample> -c <control sample> --GTF <genic-GTF-file> --TE <TE-GTF-file>
 
 TEtranscripts
 =============
@@ -294,11 +296,11 @@ For paired-end libraries, it is recommended that only alignments from properly p
 
 *Specific recommendations when using STAR*
 
-`STAR <https://github.com/alexdobin/STAR>`_ utilizes two parameters for optimal identification of multi-mappers `--outFilterMultimapNmax` and `--outAnchorMultimapNmax`.
-The author of STAR recommends that `--winAnchorMultimapNmax` should be set at twice the value used in `--outFilterMultimapNmax`,
+`STAR <https://github.com/alexdobin/STAR>`_ utilizes two parameters for optimal identification of multi-mappers ``--outFilterMultimapNmax`` and ``--outAnchorMultimapNmax``.
+The author of STAR recommends that ``--winAnchorMultimapNmax`` should be set at twice the value used in ``--outFilterMultimapNmax``,
 but no less than 50. In our study, we used the same number for both parameters (100), and found negligible differences in identifying
-multi-mappers. Upon further discussion with the author of STAR, we recommend that setting the same value for `--winAnchorMultimapNmax`
-and `--outFilterMultimapNmax`, though we highly suggest users test multiple values of `--winAnchorMultimapNmax` to identify the
+multi-mappers. Upon further discussion with the author of STAR, we recommend that setting the same value for ``--winAnchorMultimapNmax``
+and ``--outFilterMultimapNmax``, though we highly suggest users test multiple values of ``--winAnchorMultimapNmax`` to identify the
 optimal value for their experiment.
 
 
