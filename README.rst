@@ -77,11 +77,11 @@ execution of containers, TEtranscripts also has a
 container through docker, it can be downloaded by
 singularity thusly::
 
-singularity pull tetranscripts.sif docker://mhammelllab/tetranscripts:latest
+  singularity pull tetranscripts.sif docker://mhammelllab/tetranscripts:latest
 
 Execution is then through singularity as well::
 
-singularity exec tetranscripts.sif TEtranscripts -t <treatment sample> -c <control sample> --GTF <genic-GTF-file> --TE <TE-GTF-file>
+  singularity exec tetranscripts.sif TEtranscripts -t <treatment sample> -c <control sample> --GTF <genic-GTF-file> --TE <TE-GTF-file>
 
 TEtranscripts
 =============
