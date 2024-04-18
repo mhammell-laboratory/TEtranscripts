@@ -169,11 +169,11 @@ Example Command Lines
 
 If BAM files are unsorted, or sorted by queryname::
 
-    TEtranscripts --format BAM --mode multi -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --project sample_nosort_test
+    TEtranscripts --format BAM --mode multi -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --GTF gene_annot.gtf --TE te_annot.gtf --project sample_nosort_test
 
 If BAM files are sorted by coordinates/position::
 
-    TEtranscripts --sortByPos --format BAM --mode multi -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --project sample_sorted_test
+    TEtranscripts --sortByPos --format BAM --mode multi -t RNAseq1.bam RNAseq2.bam -c CtlRNAseq1.bam CtlRNAseq.bam --GTF gene_annot.gtf --TE te_annot.gtf --project sample_sorted_test
 
 Cluster Usage Recommendation
 ----------------------------
@@ -250,11 +250,11 @@ Example Command Lines
 
 If BAM files are unsorted, or sorted by queryname::
 
-    TEcount --format BAM --mode multi -b RNAseq.bam --project sample_nosort_test
+    TEcount --format BAM --mode multi -b RNAseq.bam --GTF gene_annot.gtf --TE te_annot.gtf --project sample_nosort_test
 
 If BAM files are sorted by coordinates/position::
 
-    TEcount --sortByPos --format BAM --mode multi -b RNAseq.bam --project sample_sorted_test
+    TEcount --sortByPos --format BAM --mode multi -b RNAseq.bam --GTF gene_annot.gtf --TE te_annot.gtf --project sample_sorted_test
 
 Cluster Usage Recommendations
 -----------------------------
