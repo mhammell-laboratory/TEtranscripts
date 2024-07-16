@@ -17,7 +17,7 @@ DESeq2.
 
 `Pypi Page <https://pypi.python.org/pypi/TEtranscripts>`_
 
-`MHammell Lab <http://hammelllab.labsites.cshl.edu/software>`_
+`MHammell Lab <https://www.mghlab.org/software>`_
 
 Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Gale Hammell, February 2014
 
