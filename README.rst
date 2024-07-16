@@ -307,7 +307,7 @@ optimal value for their experiment.
 Copying & distribution
 ======================
 
-TEtranscripts and TEcount are part of `TEToolkit suite <http://hammelllab.labsites.cshl.edu/software/>`_.
+TEtranscripts and TEcount are part of `TEToolkit suite <https://www.mghlab.org/software>`_.
 
 TEtranscripts is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
