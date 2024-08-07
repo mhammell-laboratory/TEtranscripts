@@ -5,7 +5,7 @@ Version: 2.2.3
 
 *NOTE* TEtranscripts and TEcount rely on specially curated GTF files, which are not
 packaged with this software due to their size. Please go to
-`our website <https://www.mghlab.org/software/TEtranscripts>`_
+`our website <https://www.mghlab.org/software/tetranscripts>`_
 for instructions to download the curated GTF files.
 
 TEtranscripts and TEcount takes RNA-seq (and similar data) and annotates reads to both
