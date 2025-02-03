@@ -21,9 +21,9 @@ setup(name='TEtranscripts',
           'Operating System :: Unix'
       ],
       keywords='TE transposable element differential enrichment',
-      url='http://hammelllab.labsites.cshl.edu/software#TEtranscripts',
+      url='https://www.mghlab.org/software/tetranscripts',
       author='Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam, Molly Hammell',
-      author_email='yjin@cshl.edu',
+      author_email='mghcompbio@gmail.com',
       license='GPLv3',
       packages=[
           'TEToolkit',

@@ -1,9 +1,9 @@
 Name: TEtranscripts
 Version: 2.2.3
 Summary: Tools for estimating differential enrichment of Transposable Elements and other highly repetitive regions
-Home-page: http://hammelllab.labsites.cshl.edu/software#TEtranscripts
+Home-page: https://www.mghlab.org/software/tetranscripts
 Author: Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam and Molly Hammell
-Author-email: yjin@cshl.edu
+Author-email: mghcompbio@gmail.com
 License: GPLv3
 Description: TEtranscripts
         =========
@@ -14,7 +14,7 @@ Description: TEtranscripts
 
         *NOTE* All programs rely on specially curated GTF files, which are not
         packaged with this software due to their size. Please go to
-        `our website <http://hammelllab.labsites.cshl.edu/software#TEtranscripts>`_
+        `our website <https://www.mghlab.org/software/tetranscripts>`_
         for instructions to download the curated GTF files.
 
         TEtranscripts and TEcount takes RNA-seq (and similar data) and annotates reads
@@ -26,12 +26,12 @@ Description: TEtranscripts
 
         `Pypi Page <https://pypi.python.org/pypi/TEToolkit>`_
 
-        `MHammell Lab <http://hammelllab.labsites.cshl.edu/software>`_
+        `MHammell Lab <https://www.mghlab.org/software>`_
 
         Created by Ying Jin, Eric Paniagua, Oliver Tam & Molly Hammell, February 2014
 
         Copyright (C) 2014-2020 Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam & Molly Hammell
-        Contact: Ying Jin (yjin@cshl.edu)
+        Contact: mghcompbio@gmail.com
 
         Requirements
         ------------
@@ -275,7 +275,7 @@ Description: TEtranscripts
         Copying & distribution
         ======================
 
-        TEtranscripts and TEcount are part of `TEToolkit suite <http://hammelllab.labsites.cshl.edu/software/>`_.
+        TEtranscripts and TEcount are part of `TEToolkit suite <https://www.mghlab.org/software/>`_.
 
         TEtranscripts is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
