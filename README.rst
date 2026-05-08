@@ -26,7 +26,7 @@ Copyright (C) 2014-2023 Ying Jin, Eric Paniagua, Talitha Forcier, Oliver Tam & M
 Contact: mghcompbio@gmail.com
 
 Requirements
-------------
+============
 
 Python:     2.7.x or >= 3.2.x (tested on Python 2.7.11 and 3.7.7)
 
@@ -38,7 +38,17 @@ DESeq2:     1.10.x or greater
 
 
 Installation
-------------
+============
+
+From PyPi
+---------
+
+1. Run the following::
+
+    $ pip install TEtranscripts
+
+From source
+-----------
 
 1. Download compressed tarball.
 2. Unpack tarball.
