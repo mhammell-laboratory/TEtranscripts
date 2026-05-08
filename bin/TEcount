@@ -245,145 +245,148 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
     te_multi_counts = [0.0] * len(te_counts)
     multi_reads = []
     cc = 0
-    try:
-        while 1:
-            i += 1
-            cc += 1
+    morereads = True
+
+    while morereads:
+        i += 1
+        cc += 1
+
+        try:
             aligned_read = next(samfile)
+        except StopIteration:
+            morereads = False
+            prev_read_name = 'lastread'
+            pass
 
-            if aligned_read.is_unmapped or aligned_read.is_duplicate or aligned_read.is_qcfail:
-                continue
+        if aligned_read.is_unmapped or aligned_read.is_duplicate or aligned_read.is_qcfail:
+            continue
 
-            added_flag_pos = aligned_read.query_name.find('/')
-            cur_read_name = ""
-            if added_flag_pos == -1:
-                cur_read_name = aligned_read.query_name
-            else:
-                cur_read_name = aligned_read.query_name[:added_flag_pos]
-            if aligned_read.is_paired:  # this is not reliable if read mate is unmapped
-                paired = True
-                if cur_read_name == prev_read_name or prev_read_name == "":
-                    prev_read_name = cur_read_name
-                    if aligned_read.is_read1:
-                        multi_read1.append(aligned_read)
-                    if aligned_read.is_read2:
-                        multi_read2.append(aligned_read)
-                    continue
-
-                else:
-                    if len(multi_read1) <= 1 and len(multi_read2) <= 1:
-                        uniq_reads += 1
-                        read1 = None
-                        read2 = None
-                        if len(multi_read1) == 1:
-                            read1 = multi_read1[0]
-                        if len(multi_read2) == 1:
-                            read2 = multi_read2[0]
-                        if read1 is not None and read1.is_proper_pair:
-                            if read2 is None:
-                                sys.stderr.write("******NOT COMPLETE******* \n")
-                                sys.stderr.write("If the BAM file is sorted by coordinates, please specify \
-                                --sortByPos and re-run! \n")
-                                sys.exit(0)
-                            if tmp_cnt < 10000:
-                                pos1 = read1.reference_start
-                                pos2 = read2.reference_start
-                                if abs(pos1 - pos2) <= maxL:
-                                    avgReadLength += abs(pos1 - pos2) + read2.query_length
-                                    tmp_cnt += 1
-
-                        alignments_per_read.append((read1, read2))
-
-                    else:
-                        nonunique += 1
-                        if te_mode == 'uniq':
-                            empty += 1
-                            alignments_per_read = []
-                            multi_read1 = []
-                            multi_read2 = []
-                            prev_read_name = cur_read_name
-                            if aligned_read.is_read1:
-                                multi_read1.append(aligned_read)
-                            if aligned_read.is_read2:
-                                multi_read2.append(aligned_read)
-                            continue
-
-                        else:
-                            # singleton
-                            if len(multi_read2) == 0:
-                                for r in multi_read1:
-                                    alignments_per_read.append((r, None))
-                            if len(multi_read1) == 0:
-                                for r in multi_read2:
-                                    alignments_per_read.append((None, r))
-                            if len(multi_read2) == len(multi_read1):
-                                for i in range(len(multi_read1)):
-                                    read1 = multi_read1[i]
-                                    read2 = multi_read2[i]
-                                    alignments_per_read.append((read1, read2))
-
-            else:  # single end read
-                if cur_read_name == prev_read_name or prev_read_name == "":
-                    alignments_per_read.append((aligned_read, None))
-                    prev_read_name = cur_read_name
-                    continue
-                else:  # a new read
-                    if tmp_cnt < 10000:
-                        avgReadLength += aligned_read.query_length
-                        tmp_cnt += 1
-
-                    if len(alignments_per_read) == 1:
-                        uniq_reads += 1
-                    else:
-                        nonunique += 1
-                        if te_mode == 'uniq':  # ignore multi-reads
-                            empty += 1
-                            alignments_per_read = []
-                            prev_read_name = cur_read_name
-                            alignments_per_read.append((aligned_read, None))
-                            continue
-            try:
-                (annot_gene, annot_TE) = ovp_annotation(references, alignments_per_read, geneIdx,
-                                                        teIdx, stranded, fileformat)
-                if len(alignments_per_read) > 1:  # multi read, prior to TE
-                    no_annot_te = parse_annotations_TE(multi_reads, annot_TE, te_counts, te_multi_counts, leftOver_te)
-
-                    if no_annot_te:
-                        no_annot_gene = parse_annotations_gene(annot_gene, gene_counts, leftOver_gene)
-                        if no_annot_gene:
-                            empty += 1
-
-                else:  # uniq read , prior to gene
-                    no_annot_gene = parse_annotations_gene(annot_gene, gene_counts, leftOver_gene)
-                    if no_annot_gene:
-                        no_annot_te = parse_annotations_TE(multi_reads, annot_TE, te_counts,
-                                                           te_multi_counts, leftOver_te)
-                        if no_annot_te:
-                            empty += 1
-
-            except:
-                sys.stderr.write("Error occurred when processing annotations of %s in file %s. \n" %
-                                 (prev_read_name, filename))
-                raise
-
-            if i % 1000000 == 0:
-                    sys.stderr.write("%d %s processed. \n" % (i, "alignments "))
-
-            alignments_per_read = []
-            multi_read1 = []
-            multi_read2 = []
-            prev_read_name = cur_read_name
-            if not aligned_read.is_paired:
-                alignments_per_read.append((aligned_read, None))
-            else:
+        added_flag_pos = aligned_read.query_name.find('/')
+        if added_flag_pos == -1:
+            cur_read_name = aligned_read.query_name
+        else:
+            cur_read_name = aligned_read.query_name[:added_flag_pos]
+        if aligned_read.is_paired:  # this is not reliable if read mate is unmapped
+            paired = True
+            if cur_read_name == prev_read_name or prev_read_name == "":
+                prev_read_name = cur_read_name
                 if aligned_read.is_read1:
                     multi_read1.append(aligned_read)
                 if aligned_read.is_read2:
                     multi_read2.append(aligned_read)
+                continue
 
-    except StopIteration:
-        pass
-        # the last read
+            else:
+                if len(multi_read1) <= 1 and len(multi_read2) <= 1:
+                    uniq_reads += 1
+                    read1 = None
+                    read2 = None
+                    if len(multi_read1) == 1:
+                        read1 = multi_read1[0]
+                    if len(multi_read2) == 1:
+                        read2 = multi_read2[0]
+                    if read1 is not None and read1.is_proper_pair:
+                        if read2 is None:
+                            sys.stderr.write("******NOT COMPLETE******* \n")
+                            sys.stderr.write("If the BAM file is sorted by coordinates, please specify \
+                            --sortByPos and re-run! \n")
+                            sys.exit(0)
+                        if tmp_cnt < 10000:
+                            pos1 = read1.reference_start
+                            pos2 = read2.reference_start
+                            if abs(pos1 - pos2) <= maxL:
+                                avgReadLength += abs(pos1 - pos2) + read2.query_length
+                                tmp_cnt += 1
+
+                    alignments_per_read.append((read1, read2))
+
+                else:
+                    nonunique += 1
+                    if te_mode == 'uniq':
+                        empty += 1
+                        alignments_per_read = []
+                        multi_read1 = []
+                        multi_read2 = []
+                        prev_read_name = cur_read_name
+                        if aligned_read.is_read1:
+                            multi_read1.append(aligned_read)
+                        if aligned_read.is_read2:
+                            multi_read2.append(aligned_read)
+                        continue
+
+                    else:
+                        # singleton
+                        if len(multi_read2) == 0:
+                            for r in multi_read1:
+                                alignments_per_read.append((r, None))
+                        if len(multi_read1) == 0:
+                            for r in multi_read2:
+                                alignments_per_read.append((None, r))
+                        if len(multi_read2) == len(multi_read1):
+                            for i in range(len(multi_read1)):
+                                read1 = multi_read1[i]
+                                read2 = multi_read2[i]
+                                alignments_per_read.append((read1, read2))
+
+        else:  # single end read
+            if cur_read_name == prev_read_name or prev_read_name == "":
+                alignments_per_read.append((aligned_read, None))
+                prev_read_name = cur_read_name
+                continue
+            else:  # a new read
+                if tmp_cnt < 10000:
+                    avgReadLength += aligned_read.query_length
+                    tmp_cnt += 1
+
+                if len(alignments_per_read) == 1:
+                    uniq_reads += 1
+                else:
+                    nonunique += 1
+                    if te_mode == 'uniq':  # ignore multi-reads
+                        empty += 1
+                        alignments_per_read = []
+                        prev_read_name = cur_read_name
+                        alignments_per_read.append((aligned_read, None))
+                        continue
+        try:
+            (annot_gene, annot_TE) = ovp_annotation(references, alignments_per_read, geneIdx,
+                                                        teIdx, stranded, fileformat)
+            if len(alignments_per_read) > 1:  # multi read, prior to TE
+                no_annot_te = parse_annotations_TE(multi_reads, annot_TE, te_counts, te_multi_counts, leftOver_te)
+
+                if no_annot_te:
+                    no_annot_gene = parse_annotations_gene(annot_gene, gene_counts, leftOver_gene)
+                    if no_annot_gene:
+                        empty += 1
+
+            else:  # uniq read , prior to gene
+                no_annot_gene = parse_annotations_gene(annot_gene, gene_counts, leftOver_gene)
+                if no_annot_gene:
+                    no_annot_te = parse_annotations_TE(multi_reads, annot_TE, te_counts,
+                                                           te_multi_counts, leftOver_te)
+                    if no_annot_te:
+                        empty += 1
+
+        except:
+            sys.stderr.write("Error occurred when processing annotations of %s in file %s. \n" %
+                             (prev_read_name, filename))
+            raise
+
+        if i % 1000000 == 0:
+                sys.stderr.write("%d %s processed. \n" % (i, "alignments "))
+
+        alignments_per_read = []
+        multi_read1 = []
+        multi_read2 = []
+        prev_read_name = cur_read_name
+        if not aligned_read.is_paired:
+            alignments_per_read.append((aligned_read, None))
+        else:
+            if aligned_read.is_read1:
+                multi_read1.append(aligned_read)
+            if aligned_read.is_read2:
+                multi_read2.append(aligned_read)
+
     try:
         # resolve ambiguity
         if len(leftOver_gene) > 0:
