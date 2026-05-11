@@ -1,7 +1,3 @@
-![PyPI](https://img.shields.io/pypi/v/TEtranscripts?logo=python)](https://pypi.org/project/TEtranscripts/)
-
-
-
 TEtranscripts
 =============
 
