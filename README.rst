@@ -6,7 +6,8 @@
   :target: https://doi.org/10.5281/zenodo.20090491
 .. image:: https://img.shields.io/badge/Pubmed-26206304-blue?logo=pubmed
   :target: https://pubmed.ncbi.nlm.nih.gov/26206304/
-
+.. image:: https://img.shields.io/github/license/mhammell-laboratory/TEtranscripts
+   :alt: GitHub License
 
 TEtranscripts
 =============
