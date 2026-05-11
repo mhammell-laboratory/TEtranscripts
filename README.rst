@@ -1,3 +1,7 @@
+[![PyPI](https://img.shields.io/pypi/v/TEtranscripts?logo=python)](https://pypi.org/project/TEtranscripts/)
+
+
+
 TEtranscripts
 =============
 
@@ -14,8 +18,6 @@ DESeq2.
 
 
 `Github Page <https://github.com/mhammell-laboratory/TEtranscripts>`_
-
-`Pypi Page <https://pypi.python.org/pypi/TEtranscripts>`_
 
 `Molly Gale Hammell Lab <https://www.mghlab.org/software>`_
 
