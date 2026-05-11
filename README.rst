@@ -1,3 +1,13 @@
+.. image:: https://img.shields.io/pypi/v/TEtranscripts?logo=python
+  :target: https://pypi.org/project/TEtranscripts/
+.. image:: https://img.shields.io/docker/v/mhammelllab/tetranscripts?logo=docker&label=docker%2Fsingularity
+  :target: https://hub.docker.com/r/mhammelllab/tetranscripts/tags
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.20090491.svg
+  :target: https://doi.org/10.5281/zenodo.20090491
+.. image:: https://img.shields.io/badge/Pubmed-26206304-blue?logo=pubmed
+  :target: https://pubmed.ncbi.nlm.nih.gov/26206304/ 
+
+
 TEtranscripts
 =============
 
@@ -11,7 +21,6 @@ for instructions to download the curated GTF files.
 TEtranscripts and TEcount takes RNA-seq (and similar data) and annotates reads to both
 genes & transposable elements. TEtranscripts then performs differential analysis using
 DESeq2.
-
 
 `Github Page <https://github.com/mhammell-laboratory/TEtranscripts>`_
 
@@ -334,7 +343,7 @@ Citation
 ======================
 
 If using the software in a publication, please cite the
-`following <https://pubmed.ncbi.nlm.nih.gov/26206304/>`_:
+following:
 
 Jin Y, Tam OH, Paniagua E, Hammell M. (2015) TEtranscripts: a package
 for including transposable elements in differential expression
