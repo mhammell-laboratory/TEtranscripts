@@ -352,7 +352,7 @@ def read_opts2(parser):
                 "# stranded = %s\n" % (args.stranded)
     ))
     if args.DESeq:
-        args.argtxt = args.argtxt + "\n".join(("# differential analysis using DESeq", \
+        args.argtxt = args.argtxt + "\n".join(("# differential analysis using the legacy DESeq-compatible Python workflow", \
                     "# normalization = %s (rpm: Reads Per Million mapped; quant: Quantile normalization)" % (args.norm), \
                     "# FDR cutoff = %.2e" % (args.pval), \
                     "# fold-change cutoff = %5.2f" % (args.fc), \
@@ -361,8 +361,8 @@ def read_opts2(parser):
                     "# Alignments grouped by read ID = %s\n" % (not args.sortByPos)
         ))
     else:
-        args.argtxt = args.argtxt + "\n".join(("# differential analysis using DESeq2", \
-                    "# normalization = DESeq2_default", \
+        args.argtxt = args.argtxt + "\n".join(("# differential analysis using the DESeq2-compatible Python workflow", \
+                    "# normalization = median-ratio", \
                     "# FDR cutoff = %.2e" % (args.pval), \
                     "# fold-change cutoff = %5.2f" % (args.fc), \
                     "# read count cutoff = %d" % (args.min_read), \
@@ -602,5 +602,4 @@ def __assignWeight(sample,suffix,error):
 
     of.close()
     return dest
-
 

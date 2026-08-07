@@ -21,7 +21,7 @@ for instructions to download the curated GTF files.
 
 TEtranscripts and TEcount takes RNA-seq (and similar data) and annotates reads to both
 genes & transposable elements. TEtranscripts then performs differential analysis using
-DESeq2.
+a Python-native, DESeq2-compatible workflow.
 
 `Github Page <https://github.com/mhammell-laboratory/TEtranscripts>`_
 
@@ -40,9 +40,28 @@ Python:     2.7.x or >= 3.2.x (tested on Python 2.7.11 and 3.7.7)
 
 pysam:      0.9.x or greater
 
-R:          2.15.x or greater
+R and Bioconductor are not required.
 
-DESeq2:     1.10.x or greater
+
+Python-native differential analysis
+===================================
+
+TEtranscripts implements the subset of the DESeq/DESeq2 workflow used by this
+package directly in :code:`TEToolkit.DifferentialAnalysis`. The implementation
+includes median-ratio size-factor estimation, the ``blind``, ``pooled``, and
+``per-condition`` dispersion modes, negative-binomial-inspired exact tests,
+Wald tests, Benjamini-Hochberg correction, and result-table generation.
+
+The command line and the main output contracts are unchanged:
+
+* ``<project>.cntTable``
+* ``<project>_gene_TE_analysis.txt``
+* ``<project>_sigdiff_gene_TE.txt``
+
+The native implementation follows the DESeq statistical model but is not a
+bit-for-bit reimplementation of every Bioconductor fitting heuristic. Existing
+pipelines can use the same arguments and consume the same output filenames and
+columns without installing or invoking R.
 
 
 Installation
@@ -161,9 +180,12 @@ Usage
 
       *DESeq1 compatibility options*
       --DESeq
-         Use DESeq (instead of DESeq2) for differential analysis.
+         Use the legacy DESeq-compatible Python analysis instead of the default
+         DESeq2-compatible Python analysis.
       -n | --norm [normalization]
-         Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts), quant (quantile normalization). Only applicable if DESeq is used instead of DESeq2.
+         Normalization method: DESeq_default (median-ratio normalization), TC
+         (total annotated read counts), or quant (quantile normalization). Only
+         applicable to the legacy DESeq-compatible analysis.
          DEFAULT: DESeq_default
 
       *Other options*

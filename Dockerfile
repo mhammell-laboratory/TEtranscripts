@@ -1,24 +1,8 @@
-FROM python
-
-#PREAMBLE
+FROM python:3.12-slim
 
 WORKDIR /home/genomics
 COPY . /home/genomics
-RUN cd /home/genomics
 
-RUN apt-get --assume-yes update \
-	&& apt-get --assume-yes upgrade
-
-#MAIN
-
-RUN apt-get --assume-yes install r-base
-
-RUN R -e "install.packages('lattice', dependencies=TRUE, repos='http://cran.rstudio.com/')" \
-  && R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/locfit/locfit_1.5-9.4.tar.gz', repos=NULL, type='source')" \
-  && R -e "install.packages('BiocManager', dependencies=TRUE, repos='http://cran.rstudio.com/'); BiocManager::install()" \
-	&& R -e "BiocManager::install(\"DESeq2\")" \
-	&& pip install pysam \
-	&& pip install TEtranscripts \
-	&& rm -rf *.tgz *.tar *.zip \
-	&& rm -rf /var/cache/apk/* \
-	&& rm -rf /tmp/*
+# Install the checked-out source. Differential analysis and normalization are
+# implemented in Python and no longer require R or Bioconductor packages.
+RUN pip install --no-cache-dir .

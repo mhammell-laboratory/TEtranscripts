@@ -1,2 +1,0 @@
-argparse
-pysam>=0.9
