@@ -4,12 +4,15 @@ on:
   push:
     branches: [master]
   pull_request:
-    branches: [master]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       matrix:
         python-version: ["3.9", "3.12"]
@@ -23,3 +26,53 @@ jobs:
         run: python -m pip install .
       - name: Run unit tests
         run: python -m unittest discover -v
+
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Build source and wheel distributions
+        run: |
+          python -m pip install --upgrade build
+          python -m build
+      - name: Install and smoke-test the wheel in isolation
+        run: |
+          python -m venv "$RUNNER_TEMP/tetranscripts-wheel"
+          "$RUNNER_TEMP/tetranscripts-wheel/bin/python" -m pip install dist/*.whl
+          "$RUNNER_TEMP/tetranscripts-wheel/bin/TEtranscripts" --version | grep '2.2.4'
+          "$RUNNER_TEMP/tetranscripts-wheel/bin/TEcount" --version | grep '2.2.4'
+          "$RUNNER_TEMP/tetranscripts-wheel/bin/python" -c 'import TEToolkit.DifferentialAnalysis'
+
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build container image
+        run: >-
+          docker build
+          --build-arg VCS_REF="$GITHUB_SHA"
+          --tag tetranscripts:test
+          .
+      - name: Smoke-test both installed CLIs
+        run: |
+          docker run --rm tetranscripts:test --version | grep '2.2.4'
+          docker run --rm --entrypoint TEcount tetranscripts:test --version | grep '2.2.4'
+      - name: Verify the native runtime
+        run: |
+          docker run --rm --entrypoint python tetranscripts:test -c 'import TEToolkit.DifferentialAnalysis'
+          docker run --rm --entrypoint sh tetranscripts:test -c '! command -v R && ! command -v Rscript'
+      - name: Verify non-root execution and writable work directory
+        run: |
+          docker run --rm --entrypoint python tetranscripts:test -c 'import os; assert os.getuid() == 10001'
+          docker run --rm --entrypoint python tetranscripts:test -c 'from pathlib import Path; Path("container-write-test").write_text("ok"); assert Path("container-write-test").read_text() == "ok"'
+      - name: Verify image metadata
+        run: |
+          test "$(docker inspect --format '{{.Config.User}}' tetranscripts:test)" = 'tetranscripts'
+          test "$(docker inspect --format '{{index .Config.Labels "org.opencontainers.image.source"}}' tetranscripts:test)" = 'https://github.com/molikd/TEtranscripts'
+          test "$(docker inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' tetranscripts:test)" = "$GITHUB_SHA"
