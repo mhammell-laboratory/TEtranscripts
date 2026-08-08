@@ -105,10 +105,28 @@ python version, and ``Y`` refers to the minor python version.
 ``python3.6`` if using python version 3.6.x)
 
 
+Docker
+------
+
+Build the command-line image from the checked-out source::
+
+  docker build --tag tetranscripts:local .
+
+The image runs :code:`TEtranscripts` as its entrypoint and uses :code:`/data`
+for input and output. On Linux, map the container process to your host user so
+results written through the bind mount have the expected ownership::
+
+  docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/data" tetranscripts:local --version
+
+An analysis command uses the same TEtranscripts arguments as a local install::
+
+  docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/data" tetranscripts:local -t treatment.bam -c control.bam --GTF genes.gtf --TE transposons.gtf --project example
+
+
 Alternative Singularity Installation for HPC
 --------------------------------------------
 
-Many High Performance Compunting clusters (HPCs) have
+Many High Performance Computing clusters (HPCs) have
 access to singularity which allows for the download and
 execution of containers, TEtranscripts also has a
 container through docker, it can be downloaded by
