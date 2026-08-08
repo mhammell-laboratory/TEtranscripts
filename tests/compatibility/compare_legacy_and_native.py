@@ -7,7 +7,6 @@ import argparse
 import csv
 import math
 import os
-import runpy
 import statistics
 import subprocess
 
@@ -212,8 +211,7 @@ def _render_report(legacy_columns, legacy, native_columns, native, legacy_commit
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--legacy-source", required=True)
-    parser.add_argument("--legacy-commit", required=True)
+    parser.add_argument("--legacy-revision", required=True)
     parser.add_argument("--counts", required=True)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--report", required=True)
@@ -223,7 +221,15 @@ def main():
     counts = os.path.abspath(args.counts)
     legacy_project = os.path.join(os.path.abspath(args.output_dir), "legacy")
     native_project = os.path.join(os.path.abspath(args.output_dir), "native")
-    legacy_namespace = runpy.run_path(args.legacy_source)
+    legacy_path = args.legacy_revision + ":bin/TEtranscripts"
+    legacy_source = subprocess.check_output(
+        ["git", "show", legacy_path], text=True
+    )
+    legacy_namespace = {
+        "__file__": legacy_path,
+        "__name__": "legacy_TEtranscripts",
+    }
+    exec(compile(legacy_source, legacy_path, "exec"), legacy_namespace)
     r_code = legacy_namespace["write_R_code"](
         counts,
         ["t1", "t2", "t3"],
@@ -260,7 +266,7 @@ def main():
         legacy,
         native_columns,
         native,
-        args.legacy_commit,
+        args.legacy_revision,
         r_version,
     )
     with open(args.report, "w") as handle:
