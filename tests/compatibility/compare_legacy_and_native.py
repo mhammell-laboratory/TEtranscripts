@@ -32,11 +32,20 @@ def _number(value):
 
 def _read_results(filename):
     with open(filename, newline="") as handle:
-        reader = csv.DictReader(handle, delimiter="\t")
-        columns = tuple(name for name in reader.fieldnames if name)
+        reader = csv.reader(handle, delimiter="\t")
+        header = next(reader)
+        # R's historical write.table() output has an unnamed row-name field in
+        # each record but no corresponding leading header cell.  The native
+        # writer emits that empty header cell explicitly.  Normalize both forms
+        # before mapping the numeric result columns.
+        columns = tuple(header[1:] if header and not header[0] else header)
         rows = {}
-        for row in reader:
-            name = row.get("") or row.get("id")
+        for fields in reader:
+            if not fields:
+                continue
+            name = fields[0]
+            values = fields[1:]
+            row = dict(zip(columns, values))
             rows[name] = {column: _number(row.get(column)) for column in RESULT_COLUMNS}
     return columns, rows
 
