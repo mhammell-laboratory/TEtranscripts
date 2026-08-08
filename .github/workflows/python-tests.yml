@@ -76,3 +76,36 @@ jobs:
           test "$(docker inspect --format '{{.Config.User}}' tetranscripts:test)" = 'tetranscripts'
           test "$(docker inspect --format '{{index .Config.Labels "org.opencontainers.image.source"}}' tetranscripts:test)" = 'https://github.com/molikd/TEtranscripts'
           test "$(docker inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' tetranscripts:test)" = "$GITHUB_SHA"
+
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Install Python-native package
+        run: python -m pip install .
+      - name: Install legacy DESeq2 runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends r-base r-bioc-deseq2
+      - name: Extract the legacy analysis implementation
+        run: >-
+          git show
+          --output="$RUNNER_TEMP/legacy_TEtranscripts.py"
+          origin/master:bin/TEtranscripts
+      - name: Compare legacy and native results
+        run: |
+          mkdir -p "$RUNNER_TEMP/comparison"
+          python tests/compatibility/compare_legacy_and_native.py \
+            --legacy-source "$RUNNER_TEMP/legacy_TEtranscripts.py" \
+            --legacy-commit 32426b94d2d8ed0ebaca011feec86cc62df61e6c \
+            --counts tests/compatibility/small_counts.cntTable \
+            --output-dir "$RUNNER_TEMP/comparison" \
+            --report "$RUNNER_TEMP/comparison/results.md"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: legacy-native-comparison
+          path: ${{ runner.temp }}/comparison
