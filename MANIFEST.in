@@ -1,3 +1,4 @@
 include README.rst
 include COPYING
 include doc/*
+recursive-include tests *.py
