@@ -120,6 +120,12 @@ def estimateSizeFactors(cds, method="ratio"):
             if geo_mean > 0 and (count > 0 or not use_positive):
                 ratios.append(count / geo_mean)
         if not ratios:
+            if all(row[sample_index] == 0 for row in cds.counts):
+                raise ValueError(
+                    "cannot estimate a size factor for sample %s; "
+                    "the sample library contains only zero counts"
+                    % cds.column_names[sample_index]
+                )
             raise ValueError("cannot estimate a size factor for sample %s" % cds.column_names[sample_index])
         factor = _median(ratios)
         if factor <= 0 or not _isfinite(factor):
@@ -362,10 +368,35 @@ def _two_sided_count_test(observed, total, probability, dispersion):
     if total <= 10000:
         observed_log_probability = log_pmf(observed)
         probability_sum = 0.0
+        if dispersion > 1e-10:
+            current_log_probability = _log_beta_binomial_pmf(
+                0, total, alpha, beta
+            )
+        else:
+            current_log_probability = total * math.log1p(-probability)
+
+        # Walk the PMF using P(k + 1) / P(k).  This preserves exact
+        # enumeration while avoiding thousands of repeated lgamma calls near
+        # the historical 10,000-count cutoff.
         for value in range(total + 1):
-            current = log_pmf(value)
-            if current <= observed_log_probability + 1e-12:
-                probability_sum += math.exp(current)
+            if current_log_probability <= observed_log_probability + 1e-12:
+                probability_sum += math.exp(current_log_probability)
+            if value == total:
+                break
+            if dispersion > 1e-10:
+                current_log_probability += (
+                    math.log(total - value)
+                    - math.log(value + 1)
+                    + math.log(value + alpha)
+                    - math.log(total - value - 1 + beta)
+                )
+            else:
+                current_log_probability += (
+                    math.log(total - value)
+                    - math.log(value + 1)
+                    + math.log(probability)
+                    - math.log1p(-probability)
+                )
         return min(max(probability_sum, 0.0), 1.0)
 
     if variance <= 0:
@@ -555,6 +586,11 @@ def run_differential_analysis(
     min_read=1,
 ):
     """Run the Python-native analysis and write the historical result files."""
+
+    if treatment_count <= 0:
+        raise ValueError("treatment_count must be positive")
+    if control_count <= 0:
+        raise ValueError("control_count must be positive")
 
     column_names, row_names, counts = _read_count_table(
         count_table, treatment_count, control_count, min_read

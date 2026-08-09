@@ -1,11 +1,14 @@
 from __future__ import division
 
+import math
 import os
 import tempfile
 import unittest
 
 from TEToolkit.DifferentialAnalysis import (
     _benjamini_hochberg,
+    _log_beta_binomial_pmf,
+    _log_binomial_pmf,
     _quantile_normalize,
     _set_size_factors,
     _two_sided_count_test,
@@ -55,6 +58,24 @@ class DifferentialAnalysisTests(unittest.TestCase):
         estimateSizeFactors(cds)
         self.assertEqual(len(cds.size_factors), 2)
         self.assertTrue(all(value > 0 for value in cds.size_factors))
+
+    def test_size_factors_reject_an_all_zero_matrix(self):
+        cds = newCountDataSet(
+            [[0, 0], [0, 0]],
+            ["T", "C"],
+            column_names=["zero_treatment", "zero_control"],
+        )
+        with self.assertRaisesRegex(ValueError, "only zero counts"):
+            estimateSizeFactors(cds)
+
+    def test_size_factors_reject_an_entirely_zero_sample_library(self):
+        cds = newCountDataSet(
+            [[0, 10, 12], [0, 25, 20], [0, 5, 8]],
+            ["T", "T", "C"],
+            column_names=["empty_sample", "treatment", "control"],
+        )
+        with self.assertRaisesRegex(ValueError, "empty_sample.*only zero counts"):
+            estimateSizeFactors(cds)
 
     def test_size_factor_validation(self):
         cds = newCountDataSet([[1, 2], [3, 4]], ["A", "B"])
@@ -160,6 +181,44 @@ class DifferentialAnalysisTests(unittest.TestCase):
                 pvalue = _two_sided_count_test(*arguments)
                 self.assertGreaterEqual(pvalue, 0.0)
                 self.assertLessEqual(pvalue, 1.0)
+
+    def test_optimized_exact_count_test_matches_direct_enumeration(self):
+        cases = (
+            (7, 20, 0.3, 0.0),
+            (12, 35, 0.6, 0.15),
+            (2, 75, 0.1, 0.4),
+        )
+        for observed, total, probability, dispersion in cases:
+            with self.subTest(
+                observed=observed,
+                total=total,
+                probability=probability,
+                dispersion=dispersion,
+            ):
+                if dispersion > 1e-10:
+                    concentration = 1.0 / dispersion
+                    alpha = probability * concentration
+                    beta = (1.0 - probability) * concentration
+                    log_pmf = lambda value: _log_beta_binomial_pmf(
+                        value, total, alpha, beta
+                    )
+                else:
+                    log_pmf = lambda value: _log_binomial_pmf(
+                        value, total, probability
+                    )
+                observed_log_probability = log_pmf(observed)
+                expected = sum(
+                    math.exp(log_pmf(value))
+                    for value in range(total + 1)
+                    if log_pmf(value) <= observed_log_probability + 1e-12
+                )
+                self.assertAlmostEqual(
+                    _two_sided_count_test(
+                        observed, total, probability, dispersion
+                    ),
+                    min(expected, 1.0),
+                    places=10,
+                )
 
     def test_default_analysis_preserves_deseq2_table_contract(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -301,6 +360,44 @@ class DifferentialAnalysisTests(unittest.TestCase):
                             1,
                             os.path.join(directory, "invalid-%d" % index),
                         )
+
+    def test_public_api_rejects_all_zero_tables_and_sample_libraries(self):
+        with tempfile.TemporaryDirectory() as directory:
+            all_zero = os.path.join(directory, "all-zero.cntTable")
+            with open(all_zero, "w") as handle:
+                handle.write("gene/TE\tt1.T\tc1.C\n")
+                handle.write("zero_a\t0\t0\n")
+                handle.write("zero_b\t0\t0\n")
+            with self.assertRaisesRegex(ValueError, "no features remain"):
+                run_differential_analysis(
+                    all_zero, 1, 1, os.path.join(directory, "all-zero")
+                )
+
+            zero_library = os.path.join(directory, "zero-library.cntTable")
+            with open(zero_library, "w") as handle:
+                handle.write("gene/TE\tempty.T\tt2.T\tc1.C\n")
+                handle.write("one\t0\t10\t8\n")
+                handle.write("two\t0\t30\t25\n")
+            with self.assertRaisesRegex(ValueError, "empty.T.*only zero counts"):
+                run_differential_analysis(
+                    zero_library,
+                    2,
+                    1,
+                    os.path.join(directory, "zero-library"),
+                )
+
+    def test_public_api_rejects_zero_sized_groups(self):
+        with tempfile.TemporaryDirectory() as directory:
+            count_table = os.path.join(directory, "input.cntTable")
+            self._write_count_table(count_table)
+            with self.assertRaisesRegex(ValueError, "treatment_count must be positive"):
+                run_differential_analysis(
+                    count_table, 0, 2, os.path.join(directory, "no-treatment")
+                )
+            with self.assertRaisesRegex(ValueError, "control_count must be positive"):
+                run_differential_analysis(
+                    count_table, 2, 0, os.path.join(directory, "no-control")
+                )
 
     def test_significant_output_applies_fold_change_threshold(self):
         with tempfile.TemporaryDirectory() as directory:
