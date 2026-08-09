@@ -21,7 +21,7 @@ for instructions to download the curated GTF files.
 
 TEtranscripts and TEcount takes RNA-seq (and similar data) and annotates reads to both
 genes & transposable elements. TEtranscripts then performs differential analysis using
-DESeq2.
+a Python-native, DESeq2-compatible workflow.
 
 `Github Page <https://github.com/mhammell-laboratory/TEtranscripts>`_
 
@@ -40,9 +40,28 @@ Python:     2.7.x or >= 3.2.x (tested on Python 2.7.11 and 3.7.7)
 
 pysam:      0.9.x or greater
 
-R:          2.15.x or greater
+R and Bioconductor are not required.
 
-DESeq2:     1.10.x or greater
+
+Python-native differential analysis
+===================================
+
+TEtranscripts implements the subset of the DESeq/DESeq2 workflow used by this
+package directly in :code:`TEToolkit.DifferentialAnalysis`. The implementation
+includes median-ratio size-factor estimation, the ``blind``, ``pooled``, and
+``per-condition`` dispersion modes, negative-binomial-inspired exact tests,
+Wald tests, Benjamini-Hochberg correction, and result-table generation.
+
+The command line and the main output contracts are unchanged:
+
+* ``<project>.cntTable``
+* ``<project>_gene_TE_analysis.txt``
+* ``<project>_sigdiff_gene_TE.txt``
+
+The native implementation follows the DESeq statistical model but is not a
+bit-for-bit reimplementation of every Bioconductor fitting heuristic. Existing
+pipelines can use the same arguments and consume the same output filenames and
+columns without installing or invoking R.
 
 
 Installation
@@ -86,10 +105,41 @@ python version, and ``Y`` refers to the minor python version.
 ``python3.6`` if using python version 3.6.x)
 
 
+Docker
+------
+
+Build the command-line image from the checked-out source::
+
+  docker build --tag tetranscripts:local .
+
+The image runs :code:`TEtranscripts` as its entrypoint and uses :code:`/data`
+for input and output. On Linux, map the container process to your host user so
+results written through the bind mount have the expected ownership::
+
+  docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/data" tetranscripts:local --version
+
+An analysis command uses the same TEtranscripts arguments as a local install::
+
+  docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/data" tetranscripts:local -t treatment.bam -c control.bam --GTF genes.gtf --TE transposons.gtf --project example
+
+The default image is deliberately Python-native and does not contain R. For
+reproducing historical analyses, validating the native implementation against
+Bioconductor, or running other R-based compatibility work, the same Dockerfile
+also provides an optional ``legacy`` target containing R, DESeq, and DESeq2::
+
+  docker build --target legacy --tag tetranscripts:legacy .
+  docker run --rm --entrypoint Rscript tetranscripts:legacy -e 'library(DESeq); library(DESeq2); sessionInfo()'
+
+Building the legacy target does not change the current TEtranscripts command:
+its default and ``--DESeq`` modes remain Python-native. The additional target
+provides the historical R packages explicitly when reproducibility or direct
+comparison requires them.
+
+
 Alternative Singularity Installation for HPC
 --------------------------------------------
 
-Many High Performance Compunting clusters (HPCs) have
+Many High Performance Computing clusters (HPCs) have
 access to singularity which allows for the download and
 execution of containers, TEtranscripts also has a
 container through docker, it can be downloaded by
@@ -161,9 +211,12 @@ Usage
 
       *DESeq1 compatibility options*
       --DESeq
-         Use DESeq (instead of DESeq2) for differential analysis.
+         Use the legacy DESeq-compatible Python analysis instead of the default
+         DESeq2-compatible Python analysis.
       -n | --norm [normalization]
-         Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts), quant (quantile normalization). Only applicable if DESeq is used instead of DESeq2.
+         Normalization method: DESeq_default (median-ratio normalization), TC
+         (total annotated read counts), or quant (quantile normalization). Only
+         applicable to the legacy DESeq-compatible analysis.
          DEFAULT: DESeq_default
 
       *Other options*

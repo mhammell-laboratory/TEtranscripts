@@ -7,24 +7,16 @@ bin correlation
 
 @author: Ying Jin
 '''
-#from rpy2.robjects.packages import importr
-#from rpy2.robjects import FloatVector
-#import rpy2.robjects as robjects
-#import rpy2.robjects.lib.ggplot2 as ggplot2
-import subprocess
-
-
 from array import array
+import math
+import struct
+import zlib
 #import numpy as np
 
 import logging
 import sys
 from TEToolkit.Constants import *
 from TEToolkit.ShortRead.ParseBEDFile import *
-
-
-#stats = importr('stats')
-#grdevices = importr('grDevices')
 
 
 #def normalize(method,treatment,control,chrlen_tbl) :
@@ -41,6 +33,11 @@ def normalize(method,treatment,tinput,control,cinput,species,prj_name) :
 def seq_depth(list1,list1input,list2,list2input):
 
     max_size = 0.0
+    samples = list(list1) + list(list1input) + list(list2) + list(list2input)
+    if any(sample.libsize() <= 0 for sample in samples):
+        raise ValueError(
+            "library sizes must be positive for sequence-depth normalization"
+        )
 
     for i in range(len(list1)):
         tsmp = list1[i]
@@ -74,60 +71,71 @@ def seq_depth(list1,list1input,list2,list2input):
 
     return (sf1,sf2)
 
-def __binCorr2r(filename):
-    rfhd=open(filename,'w')
+def _linear_scale_factor(reference, sample):
+    """Return the zero-intercept OLS slope used by the former R helper."""
 
-    rfhd.write("#!/bin/env Rscript\n")
-
-    rfhd.write("args = commandArgs(TRUE)\n")
-
-    rfhd.write("infile = args[1]\n")
-    rfhd.write("outfile = args[2]\n")
-
-    rfhd.write("d<-read.delim(infile,header=T,stringsAsFactors=F) \n")
-
-    rfhd.write("colnum <- length(d) \n")
-
-    rfhd.write("min_sf_idx = 1 \n")
-    rfhd.write("min_sf = 1.0 \n")
-
-    rfhd.write("for (i in 2:colnum) {\n")
-
-    rfhd.write("lm.r<-lm(d[,1]~d[,i]-1)\n")
-
-    rfhd.write("cur_sf <- as.numeric(lm.r$coefficients[1])\n")
-
-    #rfhd.write("if (min_sf > cur_sf ) { \n")
-    rfhd.write("min_sf = cur_sf;\n")
-    #rfhd.write("min_sf_idx = i }\n")
-
-    rfhd.write("png(outfile,height=5,width=5,res=500,units='in')\n")
-    rfhd.write("plot(d[,1]~d[,2],xlab=colnames(d)[1],ylab=colnames(d)[2],log='xy') \n")
-    rfhd.write("dev.off() }\n")
-    rfhd.write("cat(min_sf)\n")
-    rfhd.close()
+    denominator = sum(float(value) * float(value) for value in sample)
+    if denominator == 0:
+        return 1.0
+    numerator = sum(float(left) * float(right) for left, right in zip(reference, sample))
+    return numerator / denominator
 
 
+def _png_chunk(chunk_type, data):
+    payload = chunk_type + data
+    return struct.pack(">I", len(data)) + payload + struct.pack(">I", zlib.crc32(payload) & 0xffffffff)
 
 
-def __output_count_tbl(list1,list2, smp1,smp2, fname):
+def _write_scatter_png(filename, reference, sample, width=500, height=500):
+    """Write the historical log/log normalization scatter plot without R."""
 
+    pixels = bytearray([255]) * (width * height * 3)
 
-    try:
-        f = open(fname, 'w')
-    except IOError:
-        error("Cannot create report file %s !\n" % (fname))
-        sys.exit(1)
-    else:
-        cnt_tbl = dict()
-        header = ""+smp1+"\t"+smp2
-        f.write(header+"\n")
-        for i in range(len(list1)) :
-            f.write(str(list1[i]) + "\t" +str(list2[i])+"\n")
+    def set_pixel(x_value, y_value, color):
+        if 0 <= x_value < width and 0 <= y_value < height:
+            offset = (y_value * width + x_value) * 3
+            pixels[offset:offset + 3] = bytearray(color)
 
-        f.close()
+    left, right, top, bottom = 48, width - 16, 16, height - 42
+    for x_value in range(left, right + 1):
+        set_pixel(x_value, bottom, (50, 50, 50))
+    for y_value in range(top, bottom + 1):
+        set_pixel(left, y_value, (50, 50, 50))
 
-    return
+    points = [
+        (math.log10(float(x_value)), math.log10(float(y_value)))
+        for y_value, x_value in zip(reference, sample)
+        if x_value > 0 and y_value > 0
+    ]
+    if points:
+        x_values = [point[0] for point in points]
+        y_values = [point[1] for point in points]
+        x_min, x_max = min(x_values), max(x_values)
+        y_min, y_max = min(y_values), max(y_values)
+        if x_min == x_max:
+            x_min, x_max = x_min - 0.5, x_max + 0.5
+        if y_min == y_max:
+            y_min, y_max = y_min - 0.5, y_max + 0.5
+        for x_log, y_log in points:
+            x_pixel = int(round(left + (x_log - x_min) * (right - left) / (x_max - x_min)))
+            y_pixel = int(round(bottom - (y_log - y_min) * (bottom - top) / (y_max - y_min)))
+            for x_offset in (-1, 0, 1):
+                for y_offset in (-1, 0, 1):
+                    set_pixel(x_pixel + x_offset, y_pixel + y_offset, (38, 91, 160))
+
+    scanlines = bytearray()
+    stride = width * 3
+    for row in range(height):
+        scanlines.append(0)
+        scanlines.extend(pixels[row * stride:(row + 1) * stride])
+
+    signature = b"\x89PNG\r\n\x1a\n"
+    header = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
+    with open(filename, "wb") as handle:
+        handle.write(signature)
+        handle.write(_png_chunk(b"IHDR", header))
+        handle.write(_png_chunk(b"IDAT", zlib.compress(bytes(scanlines), 9)))
+        handle.write(_png_chunk(b"IEND", b""))
 
 #def bin_corr(list1,list2,chrlen_tbl):
 def bin_corr(list1,list1input,list2,list2input,species,prj_name):
@@ -177,44 +185,22 @@ def bin_corr(list1,list1input,list2,list2input,species,prj_name):
     for i in range(tsize):
         list1[i].clear_bins()
 
-    #call linear regression function
- #   refsmp = FloatVector(reads[0])
- #   robjects.globalenv['A'] = refsmp
-
-    min_sf_idx = 0
-    min_sf = 1.0
-
-    __binCorr2r("bin_corr.r")
-
+    # Calculate the same zero-intercept regression slope as ``lm(ref ~
+    # sample - 1)`` and emit the same project-prefixed PNG artifacts natively.
     for i in range(tsize+tisize):
-        tmpfname = "."+fnames[0]+"-"+fnames[i]
-        __output_count_tbl(reads[0],reads[i],fnames[0],fnames[i],tmpfname)
-        outfname = prj_name+"_"+fnames[0]+"vs"+fnames[i]+".png"
-        if i != 0 :
-            #msf = subprocess.check_output(["Rscript","bin_corr.r",tmpfname,outfname])
-            msf = subprocess.Popen(["Rscript","bin_corr.r",tmpfname,outfname],stdout=subprocess.PIPE)
-            msf = float(msf.communicate()[0])
-        else :
-            msf = 1
-     #   subprocess.call(["rm","-f",tmpfname])
-        if min_sf > msf :
-            min_sf = msf
-            min_sf_idx = i
+        if i == 0:
+            msf = 1.0
+        else:
+            msf = _linear_scale_factor(reads[0], reads[i])
+            outfname = prj_name+"_"+fnames[0]+"vs"+fnames[i]+".png"
+            _write_scatter_png(outfname, reads[0], reads[i])
         sf1.append(msf)
 
     for i in range(tsize+tisize,csize + cisize + tsize+tisize):
-        tmpfname = "."+fnames[0]+"-"+fnames[i]
         outfname = prj_name+"_"+fnames[0]+"vs"+fnames[i]+".png"
-        __output_count_tbl(reads[0],reads[i],fnames[0],fnames[i],tmpfname)
-
-        #msf = subprocess.check_output(["Rscript","bin_corr.r",tmpfname,outfname])
-        msf = subprocess.Popen(["Rscript","bin_corr.r",tmpfname,outfname],stdout=subprocess.PIPE)
-        msf = float(msf.communicate()[0])
-      #  subprocess.call(["rm","-f",tmpfname])
-        if min_sf > msf :
-            min_sf = msf
-            min_sf_idx = i
-        sf2.append( msf)
+        msf = _linear_scale_factor(reads[0], reads[i])
+        _write_scatter_png(outfname, reads[0], reads[i])
+        sf2.append(msf)
 
 
     #plot scatter plot
@@ -329,47 +315,3 @@ def join_bins(list1,list1input,list2,list2input,fnames,ref_idx):
         sys.exit(0)
 
     return (tot_reads,reads,sel_idx)
-
-'''
-def plot_sf(t_reads,reads,sel_idx,smps,ref_idx):
-
-    sf1 = []
-
-    # plotting code here
-    refsmp = FloatVector(reads[ref_idx])
-    robjects.globalenv['A'] = refsmp
-
-    for i in range(len(reads)):
-        robjects.globalenv['B'] = FloatVector(reads[i])
-        res = stats.lm('A ~ B - 1')
-        slm = robjects.r.summary(res)
-        sf1.append(res[0][0])
-        r_sqr = slm[8][0]
-
-        if i != ref_idx :
-            fname = smps[ref_idx]+"_vs_"+ smps[i] + ".png"
-            grdevices.png(file=fname, width=512, height=512)
-
-            xlab_desc = 'Reads per 10kbp bin of sample ' + smps[i]
-            ylab_desc = 'Reads per 10kbp bin of sample ' + smps[ref_idx]
-            tt = "Slope: " + str(round(res[0][0],2)) + "\tR-squared: " + str(round(r_sqr,2))
-
-            d = {'ref': robjects.FloatVector(t_reads[ref_idx]),
-            'smp': robjects.FloatVector(t_reads[i]),'background':robjects.IntVector(sel_idx)}
-            dataf = robjects.DataFrame(d)
-
-            gp = ggplot2.ggplot(dataf)
-            pp = gp + \
-                 ggplot2.aes_string(y = 'ref', x = 'smp', col='factor(background)') + \
-                 ggplot2.geom_point(size=2,shape=16) + \
-                 ggplot2.stat_abline(intercept=0,slope=res[0][0],col='blue') + \
-                 ggplot2.opts(title=tt) + \
-                 ggplot2.scale_colour_discrete(name="",breaks = [0,1], labels = ['all','selected']) + \
-                 ggplot2.scale_x_continuous(xlab_desc) + \
-                 ggplot2.scale_y_continuous(ylab_desc)
-
-  #          pp.plot()
- #           grdevices.dev_off()
-
-#    return sf1
-'''

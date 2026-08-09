@@ -19,7 +19,7 @@ Description: TEtranscripts
 
         TEtranscripts and TEcount takes RNA-seq (and similar data) and annotates reads
         to both genes & transposable elements. TEtranscripts then performs differential
-        analysis using DESeq2.
+        analysis using a Python-native, DESeq2-compatible workflow.
 
 
         `Github Page <https://github.com/mhammell-laboratory/TEtranscripts>`_
@@ -40,9 +40,7 @@ Description: TEtranscripts
 
         pysam:      0.9.0 or greater
 
-        R:          2.15.x or greater
-
-        DESeq2:     1.10.x or greater (recommended)
+        R and Bioconductor are not required.
 
 
         Installation
@@ -130,9 +128,9 @@ Description: TEtranscripts
 
               *DESeq1 compatability options
               --DESeq
-                 Use DESeq (instead of DESeq2) for differential analysis.
+                 Use the legacy DESeq-compatible Python analysis instead of the default DESeq2-compatible analysis.
               -n | --norm [normalization]
-                 Normalization method : DESeq_default (default normalization method of DESeq), TC (total annotated read counts), quant (quantile normalization). Only applicable if DESeq is used instead of DESeq2.
+                 Normalization method: DESeq_default (median-ratio normalization), TC (total annotated read counts), or quant (quantile normalization). Only applicable to the legacy DESeq-compatible analysis.
                  DEFAULT: DESeq_default
 
               *Other options*

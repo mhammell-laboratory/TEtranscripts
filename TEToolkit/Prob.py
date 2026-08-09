@@ -83,6 +83,11 @@ def normal_cdf_inv(p, mu = None, sigma2 = None, lower=True):
     upper = not lower
     if p < 0 or p > 1:
         raise Exception("Illegal argument %f for qnorm(p)." % p)
+    if p == 0 or p == 1:
+        endpoint = float("-inf") if p == 0 else float("inf")
+        if not lower:
+            endpoint = -endpoint
+        return endpoint
 
     split = 0.42
     a0 = 2.50662823884
@@ -391,7 +396,7 @@ def poisson_pdf ( k, a ):
     """
     if a <= 0:
         return 0
-    return exp(-a) * pow (a, k) / factorial (k)
+    return exp(-a) * pow (a, k) / math.factorial(k)
 
 
 def binomial_coef (n,k):
@@ -425,7 +430,7 @@ def binomial_cdf (x, a, b, lower=True):
 def _binomial_cdf_r (x,a,b):
     if x < 0:
         return 1
-    elif a < x:
+    elif a <= x:
         return 0
     elif b == 0:
         return 0
@@ -472,7 +477,7 @@ def _binomial_cdf_r (x,a,b):
 def _binomial_cdf_f (x,a,b):
     if x < 0:
         return 0
-    elif a < x:
+    elif a <= x:
         return 1
     elif b == 0:
         return 1
@@ -598,4 +603,3 @@ def test():
 
 if __name__ == '__main__':
     test()
-

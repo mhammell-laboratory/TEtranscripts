@@ -206,9 +206,9 @@ def EMestimate(te_features,multi_reads,uniq_counts,multi_counts,numItr,estimated
         rr = dotProd_(r,v)
         rvNorm = math.sqrt(abs(rr))
 
-        if vNorm == 0 :
+        if vNorm == 0 or rvNorm == 0:
             means0 = means1
-            sys.stderr.write("at iteration " + str(cur_iter) + " vNorm == 0 \n")
+            sys.stderr.write("at iteration " + str(cur_iter) + " acceleration norm == 0 \n")
             break
         alphaS = rNorm / rvNorm
         alphaS = max(minStep, min(maxStep, alphaS))
@@ -285,12 +285,15 @@ def computeAbundances(meansIn,multi_reads):
               totalMass += meansIn[tid]
 
         if totalMass > 0.0 :
-                  norm = 1.0 / totalMass
-        else :
-                  norm = 0.0
-
-        for tid in TE_transcripts :
-              multi_counts[tid] += meansIn[tid] * norm
+            norm = 1.0 / totalMass
+            for tid in TE_transcripts :
+                multi_counts[tid] += meansIn[tid] * norm
+        elif TE_transcripts:
+            # With no prior evidence, retain the read and use an uninformative
+            # equal allocation rather than silently losing count mass.
+            weight = 1.0 / len(TE_transcripts)
+            for tid in TE_transcripts:
+                multi_counts[tid] += weight
 
     sys.stderr.write("total multi counts = "+ repr(int(sum(multi_counts)))+"\n")
     return multi_counts

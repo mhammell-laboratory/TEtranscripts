@@ -34,6 +34,7 @@ from TEToolkit.TEindex import *
 from TEToolkit.EMAlgorithm import *
 from TEToolkit.IntervalTree import *
 from TEToolkit.GeneFeatures import *
+from TEToolkit.DifferentialAnalysis import run_differential_analysis
 
 
 def prepare_parser():
@@ -72,11 +73,11 @@ def prepare_parser():
                         help='read count cutoff. genes/TEs with reads less than the cutoff will not be considered. \
                         DEFAULT: 1')
     parser.add_argument('--DESeq', dest='DESeq', action="store_true",
-                        help='Use DESeq (instead of DESeq2) for differential analysis.')
+                        help='Use the legacy DESeq-compatible Python analysis instead of the default DESeq2-compatible analysis.')
     parser.add_argument('-n', '--norm', metavar='normalization', dest='norm', nargs='?', default='DESeq_default',
                         choices=['DESeq_default', 'TC', 'quant'], help='Normalization method : \
                         DESeq_default (DESeq default normalization method), TC (total annotated counts), \
-                        quant (quantile normalization). Only applicable if DESeq is used instead of DESeq2. \
+                        quant (quantile normalization). Only applicable to the legacy DESeq-compatible analysis. \
                         DEFAULT: DESeq_default')
     parser.add_argument('--sortByPos', dest='sortByPos', action="store_true",
                         help='Alignment files are sorted by chromosome position.')
@@ -143,7 +144,7 @@ def fetch_exon(chrom, st, cigar, direction, fileformat):
     exon_bound = []
 
     for c, s in cigar:  # code and size
-        if c == 0:  # match
+        if c in (0, 7, 8):  # M, =, and X consume query and reference
             if direction == 0:
                 exon_bound.append([chrom, chrom_st, chrom_st + s - 1, "."])
             if direction == 1:
@@ -157,8 +158,8 @@ def fetch_exon(chrom, st, cigar, direction, fileformat):
             chrom_st += s
         elif c == 3:  # gap or intron
             chrom_st += s
-        elif c == 4:  # soft clipping. We do NOT include soft clip as part of exon
-            chrom_st += s
+        elif c in (4, 5, 6):  # soft/hard clipping and padding do not consume reference
+            continue
         else:
             continue
     return exon_bound
@@ -284,15 +285,15 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
             aligned_read = next(samfile)
         except StopIteration:
             morereads = False
-            prev_read_name = 'lastread'
-            pass
+            aligned_read = None
 
-        if aligned_read.is_unmapped or aligned_read.is_duplicate or aligned_read.is_qcfail:
+        if aligned_read is not None and (
+                aligned_read.is_unmapped or aligned_read.is_duplicate or aligned_read.is_qcfail):
             continue
 
-        cur_read_name = aligned_read.query_name
+        cur_read_name = '__TETRANSCRIPTS_EOF__' if aligned_read is None else aligned_read.query_name
 
-        if aligned_read.is_paired:  # this is not reliable if read mate is unmapped
+        if aligned_read is not None and aligned_read.is_paired:  # this is not reliable if read mate is unmapped
             added_flag_pos = aligned_read.query_name.find('/')
             if added_flag_pos == -1:
                 added_flag_pos = len(aligned_read.query_name)
@@ -368,7 +369,7 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
                 prev_read_name = cur_read_name
                 continue
             else:  # a new read
-                if tmp_cnt < 10000:
+                if aligned_read is not None and tmp_cnt < 10000:
                     avgReadLength += aligned_read.query_length
                     tmp_cnt += 1
 
@@ -414,6 +415,8 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
         multi_read2 = []
         prev_read_name = cur_read_name
 
+        if aligned_read is None:
+            continue
         if not aligned_read.is_paired:
             alignments_per_read.append((aligned_read, None))
 
@@ -433,8 +436,6 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
         ss = sum(te_counts)
         sys.stderr.write("uniq te counts = %s \n" % repr(int(ss)))
 
-        te_tmp_counts = [0] * len(te_counts)
-
         if numItr > 0:
             try:
                 ''' iterative optimization on TE reads '''
@@ -450,7 +451,7 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
                     raise
                 new_te_multi_counts = [0] * len(te_counts)
                 if len(multi_reads) > 0:
-                    new_te_multi_counts = EMestimate(teIdx, multi_reads, te_tmp_counts, te_multi_counts,
+                    new_te_multi_counts = EMestimate(teIdx, multi_reads, te_counts, te_multi_counts,
                                                      numItr, avgReadLength)
 
             except:
@@ -501,10 +502,7 @@ def resolve_annotation_ambiguity(counts, leftOvers):
     for annlist, w in leftOvers:
         readslist = {}
         total = 0.0
-        size = len(annlist)
         ww = 1.0 * w
-        if size > 1:
-            ww = ww / size
 
         for ann in annlist:
             for a in ann:
@@ -518,7 +516,7 @@ def resolve_annotation_ambiguity(counts, leftOvers):
                 counts[a] += v
         else:
             for a in readslist:
-                counts[a] = ww / len(readslist)
+                counts[a] += ww / len(readslist)
 
 
 def parse_annotations_TE(multi_reads, annot_TE, uniq_counts, multi_counts, leftOver_list):
@@ -638,110 +636,6 @@ def output_norm(sf, name):
         f.close()
 
 
-def write_R_code(f_cnt_tbl, tfiles, cfiles, prj_name, DESeq1, norm, pval, fc, rpm_val, min_read):
-    # Assembling R-code for analysis
-    rscript = ''
-    rscript += '\n'
-    rscript += 'data <- read.table("%s",header=T,row.names=1)\n' % f_cnt_tbl  # load counts table
-    rscript += 'groups <- factor(c(rep("TGroup",%s),rep("CGroup",%s)))\n' % (len(tfiles), len(cfiles))
-    # generate groups for pairwise comparison
-    rscript += 'min_read <- %s\n' % min_read
-    # Counts filtering (hard coded to 20)
-    rscript += 'data <- data[apply(data,1,function(x){max(x)}) > min_read,]\n'
-
-    # Choose between DESeq2 (default) or DESeq
-    if not DESeq1:
-        # Differential analysis using DESeq2 and their internal normalization method
-        rscript += 'sampleInfo <- data.frame(groups,row.names=colnames(data))\n'
-        rscript += 'suppressPackageStartupMessages(library(DESeq2))\n'
-        rscript += 'dds <- DESeqDataSetFromMatrix(countData = data, colData = sampleInfo, design = ~ groups)\n'
-        rscript += 'dds$groups = relevel(dds$groups,ref="CGroup")\n'
-        rscript += 'dds <- DESeq(dds)\n'
-        rscript += 'res <- results(dds)\n'
-        rscript += 'write.table(res, file="%s_gene_TE_analysis.txt", sep="\\t",quote=F)\n' % prj_name
-
-        l2fc = math.log(fc, 2)
-        rscript += 'resSig <- res[(!is.na(res$padj) & (res$padj < %f) & \
-        (abs(res$log2FoldChange)> %f)), ]\n' % (pval, l2fc)
-        rscript += 'write.table(resSig, file="%s_sigdiff_gene_TE.txt",sep="\\t", quote=F)\n' % prj_name
-
-    else:
-        # Quantile normalization to calculate fold change
-        if norm == 'quant':
-            rscript += 'colnum <- length(data)\n'
-            rscript += 'rownum <- length(data[,1])\n'
-            rscript += 'ordMatrix <- matrix(nrow=rownum,ncol=colnum)\n'
-            rscript += 'ordIdx <- matrix(nrow=rownum,ncol=colnum)\n'
-            rscript += 'for (i in 1:colnum){\n'
-            rscript += '  a.sort <- sort(data[,i],index.return=T)\n'
-            rscript += '  ordMatrix[,i] <- a.sort$x\n'
-            rscript += '  ordIdx[,i] <- a.sort$ix\n'
-            rscript += '}\n'
-            rscript += 'rowAvg <- rowMeans(ordMatrix)\n'
-            rscript += 'data.q.norm <- matrix(nrow=rownum,ncol=colnum)\n'
-            rscript += 'for (i in 1:colnum){\n'
-            rscript += '  data.q.norm[,i] <- rowAvg[order(ordIdx[,i])]\n'
-            rscript += '}\n'
-            rscript += 'colnames(data.q.norm) <- colnames(data)\n'
-            rscript += 'rownames(data.q.norm) <- rownames(data)\n'
-            if len(tfiles) > 1:
-                rscript += 'sample1Mean <- rowMeans(data.q.norm[,1:%s],na.rm=T)\n' % len(tfiles)
-            else:
-                rscript += 'sample1Mean <- data.q.norm[,1]\n'
-            group2_start = len(tfiles) + 1
-            group2_stop = group2_start + len(cfiles)
-            if len(cfiles) > 1:
-                rscript += 'sample2Mean <- rowMeans(data.q.norm[,%s:%s,na.rm=T)\n' % (group2_start, group2_stop)
-            else:
-                rscript += 'sample2Mean <- data.q.norm[,%s]\n' % group2_start
-            rscript += 'FoldChange <- (sample2Mean/sample1Mean)\n'
-            rscript += 'log2FoldChange <- log2(FoldChange)\n'
-
-        # Normalize by RPM (reads per million mapped)
-        if norm == 'TC':
-            min_libSize = min(rpm_val)
-            rpm_vec = ','.join(str(x/min_libSize) for x in rpm_val)
-            rscript += 'tc <- c(%s)\n' % rpm_vec
-
-        # Performing differential analysis using DESeq
-        rscript += 'suppressPackageStartupMessages(library(DESeq))\n'
-        rscript += 'cds <- newCountDataSet(data,groups)\n'
-        if norm == 'TC':
-            rscript += 'cds$sizeFactor = tc\n'
-        else:
-            rscript += 'cds <- estimateSizeFactors(cds)\n'
-        if len(tfiles) == 1 and len(cfiles) == 1:
-            rscript += 'cds <- estimateDispersions(cds,method="blind",sharingMode="fit-only",fitType="local")\n'
-        elif len(tfiles) > 1 and len(cfiles) > 1:
-            rscript += 'cds <- estimateDispersions(cds,method="per-condition")\n'
-        else:
-            rscript += 'cds <- estimateDispersions(cds,method="pooled")\n'
-
-        rscript += 'res <- nbinomTest(cds,"CGroup","TGroup")\n'
-
-        # Generating output table
-        if norm == 'quant':
-            rscript += 'res_fc <- cbind(res$id,sample1Mean,sample2Mean,FoldChange,log2FoldChange,res$pval,res$padj)\n'
-            rscript += 'colnames(res_fc) = c("id","sample1Mean","sample2Mean",\
-            "FoldChange","log2FoldChange","pval", "padj")\n'
-        else:
-            rscript += 'res_fc <- res\n'
-        rscript += 'write.table(res_fc, file="%s_gene_TE_analysis.txt", sep="\\t",quote=F,row.names=F)\n' % prj_name
-
-        # Generating table of "significant" results
-
-        l2fc = math.log(fc, 2)
-        if norm == 'quant':
-            rscript += 'resSig <- res_fc[(!is.na(res_fc[,7]) & (res_fc[,7] < %f) & \
-            (abs(as.numeric(res_fc[,5])) > %f)), ]\n' % (pval, l2fc)
-        else:
-            rscript += 'resSig <- res_fc[(!is.na(res_fc$padj) & (res_fc$padj < %f) & \
-            (abs(res_fc$log2FoldChange)> %f)), ]\n' % (pval, l2fc)
-        rscript += 'write.table(resSig, file="%s_sigdiff_gene_TE.txt",sep="\\t", quote=F, row.names=F)\n' % (prj_name)
-
-    return rscript
-
-
 # Main function of script
 def main():
     """Start TEtranscripts......parse options......"""
@@ -832,25 +726,23 @@ def main():
     output_count_tbl(tsamples_tbl, csamples_tbl, f_cnt_tbl)
     rpm_val = tsamples_rpm + csamples_rpm
 
-    # Obtaining R-code for differential analysis
-
-    rscript = write_R_code(f_cnt_tbl, args.tfiles, args.cfiles, args.prj_name, args.DESeq, args.norm, args.pval,
-                           args.fc, rpm_val, args.min_read)
-
-    if not args.DESeq:
-        f_rscript = args.prj_name + '_DESeq2.R'
-    else:
-        f_rscript = args.prj_name + '_DESeq.R'
-
-    rcode = open('%s' % f_rscript, 'w')
-    rcode.write(rscript)
-    rcode.close()
-
-    # Running R-code for differential analysis
+    # Run the dependency-free Python differential analysis while preserving the
+    # historical count-table and result-table file contracts.
     info("Performing differential analysis ...\n")
     try:
-        subprocess.call(['Rscript', f_rscript])
-    except:
+        run_differential_analysis(
+            f_cnt_tbl,
+            len(args.tfiles),
+            len(args.cfiles),
+            args.prj_name,
+            legacy_deseq=args.DESeq,
+            normalization=args.norm,
+            padj_cutoff=args.pval,
+            fold_change_cutoff=args.fc,
+            library_sizes=rpm_val,
+            min_read=args.min_read,
+        )
+    except Exception:
         sys.stderr.write("Error in running differential analysis! \n")
         sys.stderr.write("Error: %s \n" % str(sys.exc_info()[1]))
         sys.stderr.write("[Exception type: %s, raised in %s:%d] \n" %
