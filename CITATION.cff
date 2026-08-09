@@ -1,0 +1,50 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: TEtranscripts
+message: >-
+  If using the software in a publication, please cite using
+  the metadata in this file
+type: software
+authors:
+  - given-names: Molly
+    family-names: Gale Hammell
+    email: Molly.GaleHammell@nyulangone.org
+    affiliation: >-
+      Cold Spring Harbor Laboratory, Dartmouth College, NYU
+      Grossman School of Medicine
+    orcid: 'https://orcid.org/0000-0003-0405-8392'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.4792836
+    description: Concept DOI of the work
+repository-code: 'https://github.com/mhammell-laboratory/TEtranscripts'
+url: 'https://www.mghlab.org/software/tetranscripts'
+abstract: >-
+  TEtranscripts and TEcount takes RNA-seq (and similar data)
+  and annotates reads to both genes & transposable elements.
+  TEtranscripts then performs differential analysis using
+  DESeq2.
+keywords:
+  - TE
+  - transposable element
+  - differential enrichment
+license: GPL-3.0
+preferred-citation:
+  type: article
+  title: "TEtranscripts: a package for including transposable elements in differential expression analysis of RNA-seq datasets"
+  authors:
+    - family-names: Jin
+      given-names: Ying
+    - family-names: Tam
+      given-names: Oliver H
+    - family-names: Paniagua
+      given-names: Eric
+    - family-names: Gale Hammell
+      given-names: Molly
+  year: 2015
+  journal: "Bioinformatics"
+  volume: 31
+  issue: 22
+  doi: "10.1093/bioinformatics/btv422"
