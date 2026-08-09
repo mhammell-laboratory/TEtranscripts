@@ -122,6 +122,19 @@ An analysis command uses the same TEtranscripts arguments as a local install::
 
   docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/data" tetranscripts:local -t treatment.bam -c control.bam --GTF genes.gtf --TE transposons.gtf --project example
 
+The default image is deliberately Python-native and does not contain R. For
+reproducing historical analyses, validating the native implementation against
+Bioconductor, or running other R-based compatibility work, the same Dockerfile
+also provides an optional ``legacy`` target containing R, DESeq, and DESeq2::
+
+  docker build --target legacy --tag tetranscripts:legacy .
+  docker run --rm --entrypoint Rscript tetranscripts:legacy -e 'library(DESeq); library(DESeq2); sessionInfo()'
+
+Building the legacy target does not change the current TEtranscripts command:
+its default and ``--DESeq`` modes remain Python-native. The additional target
+provides the historical R packages explicitly when reproducibility or direct
+comparison requires them.
+
 
 Alternative Singularity Installation for HPC
 --------------------------------------------
