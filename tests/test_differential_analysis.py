@@ -123,13 +123,29 @@ class DifferentialAnalysisTests(unittest.TestCase):
     def test_all_dispersion_fit_and_sharing_modes_are_supported(self):
         counts = [[10, 12, 9, 11], [100, 130, 20, 25], [5, 8, 40, 55]]
         for fit_type in ("local", "parametric", "mean"):
-            for sharing_mode in ("maximum", "fit-only", "gene-est-only"):
+            for sharing_mode in ("maximum", "fit-only", "gene-est-only", "shrinkage"):
                 with self.subTest(fit_type=fit_type, sharing_mode=sharing_mode):
                     cds = newCountDataSet(counts, ["T", "T", "C", "C"])
                     estimateSizeFactors(cds)
                     estimateDispersions(cds, fitType=fit_type, sharingMode=sharing_mode)
                     self.assertEqual(len(cds.dispersions), len(counts))
                     self.assertTrue(all(value >= 0 for value in cds.dispersions))
+
+    def test_shrinkage_dispersion_lies_between_gene_and_fitted_estimates(self):
+        cds = newCountDataSet(
+            [[10, 12, 9, 11], [100, 130, 20, 25], [5, 8, 40, 55]],
+            ["T", "T", "C", "C"],
+        )
+        estimateSizeFactors(cds)
+        estimateDispersions(cds, sharingMode="shrinkage")
+        for raw, fitted, final in zip(
+            cds.raw_dispersions, cds.fitted_dispersions, cds.dispersions
+        ):
+            if raw is None or raw <= 0:
+                self.assertEqual(final, fitted)
+            else:
+                self.assertGreaterEqual(final, min(raw, fitted))
+                self.assertLessEqual(final, max(raw, fitted))
 
     def test_dispersion_options_are_validated(self):
         cds = newCountDataSet([[1, 2], [2, 3]], ["A", "B"])

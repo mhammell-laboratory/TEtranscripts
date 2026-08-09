@@ -246,13 +246,15 @@ def estimateDispersions(cds, method="pooled", sharingMode="maximum", fitType="pa
     """Estimate feature dispersions using the modes TEtranscripts relied on.
 
     Supported methods are ``blind``, ``pooled``, and ``per-condition``.  The
-    historical ``fit-only`` and ``maximum`` sharing modes are preserved. Both
-    the parametric mean relationship and robust local smoothing are available.
+    historical ``fit-only`` and ``maximum`` sharing modes are preserved.
+    ``shrinkage`` supplies a lightweight log-scale compromise between gene-wise
+    and fitted estimates for the modern DESeq2-compatible path. Both the
+    parametric mean relationship and robust local smoothing are available.
     """
 
     if method not in ("blind", "pooled", "per-condition"):
         raise ValueError("unsupported dispersion method: %s" % method)
-    if sharingMode not in ("maximum", "fit-only", "gene-est-only"):
+    if sharingMode not in ("maximum", "fit-only", "gene-est-only", "shrinkage"):
         raise ValueError("unsupported sharing mode: %s" % sharingMode)
     if fitType not in ("local", "parametric", "mean"):
         raise ValueError("unsupported dispersion fit type: %s" % fitType)
@@ -296,6 +298,11 @@ def estimateDispersions(cds, method="pooled", sharingMode="maximum", fitType="pa
         final = fitted[:]
     elif sharingMode == "gene-est-only":
         final = [fit if value is None else max(value, 1e-8) for value, fit in zip(raw, fitted)]
+    elif sharingMode == "shrinkage":
+        final = [
+            fit if value is None or value <= 0 else math.sqrt(value * fit)
+            for value, fit in zip(raw, fitted)
+        ]
     else:
         final = [fit if value is None else max(value, fit) for value, fit in zip(raw, fitted)]
 
@@ -613,7 +620,7 @@ def run_differential_analysis(
     elif legacy_deseq and treatment_count > 1 and control_count > 1:
         estimateDispersions(cds, method="per-condition")
     else:
-        estimateDispersions(cds, method="pooled")
+        estimateDispersions(cds, method="pooled", sharingMode="shrinkage")
 
     analysis_filename = project_name + "_gene_TE_analysis.txt"
     significant_filename = project_name + "_sigdiff_gene_TE.txt"
