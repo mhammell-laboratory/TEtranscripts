@@ -14,7 +14,7 @@ if REPOSITORY_ROOT not in sys.path:
 from TEToolkit.DifferentialAnalysis import _two_sided_count_test
 
 
-TOTALS = (100, 1000, 5000, 10000)
+TOTALS = (100, 1000, 5000, 10000, 20000)
 DISPERSIONS = (0.0, 0.1)
 
 

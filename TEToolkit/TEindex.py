@@ -87,10 +87,12 @@ class BinaryTree:
 
         @returns number of children: 0, 1, 2
         """
+        if self.root is None:
+            return 0
         cnt = 0
-        if self.left:
+        if self.root.left:
             cnt += 1
-        if self.right:
+        if self.root.right:
             cnt += 1
         return cnt
 
@@ -169,6 +171,7 @@ class BinaryTree:
         if oldRoot.isRoot():
             self.root = newRoot
             newRoot.isroot = True
+            oldRoot.isroot = False
         else:
             if oldRoot.isLeftChild():
                 oldRoot.parent.left = newRoot
@@ -190,6 +193,7 @@ class BinaryTree:
         if oldRoot.isRoot():
             self.root = newRoot
             newRoot.isroot = True
+            oldRoot.isroot = False
         else:
             if oldRoot.isLeftChild():
                 oldRoot.parent.left = newRoot
@@ -298,22 +302,11 @@ class TEfeatures:
             return -1
 
     def getFamilyID(self, chromosome, start, end):
-        binID = start//TEindex_BINSIZE
-        endbinID = end//TEindex_BINSIZE + 1
-
-        if chromosome in self.indexlist:
-            index = self.indexlist[chromosome]
-            (node, RBnode) = index.lookup(binID, index.root, None, None)
-
-            if node is not None and node.overlaps(binID, endbinID):
-                full_name = (node.getName()).split(':')
-                famid = full_name[2]
-                return famid
-            else:
-                return None
-
-        else:
+        overlaps = self.findOvpTE(chromosome, start, end)
+        if not overlaps:
             return None
+        full_name = self.getFullName(overlaps[0])
+        return full_name.split(':')[2]
 
     def findOvpTE(self, chrom, start, end):
         startbinID = start//TEindex_BINSIZE
@@ -337,7 +330,10 @@ class TEfeatures:
             telist = RBnode.overlaps(start, end)
             name_idx_list.extend(telist)
 
-        return name_idx_list
+        # A single instance is inserted into every genomic bin it spans.
+        # Preserve annotation order while ensuring a query crossing a bin
+        # boundary does not report that instance more than once.
+        return list(dict.fromkeys(name_idx_list))
 
     def TE_annotation(self, iv_seq):
         TEs = []

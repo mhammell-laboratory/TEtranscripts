@@ -104,6 +104,10 @@ class NormalizationTests(unittest.TestCase):
         self.assertEqual(treatment_factors, [4.0, 2.0, 10.0])
         self.assertEqual(control_factors, [1.0, 5.0])
 
+    def test_sequence_depth_rejects_an_empty_library(self):
+        with self.assertRaisesRegex(ValueError, "library sizes must be positive"):
+            seq_depth([FakeSample("empty", 0)], [], [FakeSample("control", 10)], [])
+
     def test_normalize_routes_supported_methods(self):
         arguments = ([], [], [], [], "hg38", "project")
         with mock.patch("TEToolkit.Normalization.seq_depth", return_value=([], [])) as depth:

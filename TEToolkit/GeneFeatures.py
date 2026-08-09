@@ -40,7 +40,7 @@ class GFF_Reader( ):
    def __iter__( self ):
       self.line_no = 0
       if self.filename.lower().endswith( ( ".gz" , ".gzip" ) ):
-            lines = gzip.open( self.filename )
+            lines = gzip.open( self.filename, "rt" )
       else:
             lines = open( self.filename )
 

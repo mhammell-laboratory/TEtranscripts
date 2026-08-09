@@ -117,7 +117,7 @@ def fetch_exon(chrom, st, cigar, direction, fileformat):
     exon_bound = []
 
     for c, s in cigar:  # code and size
-        if c == 0:  # match
+        if c in (0, 7, 8):  # M, =, and X consume query and reference
             if direction == 0:
                 exon_bound.append([chrom, chrom_st, chrom_st + s - 1, "."])
             if direction == 1:
@@ -131,8 +131,8 @@ def fetch_exon(chrom, st, cigar, direction, fileformat):
             chrom_st += s
         elif c == 3:  # gap or intron
             chrom_st += s
-        elif c == 4:  # soft clipping. We do NOT include soft clip as part of exon
-            chrom_st += s
+        elif c in (4, 5, 6):  # soft/hard clipping and padding do not consume reference
+            continue
         else:
             continue
     return exon_bound
@@ -255,18 +255,21 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
             aligned_read = next(samfile)
         except StopIteration:
             morereads = False
-            prev_read_name = 'lastread'
-            pass
+            aligned_read = None
 
-        if aligned_read.is_unmapped or aligned_read.is_duplicate or aligned_read.is_qcfail:
+        if aligned_read is not None and (
+                aligned_read.is_unmapped or aligned_read.is_duplicate or aligned_read.is_qcfail):
             continue
 
-        added_flag_pos = aligned_read.query_name.find('/')
-        if added_flag_pos == -1:
-            cur_read_name = aligned_read.query_name
+        if aligned_read is None:
+            cur_read_name = '__TECOUNT_EOF__'
         else:
-            cur_read_name = aligned_read.query_name[:added_flag_pos]
-        if aligned_read.is_paired:  # this is not reliable if read mate is unmapped
+            added_flag_pos = aligned_read.query_name.find('/')
+            if added_flag_pos == -1:
+                cur_read_name = aligned_read.query_name
+            else:
+                cur_read_name = aligned_read.query_name[:added_flag_pos]
+        if aligned_read is not None and aligned_read.is_paired:  # this is not reliable if read mate is unmapped
             paired = True
             if cur_read_name == prev_read_name or prev_read_name == "":
                 prev_read_name = cur_read_name
@@ -334,7 +337,7 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
                 prev_read_name = cur_read_name
                 continue
             else:  # a new read
-                if tmp_cnt < 10000:
+                if aligned_read is not None and tmp_cnt < 10000:
                     avgReadLength += aligned_read.query_length
                     tmp_cnt += 1
 
@@ -379,6 +382,8 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
         multi_read1 = []
         multi_read2 = []
         prev_read_name = cur_read_name
+        if aligned_read is None:
+            continue
         if not aligned_read.is_paired:
             alignments_per_read.append((aligned_read, None))
         else:
@@ -397,8 +402,6 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
         ss = sum(te_counts)
         sys.stderr.write("uniq te counts = %s \n" % repr(int(ss)))
 
-        te_tmp_counts = [0] * len(te_counts)
-
         if numItr > 0:
             try:
                 ''' iterative optimization on TE reads '''
@@ -412,7 +415,7 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
                     raise
                 new_te_multi_counts = [0] * len(te_counts)
                 if len(multi_reads) > 0:
-                    new_te_multi_counts = EMestimate(teIdx, multi_reads, te_tmp_counts, te_multi_counts,
+                    new_te_multi_counts = EMestimate(teIdx, multi_reads, te_counts, te_multi_counts,
                                                      numItr, avgReadLength)
             except:
                 sys.stderr.write("Error in optimization\n")
@@ -459,10 +462,7 @@ def resolve_annotation_ambiguity(counts, leftOvers):
     for annlist, w in leftOvers:
         readslist = {}
         total = 0.0
-        size = len(annlist)
         ww = 1.0 * w
-        if size > 1:
-            ww = ww / size
 
         for ann in annlist:
             for a in ann:
@@ -476,7 +476,7 @@ def resolve_annotation_ambiguity(counts, leftOvers):
                 counts[a] += v
         else:
             for a in readslist:
-                counts[a] = ww / len(readslist)
+                counts[a] += ww / len(readslist)
 
 
 def parse_annotations_TE(multi_reads, annot_TE, uniq_counts, multi_counts, leftOver_list):
@@ -505,27 +505,19 @@ def output_count_tbl(tbl, prefix):
     try:
         f = open("{}.cntTable".format(prefix), 'w')
     except IOError:
-        sys.stderr.write("Cannot create report file %s ! \n" % fname)
+        sys.stderr.write("Cannot create report file %s ! \n" % (prefix + ".cntTable"))
         sys.exit(1)
     else:
-        cnt_tbl = {}
-        header = "gene/TE"
-        keys = set([])
-        for tsmp in tbl:
-            keys = keys.union(list(tbl[tsmp].keys()))
-            header += "\t"+tsmp
-            cnts = tbl[tsmp]
+        sample_names = list(tbl.keys())
+        keys = set()
+        for sample_name in sample_names:
+            keys.update(tbl[sample_name].keys())
+        cnt_tbl = dict((key, []) for key in keys)
+        header = "gene/TE" + "".join("\t" + name for name in sample_names)
+        for sample_name in sample_names:
+            cnts = tbl[sample_name]
             for k in keys:
-                val = 0
-                if k in cnts:
-                    val = cnts[k]
-
-                if k in cnt_tbl:
-                    cnt_tbl[k].append(int(val))
-
-                else:
-                    vallist = [int(val)]
-                    cnt_tbl[k] = vallist
+                cnt_tbl[k].append(int(cnts.get(k, 0)))
 
         # output
         f.write(header + "\n")
@@ -627,4 +619,3 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         sys.stderr.write("User interrupt! \n")
         sys.exit(0)
-

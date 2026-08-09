@@ -102,6 +102,17 @@ class DifferentialAnalysisTests(unittest.TestCase):
             sorted(row[1] for row in normalized),
         )
 
+    def test_quantile_normalization_averages_tied_ranks(self):
+        counts = [[1, 1], [1, 2], [3, 3]]
+        self.assertEqual(
+            _quantile_normalize(counts),
+            [[1.25, 1.0], [1.25, 1.5], [3.0, 3.0]],
+        )
+        permuted = [counts[index] for index in (2, 0, 1)]
+        normalized = _quantile_normalize(permuted)
+        self.assertEqual([normalized[index] for index in (1, 2, 0)],
+                         [[1.25, 1.0], [1.25, 1.5], [3.0, 3.0]])
+
     def test_all_historical_dispersion_modes_are_supported(self):
         counts = [
             [10, 12, 9, 11],
@@ -235,6 +246,47 @@ class DifferentialAnalysisTests(unittest.TestCase):
                     min(expected, 1.0),
                     places=10,
                 )
+
+    def test_dispersed_count_test_remains_exact_above_old_cutoff(self):
+        observed, total, probability, dispersion = 1300, 10001, 0.1, 0.5
+        concentration = 1.0 / dispersion
+        alpha = probability * concentration
+        beta = (1.0 - probability) * concentration
+        log_pmf = lambda value: _log_beta_binomial_pmf(value, total, alpha, beta)
+        observed_log_probability = log_pmf(observed)
+        expected = sum(
+            math.exp(log_pmf(value))
+            for value in range(total + 1)
+            if log_pmf(value) <= observed_log_probability + 1e-12
+        )
+        self.assertAlmostEqual(
+            _two_sided_count_test(observed, total, probability, dispersion),
+            min(expected, 1.0),
+            places=10,
+        )
+
+    def test_nbinom_test_is_invariant_to_sample_order_and_condition_reversal(self):
+        counts = [[100, 120, 10, 12], [30, 28, 31, 29], [3, 4, 70, 80]]
+
+        def analyze(matrix, conditions, numerator="T", denominator="C"):
+            cds = newCountDataSet(matrix, conditions, row_names=["up", "same", "down"])
+            estimateSizeFactors(cds)
+            estimateDispersions(cds, method="per-condition")
+            return nbinomTest(cds, denominator, numerator)
+
+        baseline = analyze(counts, ["T", "T", "C", "C"])
+        order = (1, 0, 3, 2)
+        permuted = analyze(
+            [[row[index] for index in order] for row in counts],
+            ["T", "T", "C", "C"],
+        )
+        reversed_rows = analyze(counts, ["T", "T", "C", "C"], "C", "T")
+        for original, shuffled, reversed_row in zip(baseline, permuted, reversed_rows):
+            self.assertAlmostEqual(original["pval"], shuffled["pval"], places=12)
+            self.assertAlmostEqual(original["padj"], shuffled["padj"], places=12)
+            self.assertAlmostEqual(original["log2FoldChange"],
+                                   -reversed_row["log2FoldChange"], places=12)
+            self.assertAlmostEqual(original["pval"], reversed_row["pval"], places=12)
 
     def test_default_analysis_preserves_deseq2_table_contract(self):
         with tempfile.TemporaryDirectory() as directory:

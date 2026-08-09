@@ -33,6 +33,11 @@ def normalize(method,treatment,tinput,control,cinput,species,prj_name) :
 def seq_depth(list1,list1input,list2,list2input):
 
     max_size = 0.0
+    samples = list(list1) + list(list1input) + list(list2) + list(list2input)
+    if any(sample.libsize() <= 0 for sample in samples):
+        raise ValueError(
+            "library sizes must be positive for sequence-depth normalization"
+        )
 
     for i in range(len(list1)):
         tsmp = list1[i]

@@ -1,14 +1,19 @@
 # Exact-test benchmark
 
 `benchmark_exact_test.py` exercises the exact two-sided binomial and
-beta-binomial code used by the Python-native legacy DESeq path. The exact path
-enumerates totals through 10,000; larger totals use the continuity-corrected
-normal approximation.
+beta-binomial code used by the Python-native legacy DESeq path. The ordinary
+binomial path enumerates totals through 10,000 and then uses a
+continuity-corrected normal approximation. Dispersed beta-binomial tests remain
+exact above that boundary because their skew and heavy tails can make the
+normal approximation materially discontinuous.
 
 The implementation advances from `P(k)` to `P(k + 1)` with the distribution's
 probability recurrence. Runtime therefore scales linearly with the total count
 and number of tested features, while avoiding the repeated `lgamma` calls that
-previously dominated work near the cutoff. Memory use is constant.
+previously dominated work near the cutoff. Memory use is constant. The included
+20,000-count workload makes the cost of the always-exact dispersed path visible;
+very high-total legacy-DESeq analyses should expect proportionally longer test
+time.
 
 Run the reproducible workload with:
 

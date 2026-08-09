@@ -370,9 +370,12 @@ def _two_sided_count_test(observed, total, probability, dispersion):
         variance = total * probability * (1.0 - probability)
 
     # Exact two-sided enumeration is inexpensive for the low/moderate feature
-    # counts where discreteness matters.  A continuity-corrected normal tail
-    # avoids work proportional to very large RNA-seq library counts.
-    if total <= 10000:
+    # counts where discreteness matters.  The beta-binomial can remain strongly
+    # skewed or heavy-tailed at large totals, so a normal approximation is not
+    # reliable there; retain exact recurrence enumeration for dispersed data.
+    # The continuity-corrected normal tail is limited to the ordinary binomial
+    # case above the historical cutoff.
+    if total <= 10000 or dispersion > 1e-10:
         observed_log_probability = log_pmf(observed)
         probability_sum = 0.0
         if dispersion > 1e-10:
@@ -524,8 +527,16 @@ def _quantile_normalize(counts):
     ]
     result = [[0.0] * column_count for _ in range(row_count)]
     for column in range(column_count):
-        for rank, (_, original_row) in enumerate(sorted_columns[column]):
-            result[original_row][column] = rank_means[rank]
+        rank = 0
+        while rank < row_count:
+            stop = rank + 1
+            value = sorted_columns[column][rank][0]
+            while stop < row_count and sorted_columns[column][stop][0] == value:
+                stop += 1
+            tied_mean = _mean(rank_means[rank:stop])
+            for _, original_row in sorted_columns[column][rank:stop]:
+                result[original_row][column] = tied_mean
+            rank = stop
     return result
 
 
