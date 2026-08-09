@@ -61,6 +61,13 @@ jobs:
           --build-arg VCS_REF="$GITHUB_SHA"
           --tag tetranscripts:test
           .
+      - name: Build legacy DESeq compatibility image
+        run: >-
+          docker build
+          --target legacy
+          --build-arg VCS_REF="$GITHUB_SHA"
+          --tag tetranscripts:legacy
+          .
       - name: Smoke-test both installed CLIs
         run: |
           docker run --rm tetranscripts:test --version | grep '2.2.4'
@@ -69,6 +76,11 @@ jobs:
         run: |
           docker run --rm --entrypoint python tetranscripts:test -c 'import TEToolkit.DifferentialAnalysis'
           docker run --rm --entrypoint sh tetranscripts:test -c '! command -v R && ! command -v Rscript'
+      - name: Verify the optional legacy R runtime
+        run: |
+          docker run --rm --entrypoint Rscript tetranscripts:legacy -e 'stopifnot(requireNamespace("DESeq", quietly=TRUE), requireNamespace("DESeq2", quietly=TRUE), requireNamespace("lattice", quietly=TRUE), requireNamespace("locfit", quietly=TRUE))'
+          docker run --rm --entrypoint python tetranscripts:legacy -c 'import os; assert os.getuid() == 10001'
+          test "$(docker inspect --format '{{index .Config.Labels "org.opencontainers.image.variant"}}' tetranscripts:legacy)" = 'legacy-deseq'
       - name: Verify non-root execution and writable work directory
         run: |
           docker run --rm --entrypoint python tetranscripts:test -c 'import os; assert os.getuid() == 10001'

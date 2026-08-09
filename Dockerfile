@@ -42,3 +42,26 @@ USER tetranscripts
 
 ENTRYPOINT ["TEtranscripts"]
 CMD ["--help"]
+
+
+# Optional compatibility image for reproducing the historical R analysis or
+# running legacy/native comparisons.  The default final image below continues
+# to inherit directly from ``runtime`` and therefore remains R-free.
+FROM runtime AS legacy
+
+USER root
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends \
+        r-base \
+        r-bioc-deseq \
+        r-bioc-deseq2 \
+    && rm -rf /var/lib/apt/lists/*
+
+LABEL org.opencontainers.image.description="TEtranscripts compatibility image with R, DESeq, and DESeq2" \
+      org.opencontainers.image.variant="legacy-deseq"
+
+USER tetranscripts
+
+
+# Keep the no-target Docker build as the small Python-native production image.
+FROM runtime AS final
