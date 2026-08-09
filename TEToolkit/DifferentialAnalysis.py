@@ -120,6 +120,12 @@ def estimateSizeFactors(cds, method="ratio"):
             if geo_mean > 0 and (count > 0 or not use_positive):
                 ratios.append(count / geo_mean)
         if not ratios:
+            if all(row[sample_index] == 0 for row in cds.counts):
+                raise ValueError(
+                    "cannot estimate a size factor for sample %s; "
+                    "the sample library contains only zero counts"
+                    % cds.column_names[sample_index]
+                )
             raise ValueError("cannot estimate a size factor for sample %s" % cds.column_names[sample_index])
         factor = _median(ratios)
         if factor <= 0 or not _isfinite(factor):
@@ -240,13 +246,15 @@ def estimateDispersions(cds, method="pooled", sharingMode="maximum", fitType="pa
     """Estimate feature dispersions using the modes TEtranscripts relied on.
 
     Supported methods are ``blind``, ``pooled``, and ``per-condition``.  The
-    historical ``fit-only`` and ``maximum`` sharing modes are preserved. Both
-    the parametric mean relationship and robust local smoothing are available.
+    historical ``fit-only`` and ``maximum`` sharing modes are preserved.
+    ``shrinkage`` supplies a lightweight log-scale compromise between gene-wise
+    and fitted estimates for the modern DESeq2-compatible path. Both the
+    parametric mean relationship and robust local smoothing are available.
     """
 
     if method not in ("blind", "pooled", "per-condition"):
         raise ValueError("unsupported dispersion method: %s" % method)
-    if sharingMode not in ("maximum", "fit-only", "gene-est-only"):
+    if sharingMode not in ("maximum", "fit-only", "gene-est-only", "shrinkage"):
         raise ValueError("unsupported sharing mode: %s" % sharingMode)
     if fitType not in ("local", "parametric", "mean"):
         raise ValueError("unsupported dispersion fit type: %s" % fitType)
@@ -290,6 +298,11 @@ def estimateDispersions(cds, method="pooled", sharingMode="maximum", fitType="pa
         final = fitted[:]
     elif sharingMode == "gene-est-only":
         final = [fit if value is None else max(value, 1e-8) for value, fit in zip(raw, fitted)]
+    elif sharingMode == "shrinkage":
+        final = [
+            fit if value is None or value <= 0 else math.sqrt(value * fit)
+            for value, fit in zip(raw, fitted)
+        ]
     else:
         final = [fit if value is None else max(value, fit) for value, fit in zip(raw, fitted)]
 
@@ -362,10 +375,35 @@ def _two_sided_count_test(observed, total, probability, dispersion):
     if total <= 10000:
         observed_log_probability = log_pmf(observed)
         probability_sum = 0.0
+        if dispersion > 1e-10:
+            current_log_probability = _log_beta_binomial_pmf(
+                0, total, alpha, beta
+            )
+        else:
+            current_log_probability = total * math.log1p(-probability)
+
+        # Walk the PMF using P(k + 1) / P(k).  This preserves exact
+        # enumeration while avoiding thousands of repeated lgamma calls near
+        # the historical 10,000-count cutoff.
         for value in range(total + 1):
-            current = log_pmf(value)
-            if current <= observed_log_probability + 1e-12:
-                probability_sum += math.exp(current)
+            if current_log_probability <= observed_log_probability + 1e-12:
+                probability_sum += math.exp(current_log_probability)
+            if value == total:
+                break
+            if dispersion > 1e-10:
+                current_log_probability += (
+                    math.log(total - value)
+                    - math.log(value + 1)
+                    + math.log(value + alpha)
+                    - math.log(total - value - 1 + beta)
+                )
+            else:
+                current_log_probability += (
+                    math.log(total - value)
+                    - math.log(value + 1)
+                    + math.log(probability)
+                    - math.log1p(-probability)
+                )
         return min(max(probability_sum, 0.0), 1.0)
 
     if variance <= 0:
@@ -556,6 +594,11 @@ def run_differential_analysis(
 ):
     """Run the Python-native analysis and write the historical result files."""
 
+    if treatment_count <= 0:
+        raise ValueError("treatment_count must be positive")
+    if control_count <= 0:
+        raise ValueError("control_count must be positive")
+
     column_names, row_names, counts = _read_count_table(
         count_table, treatment_count, control_count, min_read
     )
@@ -577,7 +620,7 @@ def run_differential_analysis(
     elif legacy_deseq and treatment_count > 1 and control_count > 1:
         estimateDispersions(cds, method="per-condition")
     else:
-        estimateDispersions(cds, method="pooled")
+        estimateDispersions(cds, method="pooled", sharingMode="shrinkage")
 
     analysis_filename = project_name + "_gene_TE_analysis.txt"
     significant_filename = project_name + "_sigdiff_gene_TE.txt"

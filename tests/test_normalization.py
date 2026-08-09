@@ -2,6 +2,7 @@ import os
 import struct
 import tempfile
 import unittest
+import zlib
 from unittest import mock
 
 from TEToolkit.Normalization import (
@@ -34,6 +35,53 @@ class FakeSample(object):
 
 
 class NormalizationTests(unittest.TestCase):
+    def _validate_png(self, filename, expected_size=(500, 500)):
+        with open(filename, "rb") as handle:
+            content = handle.read()
+        self.assertEqual(content[:8], b"\x89PNG\r\n\x1a\n")
+
+        chunks = []
+        offset = 8
+        while offset < len(content):
+            self.assertGreaterEqual(len(content) - offset, 12)
+            length = struct.unpack(">I", content[offset:offset + 4])[0]
+            chunk_type = content[offset + 4:offset + 8]
+            data_start = offset + 8
+            data_end = data_start + length
+            crc_end = data_end + 4
+            self.assertLessEqual(crc_end, len(content))
+            chunk_data = content[data_start:data_end]
+            expected_crc = zlib.crc32(chunk_type + chunk_data) & 0xffffffff
+            actual_crc = struct.unpack(">I", content[data_end:crc_end])[0]
+            self.assertEqual(actual_crc, expected_crc, chunk_type)
+            chunks.append((chunk_type, chunk_data))
+            offset = crc_end
+
+        self.assertEqual(offset, len(content))
+        self.assertEqual(chunks[0][0], b"IHDR")
+        self.assertEqual(chunks[-1], (b"IEND", b""))
+        self.assertEqual(sum(kind == b"IHDR" for kind, _ in chunks), 1)
+        self.assertEqual(sum(kind == b"IEND" for kind, _ in chunks), 1)
+
+        width, height, bit_depth, color_type, compression, filtering, interlace = (
+            struct.unpack(">IIBBBBB", chunks[0][1])
+        )
+        self.assertEqual((width, height), expected_size)
+        self.assertEqual((bit_depth, color_type), (8, 2))
+        self.assertEqual((compression, filtering, interlace), (0, 0, 0))
+
+        compressed = b"".join(data for kind, data in chunks if kind == b"IDAT")
+        self.assertTrue(compressed)
+        scanlines = zlib.decompress(compressed)
+        stride = width * 3 + 1
+        self.assertEqual(len(scanlines), stride * height)
+        self.assertTrue(all(scanlines[row * stride] == 0 for row in range(height)))
+        pixels = b"".join(
+            scanlines[row * stride + 1:(row + 1) * stride]
+            for row in range(height)
+        )
+        self.assertTrue(any(value != 255 for value in pixels))
+
     def test_zero_intercept_regression_matches_former_r_helper(self):
         self.assertAlmostEqual(
             _linear_scale_factor([2, 4, 6], [1, 2, 3]),
@@ -115,23 +163,13 @@ class NormalizationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             filename = os.path.join(directory, "plot.png")
             _write_scatter_png(filename, [1, 10, 100], [2, 20, 50])
-            with open(filename, "rb") as handle:
-                signature = handle.read(8)
-                chunk_length = struct.unpack(">I", handle.read(4))[0]
-                chunk_name = handle.read(4)
-                width, height = struct.unpack(">II", handle.read(8))
-            self.assertEqual(signature, b"\x89PNG\r\n\x1a\n")
-            self.assertEqual(chunk_length, 13)
-            self.assertEqual(chunk_name, b"IHDR")
-            self.assertEqual((width, height), (500, 500))
+            self._validate_png(filename)
 
     def test_scatter_plot_handles_zero_only_data(self):
         with tempfile.TemporaryDirectory() as directory:
             filename = os.path.join(directory, "empty-plot.png")
             _write_scatter_png(filename, [0, 0], [0, 0])
-            with open(filename, "rb") as handle:
-                self.assertEqual(handle.read(8), b"\x89PNG\r\n\x1a\n")
-            self.assertGreater(os.path.getsize(filename), 100)
+            self._validate_png(filename)
 
 
 if __name__ == "__main__":
