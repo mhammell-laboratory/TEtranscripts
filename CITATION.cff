@@ -8,12 +8,21 @@ message: >-
   the metadata in this file
 type: software
 authors:
+  - given-names: Ying
+    family-names: Jin
+  - given-names: Eric
+    family-names: Paniagua
+  - given-names: Oliver H
+    family-names: Tam
+    email: oliver.tam@nyulangone.org
+    affiliation: >-
+      NYU Langone Health
+    orcid: 'https://orcid.org/0000-0002-1023-3655'
   - given-names: Molly
     family-names: Gale Hammell
     email: Molly.GaleHammell@nyulangone.org
     affiliation: >-
-      Cold Spring Harbor Laboratory, Dartmouth College, NYU
-      Grossman School of Medicine
+      NYU Grossman School of Medicine
     orcid: 'https://orcid.org/0000-0003-0405-8392'
 identifiers:
   - type: doi
