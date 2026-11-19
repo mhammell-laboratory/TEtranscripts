@@ -149,7 +149,8 @@ Usage
          DEFAULT: multi
       --minread [min_read] read count cutoff. DEFAULT: 1
       -L | --fragmentLength [fragLength]
-         Average length of fragment used for single-end sequencing
+         Average length of fragment used for sequencing
+	 Can be specified for paired end if fragment length cannot be estimated
          DEFAULT: For paired-end, estimated from the input alignment file. For single-end, ignored by default.
       -i | --iteration
          maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 100
@@ -242,7 +243,8 @@ Usage
             multi       (distribute among all alignments).
          DEFAULT: multi
       -L | --fragmentLength [fragLength]
-         Average length of fragment used for single-end sequencing
+         Average length of fragment used for sequencing
+	 Can be used for paired-end if fragment length cannot be estimated
          DEFAULT: For paired-end, estimated from the input alignment file. For single-end, ignored by default.
       -i | --iteration
          maximum number of iterations used to optimize multi-reads assignment. DEFAULT: 100

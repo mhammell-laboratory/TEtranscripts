@@ -68,8 +68,9 @@ def prepare_parser():
                         help='minimum fragment length. DEFAULT:0')
     parser.add_argument('-L', '--fragmentLength', metavar='fragLength', dest='fragLength', type=int, default=0,
                         help='average fragment length for single end reads. \
-                        For paired-end, estimated from the input alignment file. DEFAULT: for paired-end, \
-                        estimate from the input alignment file; for single-end, ignored by default.')
+                        Can be used for paired-end if fragment length cannot \
+                        be estimated from input alignment file. \
+                        DEFAULT: for paired-end, estimate from the input alignment file; for single-end, ignored by default.')
     parser.add_argument('--verbose', metavar='verbose', dest='verbose', type=int, nargs='?', default=2, const=3,
                         help='Set verbose level. 0: only show critical message, 1: show additional warning message, \
                         2: show process information, 3: show debug messages. DEFAULT:2')
@@ -407,8 +408,10 @@ def count_transcript_abundance(filename, fileformat, geneIdx, teIdx, stranded, t
                     avgReadLength = fragLength
                 elif avgReadLength > 0:
                     avgReadLength = avgReadLength // tmp_cnt
+                elif fragLength > 0:
+                    avgReadLength = fragLength
                 else:
-                    sys.stderr.write("There are not enough reads to estimate fragment length. \n")
+                    sys.stderr.write("There are insufficient unique mappers to estimate fragment length. Please specify an expected fragment length using the -L argument. \n")
                     raise
                 new_te_multi_counts = [0] * len(te_counts)
                 if len(multi_reads) > 0:
